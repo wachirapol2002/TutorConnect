@@ -1,17 +1,46 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <!-- nav bar -->
+    <nav class="navbar navbar-light sticky-top border-bottom bg-dark" style="height: 10vh;">
+            <div class="container-fluid">
+
+                 
+      
+            </div>
+    </nav>
+
+    <!-- router-view -->
+    <router-view :key="$route.fullPath" />
+
+
+    <footer class="bg-dark" style="height: 10vh;"></footer>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    return {
+      center:{
+          'd-flex': true,
+          'justify-content-center':true,
+          'align-items-center':true
+      },
+      hoverBooking: false,
+      hoverCheckIN: false,
+      hoverPayment: false,
+      hoverVIP: false,
+      hoverRegister: false,
+    };
+  },
+  methods: {
+    logout () {
+      this.$cookies.keys().forEach(cookie => this.$cookies.remove(cookie))
+      alert("Logout");
+      this.$router.push({path: '/user/login'})
+    },
+  },
+};
 </script>
 
 <style>
