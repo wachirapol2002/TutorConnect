@@ -232,7 +232,7 @@
     methods: {
       getTables() {
         axios
-          .get("http://44.206.165.83:3000", {
+          .get("http://localhost:8080", {
             params: {
               search: this.search,
             },

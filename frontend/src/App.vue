@@ -10,15 +10,31 @@
       }">
         <div class="container-fluid px-0" :style="{color: 'white', fontWeight: 'bold', fontSize: '4vh',}">
           <div class="col-6 d-flex justify-content-start align-items-center" :style="{backgroundColor: ''}">
-            <div class="mx-2" :class="center">
-              <img :src="require('./assets/logo.png')" style="max-height:7.5vh; width: auto;">
-            </div>
+            <router-link to="/">
+              <div class="mx-2" :class="center">
+                <img :src="require('./assets/logo.png')" style="max-height:7.5vh; width: auto;">
+              </div>
+            </router-link>
             <div>TutorConnect</div>
+
+            <router-link to="/tutor/register" :class="center" style="text-decoration: none; color: white;">
+              <div class="px-3" :style="{fontSize: '3vh'}">สมัครติวเตอร์</div>
+            </router-link>
+
+
+
           </div>
           <div class="col-6 d-flex flex-row-reverse justify-content-start align-items-center">
-            <div class="px-3" :style="{fontSize: '3vh'}">เข้าสู่ระบบ</div>
-            <div class="px-3" :style="{fontSize: '3vh'}">สมัครสมาชิก</div>
-            <div class="px-3" :style="{fontSize: '3vh'}">หาติวเตอร์</div>
+
+            <router-link to="/login" :class="center" style="text-decoration: none; color: white;">
+              <div class="px-3" :style="{fontSize: '3vh'}">เข้าสู่ระบบ</div>
+            </router-link>
+            <router-link to="/student/register" :class="center" style="text-decoration: none; color: white;">
+              <div class="px-3" :style="{fontSize: '3vh'}">สมัครสมาชิก</div>
+            </router-link>
+            <router-link to="/" :class="center" style="text-decoration: none; color: white;">
+              <div class="px-3" :style="{fontSize: '3vh'}">หาติวเตอร์</div>
+            </router-link>
           </div>
 
               
@@ -27,8 +43,10 @@
     </nav>
 
     <!-- router-view -->
-    <div class="container-fluid d-flex flex-column align-items-center mb-5" style="min-height: 90vh">
+    <div class="container-fluid bg-light d-flex flex-column align-items-center pb-5" style="min-height: 90vh">
+
       <router-view :key="$route.fullPath" />
+
     </div>
 
     <footer
