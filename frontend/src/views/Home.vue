@@ -132,7 +132,9 @@
         <div class="container py-4" style="background-color: #E5DBD9;">
           <div class="row justify-content-center g-3">
             <!-- Card 1 -->
+            
             <div class="col-md-4">
+              <router-link to="/tutor/profile" style="text-decoration: none;">
               <div class="card shadow-sm text-center">
                 <div class="card-body">
                   <div class="rounded-circle bg-light mx-auto mb-3" style="width: 100px; height: 100px;">
@@ -153,6 +155,7 @@
                   </div>
                 </div>
               </div>
+            </router-link>
             </div>
 
             <!-- Card 2 -->
@@ -415,6 +418,9 @@
 .card:hover {
   transform: scale(1.05);
 }
+.form-label{
+    font-weight: 500;
+  }
 
 </style>
   

@@ -14,7 +14,7 @@
       class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
       style="width: 50vw;"
     >
-      <div :class="center" :style="{fontSize: '4vh',}">โปรไฟล์การสอน</div>
+      <div :class="center" :style="{fontSize: '4vh',}">ข้อมูลการสอน</div>
       <!-- form -->
       <form name="Information">
         <!-- Introduce -->
@@ -75,7 +75,7 @@
             <div class="form-group col-3 mx-0">
               <button type="button" @click="addAcademy" class="btn btn-secondary ">เพิ่มประวัติ</button>
             </div>
-            <!-- แสดงรายการวิชาที่เพิ่ม -->
+            <!-- แสดงรายการการศึกษา -->
             <ul v-if="academys.length" class="m-1 border-bottom border-2 mb-4">
               <li
                 v-for="(academy, index) in academys"
@@ -91,34 +91,53 @@
         </div>
 
         <!-- สถานทีสอน -->
-        <div class="row my-2">
-          <label class="form-label" for="place">สถานที่สอน</label>
-            <div class="form-group col-9 mx-0">
+         <!-- Leaflet Map -->
+         <label class="form-label" for="place">สถานที่สอน</label>
+         <div id="map" style="height: 40vh; width: 100%;"></div>
+        <div class="row my-4">
+          <!-- พิกัดสถานที่ -->
+            <div class="form-group col-6 mx-0">
               <input
-                v-model="place"
+                v-model="placePosition"
                 type="text"
-                placeholder="สถานที่เปิดสอน"
+                placeholder="คลิกบนแผนที่เพื่อเลือก (ออนไลน์ไม่ต้องเลือก)"
+                class="form-control"
+                readonly
+              />
+            </div>
+            <!--ชื่อสถานที่ -->
+            <div class="form-group col-3 mx-0 px-0">
+              <input
+                v-model="placeName"
+                type="text"
+                placeholder="ระบุชื่อสถานที่"
                 class="form-control"
               />
             </div>
-            <!-- ปุ่มเพิ่มประวัติ -->
+            <!-- ปุ่มเพิ่มสถานที่ -->
             <div class="form-group col-3 mx-0">
-              <button type="button" @click="addPlace" class="btn btn-secondary ">เพิ่มประวัติ</button>
+              <button type="button" @click="addPlace" class="btn btn-secondary ">เพิ่มสถานที</button>
             </div>
-            <!-- แสดงรายการวิชาที่เพิ่ม -->
-            <ul v-if="places.length" class="m-1 border-bottom border-2 mb-4">
-              <li
-                v-for="(place, index) in places"
-                :key="index"
-                class="d-flex justify-content-between align-items-center my-2"
-              >
-                <span>
-                  - {{ place.name }}
-                </span>
-                <button type="button" @click="removePlace(index)" class="btn btn-danger btn-sm">ลบ</button>
-              </li>
-            </ul>
         </div>
+        <div class="row my-4">
+          <!-- แสดงรายการสถานที่ -->
+          <ul v-if="places.length" class="m-1 border-bottom border-2 mb-4">
+            <li
+              v-for="(place, index) in places"
+              :key="index"
+              class="d-flex justify-content-between align-items-center my-2"
+            >
+              <div class="col-5">
+                - {{ place.name }}
+              </div>
+              <div class="col-6">
+                {{ place.position }}
+              </div>
+              <button type="button" @click="removePlace(index)" class="btn btn-danger btn-sm">ลบ</button>
+            </li>
+          </ul>
+        </div>
+
 
         <!-- วิชาที่ต้องการสอน -->
         <div class="row my-2">
@@ -236,6 +255,8 @@ import useVuelidate from "@vuelidate/core";
 import {
   required,
 } from "@vuelidate/validators";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 export default {
   name: "TutorInfoPage",
@@ -252,7 +273,11 @@ export default {
       describe: "",
       academy: "",
       academys: [],
-      place: "",
+      map: null,       // เก็บอ็อบเจกต์แผนที่
+      marker: null,    // เก็บตำแหน่ง Marker
+      placeName: "", 
+      placePosition: "", 
+      place: "",       // เก็บค่าพิกัดที่เลือก
       places: [],
       categories: ["คณิตศาสตร์", "วิทยาศาสตร์", "ภาษาอังกฤษ"], // หมวดวิชาที่มีให้เลือก
       selectedCategory: "", // หมวดวิชาที่เลือก
@@ -261,7 +286,6 @@ export default {
       topicName: "",
       topicPrice: "",
       topics: [],
-  
       error: "",
       center: {
         "d-flex": true,
@@ -283,6 +307,7 @@ export default {
 
 },
   mounted() {
+    this.initMap(); // เรียกใช้ฟังก์ชันสร้างแผนที่
   },
   methods: {
     addAcademy() {
@@ -301,15 +326,24 @@ export default {
       this.academys.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
     },
     addPlace() {
-      if (this.place) {
+      if (this.placeName) {
         // เพิ่มวิชาใหม่เข้าไปใน Array
-        this.places.push({
-          name: this.place,
+        if (this.placePosition == "") {
+          this.places.push({
+            position: "สอนออนไลน์",
+            name: this.placeName,
+          });
+        }else{
+          this.places.push({
+          position: this.placePosition,
+          name: this.placeName,
         });
+        }
         // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-        this.place = "";
+        this.placePosition = "";
+        this.placeName = "";
       } else {
-        alert("กรุณากรอกสถานที่สอนก่อน");
+        alert("กรุณาระบุสถานที่สอนก่อน");
       }
     },
     removePlace(index) {
@@ -364,6 +398,32 @@ export default {
         this.$router.go(-1);
       }
     },
+
+    initMap() {
+      // สร้างแผนที่และกำหนดตำแหน่งเริ่มต้น
+      this.map = L.map("map").setView([13.736717, 100.523186], 13); // Bangkok
+
+      // เพิ่มแผนที่จาก OpenStreetMap
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+      }).addTo(this.map);
+
+      // เพิ่ม Marker เมื่อมีการคลิกบนแผนที่
+      this.map.on("click", this.onMapClick);
+    },
+    onMapClick(e) {
+      const { lat, lng } = e.latlng; // ดึงพิกัดจากการคลิก
+      this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+
+      // ลบ Marker ตัวเก่าถ้ามี
+      if (this.marker) {
+        this.map.removeLayer(this.marker);
+      }
+
+      // เพิ่ม Marker ใหม่ที่ตำแหน่งคลิก
+      this.marker = L.marker([lat, lng]).addTo(this.map);
+    },
   },
   watch: {
     $route(to, from) {
@@ -375,7 +435,8 @@ export default {
 </script>
 
 <style>
-.form-label{
-  font-weight: bold;
+#map {
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 </style>

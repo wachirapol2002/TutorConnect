@@ -26,6 +26,11 @@ const routes = [
         name: 'TutorInfoPage',
         component: () => import('../views/user/Tutor/TeachingInfo.vue')
     },
+    {
+        path: '/tutor/profile',
+        name: 'TutorProfilePage',
+        component: () => import('../views/TutorProfile.vue')
+    },
 ]
 
 const router = createRouter({
