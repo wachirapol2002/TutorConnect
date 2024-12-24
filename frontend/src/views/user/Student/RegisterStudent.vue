@@ -306,33 +306,33 @@ function complexPassword(value) {
       };
     },
     validations: {
-    username: {
-      required: required,
-      minLength: minLength(5),
-      maxLength: maxLength(20),
-    },
-    firstname: {
-      required: required,
-    },
-    lastname: {
-      required: required,
-    },
-    email: {
-      required: required,
-      email: email,
-    },
-    phone: {
-      required: required,
-      phone: phone,
-    },
-    password: {
-      required: required,
-      minLength: minLength(8),
-      complex: complexPassword,
-    },
-    confirmPassword: {
-      sameAs: sameAs("password"),
-    },
+      username: {
+        required: required,
+        minLength: minLength(5),
+        maxLength: maxLength(20),
+      },
+      firstname: {
+        required: required,
+      },
+      lastname: {
+        required: required,
+      },
+      email: {
+        required: required,
+        email: email,
+      },
+      phone: {
+        required: required,
+        phone: phone,
+      },
+      password: {
+        required: required,
+        minLength: minLength(8),
+        complex: complexPassword,
+      },
+      confirmPassword: {
+        sameAs: sameAs("password"),
+      },
   },
     mounted() {
     },

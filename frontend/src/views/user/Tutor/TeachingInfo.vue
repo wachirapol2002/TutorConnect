@@ -20,17 +20,19 @@
         <!-- Introduce -->
         <div class="row my-2">
           <div class="form-group col-12">
-            <label class="form-label" for="introduce">แนะนำตัวเองสั้น ๆ</label>
-            <input
+            <label class="form-label" for="introduce">ข้อความแนะนำตัว</label>
+            <textarea
               class="form-control"
               type="text"
               id="introduce"
               name="introduce"
               required
-              placeholder="คำแนะนำให้นักเรียนสนใจ"
+              placeholder="แนะนำตัวให้นักเรียนสนใจ"
               maxlength="255"
               v-model="introduce"
-            />
+              style="height: 10vh;"
+            >
+            </textarea>
             <template v-if="v$.introduce.$error">
               <p class="text-danger m-0 p-0" v-if="v$.introduce.required.$invalid">
                 ต้องกรอกข้อมูลช่องนี้
@@ -41,7 +43,7 @@
         <!-- describe -->
         <div class="row my-2">
           <div class="form-group col-12">
-            <label class="form-label" for="describe">แนะนำตัว/ประสบการณ์สอน/ความน่าสนใจ</label>
+            <label class="form-label" for="describe">ประสบการณ์สอน และ ความน่าสนใจ</label>
             <textarea
               class="form-control"
               type="text"
@@ -50,6 +52,7 @@
               required
               placeholder="เขียนบรรยายประสบการณ์สอน"
               v-model="describe"
+              style="height: 30vh;"
             >
             </textarea>
             <template v-if="v$.describe.$error">

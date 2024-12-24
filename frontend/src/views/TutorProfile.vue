@@ -1,6 +1,5 @@
 <template>
     <div id="app">
-        
         <div class="container-fluid rounded-4  border border-dark my-5 p-3 py-4" :style="{ backgroundColor: 'white' }" style="width: 80vw;">
             <!-- ส่วนข้อมูลของผู้สอน -->
             <div class="d-flex justify-content-start align-items-center" :style="{ backgroundColor: '' }">
@@ -52,7 +51,9 @@
                     </div>
                     <!-- ปุ่มส่งข้อความ -->
                     <div class="d-flex align-items-center mt-3">
-                        <button class="btn btn-warning fw-bold">ส่งข้อความ</button>
+                      <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat()">
+                          ส่งข้อความ
+                      </div>
                     </div>
                 
                 </div>
@@ -202,7 +203,10 @@
     setRating(n) {
         this.currentRating = n;
     },
-      addAcademy() {
+    chat(){
+      this.$router.push({ path: "/chat" });
+    },
+    addAcademy() {
         if (this.academy) {
           // เพิ่มวิชาใหม่เข้าไปใน Array
           this.academys.push({

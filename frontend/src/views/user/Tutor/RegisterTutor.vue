@@ -29,7 +29,7 @@
                 style="width: 100%; height: 100%; object-fit: cover;"
                 />
             </div>
-            <label class="label">รูปโปรไฟล์ผู้สอน</label>
+            <label class="label">Profile Picture</label>
 
               <label class="file-label">
                 <input
@@ -44,7 +44,7 @@
                   <span class="file-icon">
                     <i class="bi bi-upload"></i>
                   </span>
-                  <span class="file-label"> Choose an image </span>
+                  <span class="file-label"> เลือกรูปภาพ </span>
                 </span>
               </label>
             </div>
@@ -54,29 +54,6 @@
             </p>
           </div>
         </section>
-        <!-- name -->
-        <div class="row my-2">
-          <div class="form-group col-12">
-            <label class="form-label" for="tutorName">ชื่อติวเตอร์</label>
-            <input
-              class="form-control"
-              :class="{ 'border-danger': v$.tutorName.$error }"
-              type="text"
-              id="tutorName"
-              name="tutorName"
-              required
-              placeholder="ชื่อที่แสดงให้นักเรียนเห็น"
-              maxlength="20"
-              v-model="tutorName"
-            />
-            <template v-if="v$.tutorName.$error">
-              <p class="text-danger m-0 p-0" v-if="v$.tutorName.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
-              </p>
-            </template>
-          </div>
-        </div>
-
         <!-- Username -->
         <div class="row my-2">
             <div class="form-group col-12">
@@ -103,6 +80,28 @@
             </div>
           </div>
 
+        <!-- name -->
+        <div class="row my-2">
+          <div class="form-group col-12">
+            <label class="form-label" for="tutorName">Display Name*</label>
+            <input
+              class="form-control"
+              :class="{ 'border-danger': v$.tutorName.$error }"
+              type="text"
+              id="tutorName"
+              name="tutorName"
+              required
+              placeholder="ชื่อที่แสดงให้นักเรียนเห็น"
+              maxlength="20"
+              v-model="tutorName"
+            />
+            <template v-if="v$.tutorName.$error">
+              <p class="text-danger m-0 p-0" v-if="v$.tutorName.required.$invalid">
+                ต้องกรอกข้อมูลช่องนี้
+              </p>
+            </template>
+          </div>
+        </div>
 
 
         <div class="row my-2">

@@ -88,7 +88,7 @@
 </template>
   
   <script>
-  import axios from "axios";
+  // import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import { required } from "@vuelidate/validators";
   // @ is an alias to /src
@@ -124,31 +124,32 @@
     },
     methods: {
       submit() {
-        this.v$.$touch();
-        if (!this.v$.$invalid) {
-          const data = {
-            username: this.username,
-            password: this.password,
-          };
-          axios
-            .post("http://localhost:8080/user/login/", data)
-            .then((res) => {
-              const account = {
-                username: res.data.account.username,
-                permission: res.data.account.permission,
-                firstname: res.data.account.firstname,
-                lastname: res.data.account.lastname,
-                email: res.data.account.email,
-                phone: res.data.account.phone,
-              };
-              this.$cookies.set("account", account);
-              alert("Login Success");
-              // this.$router.push({ path: "/" });
-            })
-            .catch((error) => {
-              this.error = error.response.data;
-            });
-        }
+        this.$router.push({ path: "/student/profile" });
+        // this.v$.$touch();
+        // if (!this.v$.$invalid) {
+        //   const data = {
+        //     username: this.username,
+        //     password: this.password,
+        //   };
+        //   axios
+        //     .post("http://localhost:8080/user/login/", data)
+        //     .then((res) => {
+        //       const account = {
+        //         username: res.data.account.username,
+        //         permission: res.data.account.permission,
+        //         firstname: res.data.account.firstname,
+        //         lastname: res.data.account.lastname,
+        //         email: res.data.account.email,
+        //         phone: res.data.account.phone,
+        //       };
+        //       this.$cookies.set("account", account);
+        //       alert("Login Success");
+        //       // this.$router.push({ path: "/" });
+        //     })
+        //     .catch((error) => {
+        //       this.error = error.response.data;
+        //     });
+        // }
       },
     },
     watch: {
