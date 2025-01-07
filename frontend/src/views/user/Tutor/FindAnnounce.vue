@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
-          <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศที่เคยลง</div>
+          <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศ</div>
         </div>
 
         <div class="container-fluid rounded-4 border border-dark mt-0 p-0 d-flex flex-column justify-content-center align-items-center" :style="{ backgroundColor: 'white' }" style="width: 80vw; overflow: hidden;">

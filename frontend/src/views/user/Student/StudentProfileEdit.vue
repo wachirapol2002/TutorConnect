@@ -16,7 +16,7 @@
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
                           <!-- แสดงภาพตัวอย่าง -->
-                        <div :class="center" style="height:12vw; width: 12  vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                        <div :class="center" style="height:12vw; width: 12vw; background-color: white; border: 1px solid black; overflow: hidden;">     
                           <img v-if="imageUrl"
                             :src="imageUrl"
                             alt="Preview"
@@ -28,6 +28,7 @@
                               class="file-input"
                               type="file"
                               id="file"
+                              name="file"
                               ref="file"
                               accept="image/*"
                               @change="handleFileUpload"
@@ -50,22 +51,22 @@
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">
                         <label class="form-label fw-bold" for="username">ชื่อผู้ใช้งาน:</label>
-                        <div class="mx-2">IamStudent</div>
+                        <div class="mx-2" >{{ username }}</div>
                       </div>
                     </div>
                     <!-- ระดับบัญชี -->
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">
                         <label class="form-label fw-bold" for="permission">ระดับบัญชี:</label>
-                        <div class="mx-2">นักเรียน</div>
+                        <div class="mx-2">{{ permission }}</div>
                       </div>
                     </div>     
                     <!-- อีเมล -->
                     <div class="row my-2">
                       <div class="form-group col-8">
                         <label class="form-label fw-bold" for="email">อีเมล*</label>
-                        <input
-                          class="form-control"
+                        <input style="font-size: 3vh;"
+                          class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.email.$error }"
                           type="email"
                           id="email"
@@ -74,13 +75,15 @@
                           maxlength="100"
                           v-model="email"
                         />
-                        <template v-if="v$.email.$error">
-                          <p class="text-danger m-0 p-0" v-if="v$.email.required.$invalid">
-                            ต้องกรอกข้อมูลช่องนี้
-                          </p>
-                          <p class="text-danger m-0 p-0" v-if="v$.email.email.$invalid">
-                            กรอกข้อมูลไม่ถูกต้อง
-                          </p>
+                        <template  v-if="v$.email.$error">
+                          <div style="font-size: 2.5vh;">
+                            <p class="text-danger m-0 p-0" v-if="v$.email.required.$invalid">
+                              ต้องกรอก อีเมล
+                            </p>
+                            <p class="text-danger m-0 p-0" v-if="v$.email.email.$invalid">
+                              กรอกอีเมลไม่ถูกต้อง
+                            </p>
+                          </div>
                         </template>
                       </div>
                     </div>
@@ -88,8 +91,8 @@
                       <!-- ชื่อจริง -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="firstname">ชื่อจริง*</label>
-                        <input
-                          class="form-control"
+                        <input style="font-size: 3vh;"
+                          class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.firstname.$error }"
                           type="text"
                           id="firstname"
@@ -99,16 +102,18 @@
                           v-model="firstname"
                         />
                         <template v-if="v$.firstname.$error">
-                          <p class="text-danger m-0 p-0" v-if="v$.firstname.required.$invalid">
-                            ต้องกรอกข้อมูลช่องนี้
-                          </p>
+                          <div style="font-size: 2.5vh;">
+                            <p class="text-danger m-0 p-0" v-if="v$.firstname.required.$invalid">
+                              ต้องกรอก ชื่อจริง
+                            </p>
+                          </div>
                         </template>
                       </div>
                       <!-- นามสกุล -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="lastname">นามสกุล*</label>
-                        <input
-                          class="form-control"
+                        <input style="font-size: 3vh;"
+                          class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.lastname.$error }"
                           type="text"
                           id="lastname"
@@ -118,9 +123,11 @@
                           v-model="lastname"
                         />
                         <template v-if="v$.lastname.$error">
-                          <p class="text-danger m-0 p-0" v-if="v$.lastname.required.$invalid">
-                            ต้องกรอกข้อมูลช่องนี้
-                          </p>
+                          <div style="font-size: 2.5vh;">
+                            <p class="text-danger m-0 p-0" v-if="v$.lastname.required.$invalid">
+                              ต้องกรอก นามสกุล
+                            </p>
+                          </div>
                         </template>
                       </div>
                     </div>
@@ -128,8 +135,8 @@
                       <!-- เบอร์ติดต่อ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="phone">เบอร์ติดต่อ*</label>
-                        <input
-                          class="form-control"
+                        <input style="font-size: 3vh;"
+                          class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.phone.$error }"
                           type="text"
                           id="phone"
@@ -139,19 +146,21 @@
                           v-model="phone"
                         />
                         <template v-if="v$.phone.$error">
-                          <p class="text-danger m-0 p-0" v-if="v$.phone.required.$invalid">
-                            ต้องกรอกข้อมูลช่องนี้
-                          </p>
-                          <p class="text-danger m-0 p-0" v-if="v$.phone.phone.$invalid">
-                            กรอกข้อมูลไม่ถูกต้อง
-                          </p>
+                          <div style="font-size: 2.5vh;">
+                            <p class="text-danger m-0 p-0" v-if="v$.phone.required.$invalid">
+                              ต้องกรอก หมายเลขโทรศัพท์
+                            </p>
+                            <p class="text-danger m-0 p-0" v-if="v$.phone.phone.$invalid">
+                              หมายเลขโทรศัพท์ไม่ถูกต้อง
+                            </p>
+                          </div>
                         </template>
                       </div>
                       <!-- เพศ -->
                       <div class="form-group col-2">
                         <label class="form-label fw-bold" for="gender">เพศ*</label>
-                          <select v-model="selectedGender" class="form-control text-center">
-                            <option value="" disabled>-ระบุเพศ-</option>
+                          <select v-model="gender" class="form-control text-center p-0 px-2" style="font-size: 3vh; width: auto;">
+                            <option value="" disabled>ระบุเพศ</option>
                             <option v-for="(gender, index) in genders" :key="index" :value="gender">
                               {{ gender }}
                             </option>
@@ -166,7 +175,7 @@
                             <div class="button rounded-3 bg-dark mx-3 text-light" :style="{}" @click="back()">
                               กลับ
                             </div>
-                            <div class="button rounded-3 bg-dark mx-3 text-light" :style="{}" @click="submit()">
+                            <div class="button rounded-3 bg-dark mx-3 text-light" :style="{}" @click="update()">
                               บันทึก
                             </div>
                           </div>
@@ -187,27 +196,19 @@
 </template>
   
   <script>
-  // import axios from "axios";
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
     required,
     email,
     minLength,
     maxLength,
-    sameAs,
     helpers,
   } from "@vuelidate/validators";
 
 
     function phone(value) {
     return !helpers.req(value) || !!value.match(/0[0-9]{9}/);
-  }
-
-  function complexPassword(value) {
-    if (value.match(/[a-z]/) && value.match(/[A-Z]/) && value.match(/[0-9]/)) {
-      return true;
-    }
-    return false;
   }
 
   export default {
@@ -218,19 +219,19 @@
     },
     data() {
       return {
-        imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
+        imageUrl: this.$cookies.get("account").portrait_path ? 'http://localhost:3000' + this.$cookies.get("account").portrait_path : require('@/assets/user.png'),
         previousRoutes: [],
         mainColor: "#BC2C2C",
-        username: "",
-        password: "",
-        confirmPassword: "",
-        email: "",
-        phone: "",
-        firstname: "",
-        lastname: "",
-        genders: ["ชาย", "หญิง", "ไม่ระบุ"], // หมวดวิชาที่มีให้เลือก
-        selectedGender: "", // หมวดวิชาที่เลือก
-        gender: null,
+        file: null,
+        portrait_path: this.$cookies.get("account").portrait_path,
+        username: this.$cookies.get("account").username,
+        permission: this.$cookies.get("account").permission,
+        email: this.$cookies.get("account").email,
+        firstname: this.$cookies.get("account").firstname,
+        lastname: this.$cookies.get("account").lastname,
+        phone: this.$cookies.get("account").phone,
+        gender: this.$cookies.get("account").gender,
+        genders: ["ชาย", "หญิง", "ไม่ระบุ"], 
         showpassword: false,
         error: "",
         center: {
@@ -263,26 +264,19 @@
         required: required,
         phone: phone,
       },
-      password: {
-        required: required,
-        minLength: minLength(8),
-        complex: complexPassword,
-      },
-      confirmPassword: {
-        sameAs: sameAs("password"),
-      },
   },
     mounted() {
 
     },
     methods: {
       handleFileUpload(event) {
-      const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด
-      this.error = null;
+      const file = event ? event.target.files[0] : this.$refs.file.files[0];
+  
+      this.error = null; // รีเซ็ตข้อความ Error
       if (file) {
         // ตรวจสอบว่าไฟล์เป็นรูปภาพหรือไม่
         if (!file.type.startsWith("image/")) {
-          this.error = "Please upload a valid image file.";
+          this.error = "กรุณาอัปโหลดไฟล์รูปภาพที่ถูกต้อง.";
           this.imageUrl = null;
           return;
         }
@@ -290,17 +284,52 @@
         const reader = new FileReader();
         reader.onload = (e) => {
           this.imageUrl = e.target.result; // URL ของภาพ
+          this.file = file;
         };
         reader.readAsDataURL(file);
       }
       },
 
-  
-      submit() {
-        // // Validate all fields
-          this.v$.$touch();
+      update() {
+        // Validate all fields
+        this.v$.$touch();
+        // เช็คว่าในฟอร์มไม่มี error
+        if (!this.v$.$invalid) {
+          const formData = new FormData();
+          formData.append("portrait", this.file);
+          formData.append('username', this.username);
+          formData.append('firstname', this.firstname);
+          formData.append('lastname', this.lastname);
+          formData.append('gender', this.gender);
+          formData.append('email', this.email);
+          formData.append('phone', this.phone);
+          axios.post('http://localhost:3000/user/edit', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          })
+            .then((res) => {
+              const account = {
+                account_id:res.data.account.account_id,
+                portrait_path: res.data.account.portrait_path,
+                username: res.data.account.username,
+                permission: res.data.account.permission,
+                firstname: res.data.account.firstname,
+                lastname: res.data.account.lastname,
+                gender: res.data.account.gender,
+                email: res.data.account.email,
+                phone: res.data.account.phone,
+              };
+              this.$cookies.set("account", account);
+              this.$router.push({ path: "/student/profile" });
+              alert("อัพเดทข้อมูลสำเร็จ");
+            })
+            .catch((err) => {
+              alert(err.response.data.details);
+            });
+        }
    
-        },
+      },
   
       back() {
         if (this.previousRoutes.length > 0) {

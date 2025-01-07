@@ -41,8 +41,8 @@
             </router-link> 
           </div>
 
-
-          <!-- <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">
+<!-- 
+          <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">
             <router-link to="/login" :class="center" style="text-decoration: none; color: white;">
               <div class="px-3" :style="{fontSize: '3vh'}">เข้าสู่ระบบ</div>
             </router-link>

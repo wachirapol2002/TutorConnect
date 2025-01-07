@@ -30,6 +30,7 @@
                 />
             </div>
             <label class="label">Profile Picture</label>
+   
 
               <label class="file-label">
                 <input
@@ -47,6 +48,11 @@
                   <span class="file-label"> เลือกรูปภาพ </span>
                 </span>
               </label>
+              <template v-if="v$.file.$error">
+              <p class="text-danger m-0 p-0" v-if="v$.file.required.$invalid">
+                ต้องใส่รูปภาพ
+              </p>
+            </template>
             </div>
             <!-- แสดงข้อความ Error -->
             <p v-if="error" class="px-3 py-2 my-3 alert alert-danger">
@@ -71,7 +77,7 @@
               />
               <template v-if="v$.username.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.username.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก ชื่อผู้ใช้
                 </p>
                 <p class="text-danger m-0 p-0" v-if="v$.username.minLength.$invalid || v$.username.maxLength.$invalid">
                   ต้องการ 5-20 ตัวอักษร
@@ -79,30 +85,6 @@
               </template>
             </div>
           </div>
-
-        <!-- name -->
-        <div class="row my-2">
-          <div class="form-group col-12">
-            <label class="form-label" for="tutorName">Display Name*</label>
-            <input
-              class="form-control"
-              :class="{ 'border-danger': v$.tutorName.$error }"
-              type="text"
-              id="tutorName"
-              name="tutorName"
-              required
-              placeholder="ชื่อที่แสดงให้นักเรียนเห็น"
-              maxlength="20"
-              v-model="tutorName"
-            />
-            <template v-if="v$.tutorName.$error">
-              <p class="text-danger m-0 p-0" v-if="v$.tutorName.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
-              </p>
-            </template>
-          </div>
-        </div>
-
 
         <div class="row my-2">
           <!-- Firstname -->
@@ -120,7 +102,7 @@
             />
             <template v-if="v$.firstname.$error">
               <p class="text-danger m-0 p-0" v-if="v$.firstname.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
+                ต้องกรอก ชื่อจริง
               </p>
             </template>
           </div>
@@ -139,7 +121,7 @@
             />
             <template v-if="v$.lastname.$error">
               <p class="text-danger m-0 p-0" v-if="v$.lastname.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
+                ต้องกรอก นามสกุล
               </p>
             </template>
           </div>
@@ -181,6 +163,11 @@
             </div>
           </div>
         </div>
+        <template v-if="v$.gender.$error">
+                <p class="text-danger m-0 p-0" v-if="v$.gender.required.$invalid">
+                  ต้องเลือก เพศ
+                </p>
+        </template>
         <div class="row my-2">
           <!-- email -->
           <div class="form-group col-6">
@@ -197,10 +184,10 @@
             />
             <template v-if="v$.email.$error">
               <p class="text-danger m-0 p-0" v-if="v$.email.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
+                ต้องกรอก อีเมล
               </p>
               <p class="text-danger m-0 p-0" v-if="v$.email.email.$invalid">
-                กรอกข้อมูลไม่ถูกต้อง
+                กรอกอีเมลไม่ถูกต้อง
               </p>
             </template>
           </div>
@@ -219,43 +206,15 @@
             />
             <template v-if="v$.phone.$error">
               <p class="text-danger m-0 p-0" v-if="v$.phone.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
+                ต้องกรอก หมายเลขโทรศัพท์
               </p>
               <p class="text-danger m-0 p-0" v-if="v$.phone.phone.$invalid">
-                กรอกข้อมูลไม่ถูกต้อง
+                หมายเลขโทรศัพท์ไม่ถูกต้อง
               </p>
             </template>
           </div>
         </div>
 
-        <div class="row my-2">
-          <!-- facebook -->
-          <div class="form-group col-6">
-            <label class="form-label" for="facebook">Facebook</label>
-            <input
-              class="form-control"
-              type="facebook"
-              id="facebook"
-              required
-              placeholder="Link Facebook"
-              maxlength="255"
-              v-model="facebook"
-            />
-          </div>
-           <!-- line -->
-          <div class="form-group col-6">
-            <label class="form-label" for="line">Line</label>
-            <input
-              class="form-control"
-              type="text"
-              id="line"
-              required
-              placeholder="Line ID"
-              maxlength="30"
-              v-model="line"
-            />
-          </div>
-        </div>
         <!-- password -->
         <div class="row my-2">
           <div class="form-group col-12">
@@ -272,7 +231,7 @@
             />
             <template v-if="v$.password.$error">
               <p class="text-danger m-0 p-0" v-if="v$.password.required.$invalid">
-                ต้องกรอกข้อมูลช่องนี้
+                ต้องกรอก รหัสผ่าน
               </p>
               <p class="text-danger m-0 p-0" v-if="(v$.password.minLength.$invalid || v$.password.complex.$invalid) && !v$.password.required.$invalid">
                 ต้องประกอบด้วย A-Z, a-z, 0-9 และอย่างน้อย 8 ตัวอักษร
@@ -344,7 +303,7 @@
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 import {
   required,
@@ -378,14 +337,12 @@ export default {
       imageUrl: null, // เก็บ URL ภาพที่อัปโหลด
       previousRoutes: [],
       mainColor: "#BC2C2C",
-      tutorName: "",
+      file: null,
       username: "",
       password: "",
       confirmPassword: "",
       email: "",
       phone: "",
-      facebook: "",
-      line: "",
       firstname: "",
       lastname: "",
       gender: null,
@@ -401,48 +358,54 @@ export default {
       }
     };
   },
-  validations: {
-  tutorName: {
-    required: required,
+  validations() {
+    return {
+      file: {
+        required: required,
+      },
+      username: {
+        required: required,
+        minLength: minLength(5),
+        maxLength: maxLength(20),
+      },
+      firstname: {
+        required: required,
+      },
+      lastname: {
+        required: required,
+      },
+      gender: {
+          required: required,
+        },
+      email: {
+        required: required,
+        email: email,
+      },
+      phone: {
+        required: required,
+        phone: phone,
+      },
+      password: {
+        required: required,
+        minLength: minLength(8),
+        complex: complexPassword,
+      },
+      confirmPassword: {
+        sameAs: sameAs(this.password),
+      },
+    }
   },
-  username: {
-    required: required,
-    minLength: minLength(5),
-    maxLength: maxLength(20),
-  },
-  firstname: {
-    required: required,
-  },
-  lastname: {
-    required: required,
-  },
-  email: {
-    required: required,
-    email: email,
-  },
-  phone: {
-    required: required,
-    phone: phone,
-  },
-  password: {
-    required: required,
-    minLength: minLength(8),
-    complex: complexPassword,
-  },
-  confirmPassword: {
-    sameAs: sameAs("password"),
-  },
-},
   mounted() {
   },
   methods: {
     handleFileUpload(event) {
-      const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด
-      this.error = null;
+      const file = event ? event.target.files[0] : this.$refs.file.files[0];
+  
+      this.error = null; // รีเซ็ตข้อความ Error
       if (file) {
         // ตรวจสอบว่าไฟล์เป็นรูปภาพหรือไม่
         if (!file.type.startsWith("image/")) {
-          this.error = "Please upload a valid image file.";
+          this.error = "กรุณาอัปโหลดไฟล์รูปภาพที่ถูกต้อง.";
           this.imageUrl = null;
           return;
         }
@@ -450,48 +413,84 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.imageUrl = e.target.result; // URL ของภาพ
+          this.file = file;
         };
         reader.readAsDataURL(file);
       }
-    },
+      },
+
+    submits() {
+        // Validate all fields
+        this.v$.$touch();
+        // เช็คว่าในฟอร์มไม่มี error
+        if (!this.v$.$invalid) {
+          const data = {
+            username: this.username,
+            firstname: this.firstname,
+            lastname: this.lastname,
+            gender: this.gender,
+            email: this.email,
+            phone: this.phone,
+            password: this.password,
+            confirmPassword: this.confirmPassword,
+          };
+          axios
+            .post("http://localhost:3000/student/register", data)
+            .then(() => {
+              this.$router.push({ path: "/login" });
+              alert("สมัครสมาชิกสำเร็จ");
+            })
+            .catch((err) => {
+              alert(err.response.data.details.message);
+              console.log(err)
+            });
+        }
+      },
 
     submit() {
-        // // Validate all fields
-        // this.v$.$touch();
-        // // เช็คว่าในฟอร์มไม่มี error
-        // if (!this.v$.$invalid) {
-        //   var formData = new FormData();
-        //   formData.append("image", this.file);
-        //   formData.append("tutorName", this.tutorName);
-        //   formData.append("username", this.username);
-        //   formData.append("firstname", this.firstname);
-        //   formData.append("lastname", this.lastname);
-        //   formData.append("gender", this.gender);
-        //   formData.append("email", this.email);
-        //   formData.append("phone", this.phone);
-        //   formData.append("facebook", this.facebook);
-        //   formData.append("line", this.line);
-        //   formData.append("password", this.password);
-        //   formData.append("confirmPassword", this.confirmPassword);
-        //   axios
-        //     .post("http://44.206.165.83:3000/registerVIP", formData, {
-        //       headers: {
-        //         "Content-Type": "multipart/form-data",
-        //       },
-        //     })
-        //     .then(() => {
-        //       this.$router.push({ path: "/user/login" });
-        //       alert("Sign up Success");
-        //     })
-        //     .catch((error) => {
-        //       console.error("Error during API request:", error);
-        //       this.error = error.response
-        //         ? error.response.data
-        //         : "An error occurred.";
-        //     });
-        // }
-
-        this.$router.push({ path: "/tutor/info" });
+        // Validate all fields
+        this.v$.$touch();
+        // เช็คว่าในฟอร์มไม่มี error
+        if (!this.v$.$invalid) {
+          const formData = new FormData();
+          formData.append("portrait", this.file);
+          formData.append('username', this.username);
+          formData.append('firstname', this.firstname);
+          formData.append('lastname', this.lastname);
+          formData.append('gender', this.gender);
+          formData.append('email', this.email);
+          formData.append('phone', this.phone);
+          formData.append("password", this.password);
+          formData.append("confirmPassword", this.confirmPassword);
+          axios.post("http://localhost:3000/tutor/register", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then((res) => {
+              const account = {
+                account_id:res.data.account.account_id,
+                portrait_path: res.data.account.portrait_path,
+                username: res.data.account.username,
+                permission: res.data.account.permission,
+                firstname: res.data.account.firstname,
+                lastname: res.data.account.lastname,
+                gender: res.data.account.gender,
+                email: res.data.account.email,
+                phone: res.data.account.phone,
+              };
+              this.$cookies.set("account", account);
+              alert("ขั้นตอนสมัครบัญชีสำเร็จ");
+              this.$router.push({ path: "/tutor/teacher/info" });
+              
+            })
+            .catch((error) => {
+              console.error("Error during API request:", error);
+              this.error = error.response
+                ? error.response.data
+                : "An error occurred.";
+            });
+        }
       },
 
     back() {

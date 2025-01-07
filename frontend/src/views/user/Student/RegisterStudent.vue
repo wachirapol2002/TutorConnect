@@ -34,7 +34,7 @@
               />
               <template v-if="v$.username.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.username.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก ชื่อผู้ใช้
                 </p>
                 <p class="text-danger m-0 p-0" v-if="v$.username.minLength.$invalid || v$.username.maxLength.$invalid">
                   ต้องการ 5-20 ตัวอักษร
@@ -58,7 +58,7 @@
               />
               <template v-if="v$.firstname.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.firstname.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก ชื่อจริง
                 </p>
               </template>
             </div>
@@ -77,7 +77,7 @@
               />
               <template v-if="v$.lastname.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.lastname.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก นามสกุล
                 </p>
               </template>
             </div>
@@ -119,6 +119,11 @@
               </div>
             </div>
           </div>
+          <template v-if="v$.gender.$error">
+                <p class="text-danger m-0 p-0" v-if="v$.gender.required.$invalid">
+                  ต้องเลือก เพศ
+                </p>
+          </template>
 
 
           <div class="row my-2">
@@ -136,10 +141,10 @@
               />
               <template v-if="v$.email.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.email.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก อีเมล
                 </p>
                 <p class="text-danger m-0 p-0" v-if="v$.email.email.$invalid">
-                  กรอกข้อมูลไม่ถูกต้อง
+                  กรอกอีเมลไม่ถูกต้อง
                 </p>
               </template>
             </div>
@@ -157,10 +162,10 @@
               />
               <template v-if="v$.phone.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.phone.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก หมายเลขโทรศัพท์
                 </p>
                 <p class="text-danger m-0 p-0" v-if="v$.phone.phone.$invalid">
-                  กรอกข้อมูลไม่ถูกต้อง
+                  หมายเลขโทรศัพท์ไม่ถูกต้อง
                 </p>
               </template>
             </div>
@@ -180,7 +185,7 @@
               />
               <template v-if="v$.password.$error">
                 <p class="text-danger m-0 p-0" v-if="v$.password.required.$invalid">
-                  ต้องกรอกข้อมูลช่องนี้
+                  ต้องกรอก รหัสผ่าน
                 </p>
                 <p class="text-danger m-0 p-0" v-if="(v$.password.minLength.$invalid || v$.password.complex.$invalid) && !v$.password.required.$invalid">
                   ต้องประกอบด้วย A-Z, a-z, 0-9 และอย่างน้อย 8 ตัวอักษร
@@ -190,25 +195,19 @@
           </div>
           <div class="row my-2">
             <div class="form-group col-12">
-              <label class="form-label" for="confirmPassword"
-                >Confirm Password*</label
-              >
+              <label class="form-label" for="confirmPassword">Confirm Password*</label>
               <input
                 class="form-control"
-                :class="{ 'border-danger': v$.confirmPassword.$error }"
+                :class="{ 'border-danger': v$.confirmPassword.$error && this.password }"
                 :type="showpassword ? 'text' : 'password'"
                 id="confirmPassword"
-                name="password"
                 required
                 placeholder="ยืนยันรหัสผ่าน"
                 maxlength="20"
                 v-model="confirmPassword"
               />
-              <template v-if="v$.confirmPassword.$error">
-                <p
-                  class="text-danger m-0 p-0"
-                  v-if="v$.confirmPassword.sameAs.$invalid"
-                >
+              <template v-if="v$.confirmPassword.$error && this.password">
+                <p class="text-danger m-0 p-0" v-if="v$.confirmPassword.sameAs.$invalid ">
                   รหัสผ่านต้องเหมือนกัน
                 </p>
               </template>
@@ -305,35 +304,40 @@ function complexPassword(value) {
         }
       };
     },
-    validations: {
-      username: {
-        required: required,
-        minLength: minLength(5),
-        maxLength: maxLength(20),
-      },
-      firstname: {
-        required: required,
-      },
-      lastname: {
-        required: required,
-      },
-      email: {
-        required: required,
-        email: email,
-      },
-      phone: {
-        required: required,
-        phone: phone,
-      },
-      password: {
-        required: required,
-        minLength: minLength(8),
-        complex: complexPassword,
-      },
-      confirmPassword: {
-        sameAs: sameAs("password"),
-      },
-  },
+    validations() {
+      return{
+        username: {
+          required: required,
+          minLength: minLength(5),
+          maxLength: maxLength(20),
+        },
+        firstname: {
+          required: required,
+        },
+        lastname: {
+          required: required,
+        },
+        gender: {
+          required: required,
+        },
+        email: {
+          required: required,
+          email: email,
+        },
+        phone: {
+          required: required,
+          phone: phone,
+        },
+        password: {
+          required: required,
+          minLength: minLength(8),
+          complex: complexPassword,
+        },
+        confirmPassword: {
+          sameAs: sameAs(this.password),
+        },
+      }
+    },
     mounted() {
     },
     methods: {
@@ -344,22 +348,23 @@ function complexPassword(value) {
         if (!this.v$.$invalid) {
           const data = {
             username: this.username,
-            password: this.password,
-            confirmPassword: this.confirmPassword,
             firstname: this.firstname,
             lastname: this.lastname,
             gender: this.gender,
             email: this.email,
             phone: this.phone,
+            password: this.password,
+            confirmPassword: this.confirmPassword,
           };
           axios
-            .post("http://44.206.165.83:3000/user/signup", data)
+            .post("http://localhost:3000/student/register", data)
             .then(() => {
-              this.$router.push({ path: "/user/login" });
-              alert("Sign up Success");
+              this.$router.push({ path: "/login" });
+              alert("สมัครสมาชิกสำเร็จ");
             })
             .catch((err) => {
               alert(err.response.data.details.message);
+              console.log(err)
             });
         }
       },

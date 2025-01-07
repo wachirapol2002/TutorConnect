@@ -16,14 +16,14 @@
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
                           <!-- แสดงภาพตัวอย่าง -->
-                        <div :class="center" style="height:12vw; width: 12  vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                        <div :class="center" style="height:12vw; width: 12vw; background-color: white; border: 1px solid black; overflow: hidden;">     
                           <img v-if="imageUrl"
                             :src="imageUrl"
                             alt="Preview"
                             style="width: 100%; height: 100%; object-fit: cover;"
                             />
                         </div>
-                          <label class="file-label">
+                          <!-- <label class="file-label">
                             <input
                               class="file-input"
                               type="file"
@@ -35,7 +35,7 @@
                             <span class="file-cta mt-2 fw-bold text-center" style="font-size: 1.7vh;">
                               <span class="file-label"> เปลี่ยนรูปภาพ</span>
                             </span>
-                          </label>
+                          </label> -->
                         </div>
                         <!-- แสดงข้อความ Error -->
                         <p v-if="error" class="px-3 py-2 my-3 alert alert-danger">
@@ -50,45 +50,45 @@
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">
                         <label class="form-label fw-bold" for="username">ชื่อผู้ใช้งาน:</label>
-                        <div class="mx-2">IamStudent</div>
+                        <div class="mx-2">{{ username }}</div>
                       </div>
                     </div>
                     <!-- ระดับบัญชี -->
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">
                         <label class="form-label fw-bold" for="permission">ระดับบัญชี:</label>
-                        <div class="mx-2">นักเรียน</div>
+                        <div class="mx-2">{{ permission }}</div>
                       </div>
                     </div>     
                     <!-- อีเมล -->
                     <div class="row my-2">
                       <div class="form-group col-8">
                         <label class="form-label fw-bold" for="email">อีเมล</label>
-                        <div class="mx-2">Student01@gmail.com</div>
+                        <div class="mx-2">{{ email }}</div>
                       </div>
                     </div>
                     <div class="row my-2">
                       <!-- ชื่อจริง -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="firstname">ชื่อจริง</label>
-                        <div class="mx-2">Wachirapol</div>
+                        <div class="mx-2">{{ firstname }}</div>
                       </div>
                       <!-- นามสกุล -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="lastname">นามสกุล</label>
-                        <div class="mx-2">Klinkasorn</div>
+                        <div class="mx-2">{{ lastname }}</div>
                       </div>
                     </div>
                     <div class="row my-2">
                       <!-- เบอร์ติดต่อ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="phone">เบอร์ติดต่อ</label>
-                        <div class="mx-2">0965812475</div>
+                        <div class="mx-2">{{ phone }}</div>
                       </div>
                       <!-- เพศ -->
                       <div class="form-group col-2">
                         <label class="form-label fw-bold" for="gender">เพศ</label>
-                        <div class="mx-2">ชาย</div>
+                        <div class="mx-2">{{ gender }}</div>
                       </div>
                       <!-- ปุ่ม -->
                       <div class="row my-2">
@@ -148,20 +148,18 @@
     },
     data() {
       return {
-        imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
+        imageUrl: this.$cookies.get("account").portrait_path ? 'http://localhost:3000' + this.$cookies.get("account").portrait_path : require('@/assets/user.png'),
         previousRoutes: [],
         mainColor: "#BC2C2C",
-        username: "",
-        password: "",
-        confirmPassword: "",
-        email: "",
-        phone: "",
-        firstname: "",
-        lastname: "",
-        genders: ["ชาย", "หญิง", "ไม่ระบุ"], // หมวดวิชาที่มีให้เลือก
-        selectedGender: "", // หมวดวิชาที่เลือก
-        gender: null,
-        showpassword: false,
+        username: this.$cookies.get("account").username,
+        permission: this.$cookies.get("account").permission,
+        email: this.$cookies.get("account").email,
+        firstname: this.$cookies.get("account").firstname,
+        lastname: this.$cookies.get("account").lastname,
+        phone: this.$cookies.get("account").phone,
+        gender: this.$cookies.get("account").gender,
+        genders: ["ชาย", "หญิง", "ไม่ระบุ"], 
+        selectedGender: "", 
         error: "",
         center: {
           "d-flex": true,

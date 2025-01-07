@@ -88,7 +88,7 @@
 </template>
   
   <script>
-  // import axios from "axios";
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import { required } from "@vuelidate/validators";
   // @ is an alias to /src
@@ -124,32 +124,39 @@
     },
     methods: {
       submit() {
-        this.$router.push({ path: "/student/profile" });
-        // this.v$.$touch();
-        // if (!this.v$.$invalid) {
-        //   const data = {
-        //     username: this.username,
-        //     password: this.password,
-        //   };
-        //   axios
-        //     .post("http://localhost:8080/user/login/", data)
-        //     .then((res) => {
-        //       const account = {
-        //         username: res.data.account.username,
-        //         permission: res.data.account.permission,
-        //         firstname: res.data.account.firstname,
-        //         lastname: res.data.account.lastname,
-        //         email: res.data.account.email,
-        //         phone: res.data.account.phone,
-        //       };
-        //       this.$cookies.set("account", account);
-        //       alert("Login Success");
-        //       // this.$router.push({ path: "/" });
-        //     })
-        //     .catch((error) => {
-        //       this.error = error.response.data;
-        //     });
-        // }
+        this.v$.$touch();
+        if (!this.v$.$invalid) {
+          const data = {
+            username: this.username,
+            password: this.password,
+          };
+          axios
+            .post("http://localhost:3000/user/login/", data)
+            .then((res) => {
+              const account = {
+                account_id:res.data.account.account_id,
+                portrait_path: res.data.account.portrait_path,
+                username: res.data.account.username,
+                permission: res.data.account.permission,
+                firstname: res.data.account.firstname,
+                lastname: res.data.account.lastname,
+                gender: res.data.account.gender,
+                email: res.data.account.email,
+                phone: res.data.account.phone,
+              };
+              this.$cookies.set("account", account);
+              alert("เข้าสู่ระบบสำเร็จ");
+              if(this.$cookies.get("account").permission == 'ติวเตอร์'){
+                this.$router.push({ path: "/tutor/teacher/info" });
+              }else{
+                this.$router.push({ path: "/student/profile" });
+              }
+              
+            })
+            .catch((error) => {
+              this.error = error.response.data.message;
+            });
+        }
       },
     },
     watch: {

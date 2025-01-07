@@ -42,8 +42,13 @@ const routes = [
         component: () => import('../views/user/Tutor/RegisterTutor.vue')
     },
     {
-        path: '/tutor/info',
-        name: 'TutorInfoPage',
+        path: '/tutor/teacher/info',
+        name: 'TeacherInfoPage',
+        component: () => import('../views/user/Tutor/TeacherInfo.vue')
+    },
+    {
+        path: '/tutor/teaching/info',
+        name: 'TeachingInfoPage',
         component: () => import('../views/user/Tutor/TeachingInfo.vue')
     },
     {
