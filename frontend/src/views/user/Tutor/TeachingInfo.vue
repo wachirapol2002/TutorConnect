@@ -67,95 +67,79 @@
 
 
         <!-- วิชาที่ต้องการสอน -->
-        <div class="row my-2">
-          <label class="form-label" for="subject">วิชาที่ต้องการสอน</label>
+        <div class="row my-0">
+          <div class="form-group col-3 mx-0 pe-1">
+            <label class="form-label" for="subject">วิชาที่ต้องการสอน</label>
+          </div>
+          <div class="form-group col-3 mx-0 pe-1">
+            <label class="form-label" for="subject">ชื่อวิชา</label>
+          </div>
+          <div class="form-group col-2 mx-0 pe-1">
+            <label class="form-label" for="subject">ระดับชั้น</label>
+          </div>
+          <div class="form-group col-2 mx-0 pe-1">
+            <label class="form-label" for="subject">ราคา/ชั่วโมง</label>
+          </div>
+          
+        </div>
+        <div class="row my-2 mt-0">
+          <!-- <label class="form-label" for="subject">วิชาที่ต้องการสอน</label> -->
           <!-- เลือกหมวดวิชา -->
-            <div class="form-group col-3 mx-0">
+            <div class="form-group col-3 mx-0 pe-1">
               <select v-model="selectedCategory" class="form-control">
-                <option value="" disabled>-เลือกหมวดวิชา-</option>
+                <option value="" disabled>เลือกหมวดวิชา*</option>
                 <option v-for="(category, index) in categories" :key="index" :value="category">
                   {{ category }}
                 </option>
               </select>
             </div>
             <!-- กรอกชื่อวิชา -->
-            <div class="form-group col-6 mx-0 px-0">
+            <div class="form-group col-3 mx-0 px-1">
               <input
                 v-model="subjectName"
                 type="text"
-                placeholder="-วิชาที่สอน-"
+                placeholder="ชื่อวิชาที่สอน*"
+                class="form-control"
+              />
+            </div>
+            <!-- กรอกชื่อวิชา -->
+            <div class="form-group col-2 mx-0 px-1">
+              <select v-model="subjectDegree" class="form-control">
+                <option value="" disabled>ช่วงวัย</option>
+                <option value="ประถมต้น">ประถมต้น</option>
+                <option value="ประถมปลาย">ประถมปลาย</option>
+                <option value="มัธยมต้น">มัธยมต้น</option>
+                <option value="มัธยมปลาย">มัธยมปลาย</option>
+              </select>
+            </div>
+            <!-- กรอกชื่อวิชา -->
+            <div class="form-group col-2 mx-0 px-1">
+              <input
+                v-model="subjectPrice"
+                type="text"
+                placeholder="บาท"
                 class="form-control"
               />
             </div>
             <!-- ปุ่มเพิ่มวิชา -->
-            <div class="form-group col-3 mx-0">
+            <div class="form-group col-2 mx-0">
               <button type="button" @click="addSubject" class="btn btn-secondary ">เพิ่มวิชา</button>
             </div>
             <!-- แสดงรายการวิชาที่เพิ่ม -->
             <ul v-if="subjects.length" class="m-1 border-bottom border-2 mb-4">
               <li
                 v-for="(subject, index) in subjects"
-                :key="index"
+                :key="subject.subject_id"
                 class="d-flex justify-content-between align-items-center my-2"
               >
                 <span>
-                  {{ index + 1 }}. หมวด: {{ subject.category }} | ชื่อวิชา: {{ subject.name }}
+                  <!-- {{ index + 1 }}. หมวด: {{ subject.category }} | ชื่อวิชา: {{ subject.subject_name }} {{ subject.degree_level }} {{ subject.price }} บาท/ชั่วโมง -->
+                     {{ index + 1 }}. {{ subject.subject_name }} {{ subject.degree_level }} {{ subject.price }} บาท/ชั่วโมง
                 </span>
-                <button type="button" @click="removeSubject(index)" class="btn btn-danger btn-sm">ลบ</button>
+                <button type="button" @click="removeSubject(subject.subject_id, index)" class="btn btn-danger btn-sm">ลบ</button>
               </li>
             </ul>
         </div>
-
-        <!-- หัวข้อการสอนและการกำหนดราคา -->
-        <div class="row mt-4">
-          <div class="col-7">
-            <label class="form-label" for="topic">หัวข้อการสอน</label>
-          </div>
-          <div class="col-3">
-            <label class="form-label" for="topic">ราคา/ชั่วโมง</label>
-          </div>
-          <div class="col-2">
-          </div>
-        </div>
-        <div class="row my-0">
-          <!-- หัวข้อการสอน -->
-            <div class="form-group col-7 mx-0">
-              <input
-                v-model="topicName"
-                type="text"
-                placeholder="รายการที่สอน"
-                class="form-control"
-              />
-            </div>
-            <!--ราคา -->
-            <div class="form-group col-2 mx-0 px-0">
-              <input
-                v-model="topicPrice"
-                type="text"
-                placeholder="ราคา"
-                class="form-control"
-              />
-            </div>
-            <!-- ปุ่มเพิ่มหัวข้อ -->
-            <div class="form-group col-3 mx-0">
-              <button type="button" @click="addTopic" class="btn btn-secondary ">เพิ่มรายการ</button>
-            </div>
-            <!-- แสดงรายการวิชาที่เพิ่ม -->
-            <ul v-if="topics.length" class="m-1">
-              <li
-                v-for="(topic, index) in topics"
-                :key="index"
-                class="d-flex justify-content-between align-items-center my-2"
-              >
-                <span>
-                  {{ index + 1 }}. หัวข้อ: {{ topic.name }} ราคา: {{ topic.price }} ฿/ชั่วโมง
-                </span>
-                <button type="button" @click="removeTopic(index)" class="btn btn-danger btn-sm">ลบ</button>
-              </li>
-            </ul>
-        </div>
-        
-
         <div class="form-group d-flex justify-content-center">
           <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="submit()">
             สมัครติวเตอร์
@@ -177,7 +161,7 @@
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 import {
   required,
@@ -196,10 +180,14 @@ export default {
       imageUrl: null, // เก็บ URL ภาพที่อัปโหลด
       previousRoutes: [],
       mainColor: "#BC2C2C",
-      introduce: "",
-      describe: "",
-      academy: "",
-      academys: [],
+      tutor_id: '',
+      tutorName: this.$cookies.get("tutor") ? this.$cookies.get("tutor").displayname : "",
+      facebook: this.$cookies.get("tutor") ? this.$cookies.get("tutor").facebook_link : "",
+      line: this.$cookies.get("tutor") ? this.$cookies.get("tutor").line_id : "",
+      introduce: this.$cookies.get("tutor") ? this.$cookies.get("tutor").introduce_message : "",
+      describe: this.$cookies.get("tutor") ? this.$cookies.get("tutor").description : "",
+
+
       map: null,       // เก็บอ็อบเจกต์แผนที่
       marker: null,    // เก็บตำแหน่ง Marker
       placeName: "", 
@@ -209,6 +197,8 @@ export default {
       categories: ["คณิตศาสตร์", "วิทยาศาสตร์", "ภาษาอังกฤษ"], // หมวดวิชาที่มีให้เลือก
       selectedCategory: "", // หมวดวิชาที่เลือก
       subjectName: "", // ชื่อวิชาที่กรอก
+      subjectDegree: "",
+      subjectPrice: "",
       subjects: [], // Array เก็บวิชาที่เพิ่ม
       topicName: "",
       topicPrice: "",
@@ -235,22 +225,29 @@ export default {
 },
   mounted() {
     this.initMap(); // เรียกใช้ฟังก์ชันสร้างแผนที่
+    this.teacherInfo();
   },
   methods: {
-    addAcademy() {
-      if (this.academy) {
-        // เพิ่มวิชาใหม่เข้าไปใน Array
-        this.academys.push({
-          name: this.academy,
-        });
-        // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-        this.academy = "";
-      } else {
-        alert("กรุณากรอกประวัติการศึกษาก่อน");
-      }
-    },
-    removeAcademy(index) {
-      this.academys.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
+    teacherInfo() {
+        const data = {
+            account_id: this.$cookies.get("account").account_id,
+          };
+        axios.post("http://localhost:3000/tutor/teacher/info", data)
+          .then((res) => {
+              this.tutor_id = res.data.tutor.tutor_id
+              this.tutorName = res.data.tutor.displayname
+              this.facebook = res.data.tutor.facebook_link
+              this.line = res.data.tutor.line_id
+              this.introduce = res.data.tutor.introduce_message
+              this.describe = res.data.tutor.description
+              return axios.post("http://localhost:3000/tutor/subject", { tutor_id: this.tutor_id });
+          })  
+          .then((res) => {
+              this.subjects = res.data.subjects;
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
     },
     addPlace() {
       if (this.placeName) {
@@ -277,22 +274,77 @@ export default {
       this.places.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
     },
     addSubject() {
-      if (this.selectedCategory && this.subjectName) {
-        // เพิ่มวิชาใหม่เข้าไปใน Array
-        this.subjects.push({
-          category: this.selectedCategory,
-          name: this.subjectName,
-        });
-        // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-        this.selectedCategory = "";
-        this.subjectName = "";
-      } else {
-        alert("กรุณาเลือกหมวดวิชาและกรอกชื่อวิชาให้ครบถ้วน");
+      if (this.subjectName){
+        const data = {
+            tutor_id: this.tutor_id,
+            selectedCategory: this.selectedCategory, // หมวดวิชาที่เลือก
+            subjectName: this.subjectName, // ชื่อวิชาที่กรอก
+            subjectDegree: this.subjectDegree,
+            subjectPrice: this.subjectPrice,
+          };
+        axios
+          .post("http://localhost:3000/tutor/subject/add", data)
+          .then((res) => {
+            this.subjects = res.data.subjects
+            this.selectedCategory = ''
+            this.subjectName = ''
+            this.subjectDegree = ''
+            this.subjectPrice = ''
+          })
+          .catch((err) => {
+            alert(err);
+            console.log(err)
+          });
+    }else{
+      alert("กรุณากรอกชื่อวิชาก่อน");
+    }
+    },
+    
+    addAcademy() {
+      if (this.school_name){
+        const data = {
+            tutor_id: this.tutor_id,
+            status: this.status,
+            degree: this.degree,
+            school_name: this.school_name,
+            honor: this.honor,
+            grade: this.grade,
+          };
+          axios
+            .post("http://localhost:3000/tutor/graduate/add", data)
+            .then((res) => {
+              this.academys = res.data.graduates
+              this.status = ''
+              this.degree = ''
+              this.school_name = ''
+              this.honor = ''
+              this.grade = ''
+            })
+            .catch((err) => {
+              alert(err.response.data.details.message);
+              console.log(err)
+            });
+      }else{
+        alert("กรุณากรอกชื่อสถานศึกษาก่อน");
       }
     },
-    removeSubject(index) {
-      this.subjects.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
+    removeSubject(subject_id, index) {
+      if (confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
+        const data = {
+            subject_id: subject_id,
+          };
+        axios
+          .post("http://localhost:3000/tutor/subject/remove", data)
+          .then(() => {
+            this.subjects.splice(index, 1); // ลบข้อมูลจากหน้าจอ
+          })
+          .catch((err) => {
+            alert("เกิดข้อผิดพลาดในการลบข้อมูล");
+            console.error(err);
+          });
+      }
     },
+  
     addTopic() {
       if (this.topicName && this.topicPrice) {
         // เพิ่มวิชาใหม่เข้าไปใน Array
@@ -314,7 +366,7 @@ export default {
     submit() {
       // // Validate all fields
         this.v$.$touch();
- 
+        this.$router.push({ path: "/tutor/profile" });
       },
 
     back() {

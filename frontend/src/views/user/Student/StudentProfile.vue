@@ -222,15 +222,9 @@
         reader.readAsDataURL(file);
       }
       },
-
-  
       submit() {
-        // // Validate all fields
-          // this.v$.$touch();
           this.$router.push({ path: "/student/profile/edit" });
-   
         },
-  
       back() {
         if (this.previousRoutes.length > 0) {
           const previousRoute = this.previousRoutes.pop();

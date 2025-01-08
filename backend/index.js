@@ -24,9 +24,14 @@ app.use(cookieSession({
 // routers
 const indexRouter = require('./routes/index')
 const accountRouter = require('./routes/account')
+const studentRouter = require('./routes/student')
+const tutorRouter = require('./routes/tutor')
 
 app.use(indexRouter.router)
 app.use(accountRouter.router)
+app.use(studentRouter.router)
+app.use(tutorRouter.router)
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
