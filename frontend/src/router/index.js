@@ -54,7 +54,7 @@ const routes = [
     {
         path: '/tutor/profile',
         name: 'TutorProfilePage',
-        component: () => import('../views/TutorProfile.vue')
+        component: () => import('../views/user/Student/TutorProfile.vue')
     },
     {
         path: '/tutor/announce',

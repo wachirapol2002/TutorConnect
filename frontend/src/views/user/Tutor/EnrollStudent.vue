@@ -6,8 +6,12 @@
           <div class="fw-bold text-center" style="font-size: 5vh;">นักเรียนที่สมัครเรียน</div>
        
         </div>
+
+        <div v-if="registerStudents.length == 0" class="text-center my-5">
+          <div class="" style="font-size: 5vh;">ยังไม่มีนักเรียนสมัครเรียน</div>
+        </div>
         
-        <div class="container-fluid rounded-4  border border-dark p-3 py-4" :style="{ backgroundColor: 'white' }" style="width: 80vw;">
+        <div v-for="(student, index) in registerStudents" :key="index" class="container-fluid rounded-4 border border-dark p-1 py-2 mb-5" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 80vw;">
             <!-- ข้อมูส่วนตัว -->
             <div class="row" :style="{ backgroundColor: '' }">
                 <div class="col-3" style="" :style="{ backgroundColor: '' }">
@@ -15,20 +19,12 @@
                     <section class="container mt-4">
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
-                          <!-- แสดงภาพตัวอย่าง -->
-                        <div :class="center" style="height:12vw; width: 12  vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                          <img v-if="imageUrl"
-                            :src="imageUrl"
-                            alt="Preview"
-                            style="width: 100%; height: 100%; object-fit: cover;"
+                          <div :class="center" style="height:8vw; width: 8vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                            <img :src="'http://localhost:3000' + student.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                              style="width: 100%; height: 100%; object-fit: cover;"
                             />
+                          </div>
                         </div>
-                          
-                        </div>
-                        <!-- แสดงข้อความ Error -->
-                        <p v-if="error" class="px-3 py-2 my-3 alert alert-danger">
-                          {{ error }}
-                        </p>
                       </div>
                     </section>
                 </div>
@@ -38,54 +34,58 @@
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex" :style="{ backgroundColor: '' }">
                         <label class="form-label fw-bold" for="username">ชื่อผู้ใช้งาน:</label>
-                        <div class="mx-2">IamStudent</div>
+                        <div class="mx-2"> {{ student.username }}</div>
                       </div>
                       <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
                         <label class="form-label fw-bold" for="date">วันที่สมัคร</label>
-                        <div class="mx-2">01/12/2567</div>
+                        <div class="mx-2">{{ formatTimestamp(student.register_timestamp) }}</div>
                       </div>
                     </div>
                     <!-- ระดับบัญชี -->
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex">
                         <label class="form-label fw-bold" for="permission">ระดับบัญชี:</label>
-                        <div class="mx-2">นักเรียน</div>
+                        <div class="mx-2">{{ student.permission }}</div>
                       </div>
                       <!-- วิชา -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: 'white' }">
                         <label class="form-label fw-bold m-0" for="date">วิชา:</label>
-                        <div class="mx-2">คณิตศาสตร์ มัธยมปลาย</div>
+                        <div class="mx-2">{{ student.subject_name+" "+student.degree_level }}</div>
                       </div>
                     </div>     
                     <!-- อีเมล -->
                     <div class="row my-2">
                       <div class="form-group col-8">
                         <label class="form-label fw-bold" for="email">อีเมล</label>
-                        <div class="mx-2">Student01@gmail.com</div>
+                        <div class="mx-2">{{ student.email }}</div>
                       </div>
                       <!-- รูปแบบการเรียน -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: 'white' }">
                         <label class="form-label fw-bold m-0" for="date">รูปแบบ:</label>
-                        <div class="mx-2">ออนไลน์</div>
+                        <div class="mx-2">{{ student.subject_place }}</div>
                       </div>
                     </div>
                     <div class="row my-2">
                       <!-- ชื่อจริง -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="firstname">ชื่อจริง</label>
-                        <div class="mx-2">Wachirapol</div>
+                        <div class="mx-2">{{ student.firstname }}</div>
                       </div>
                       <!-- นามสกุล -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="lastname">นามสกุล</label>
-                        <div class="mx-2">Klinkasorn</div>
+                        <div class="mx-2">{{ student.lastname }}</div>
                       </div>
                       <!-- รับสอน -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                        <div class="button rounded-3 me-5 bg-success fw-bold text-light" :style="{}">
+                        <div class="button rounded-3 me-5 bg-success fw-bold text-light" :style="{}"
+                          @click="Accept(student.study_id, index)"
+                        >
                           รับสอน
                         </div>
-                        <div class="button rounded-3 m-0 bg-danger fw-bold text-light" :style="{}">
+                        <div class="button rounded-3 m-0 bg-danger fw-bold text-light" :style="{}"
+                          @click="unAccept(student.study_id, index)"
+                        >
                           ไม่รับสอน
                         </div>
                       </div>
@@ -94,12 +94,12 @@
                       <!-- เบอร์ติดต่อ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="phone">เบอร์ติดต่อ</label>
-                        <div class="mx-2">0965812475</div>
+                        <div class="mx-2">{{ student.phone }}</div>
                       </div>
                       <!-- เพศ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="gender">เพศ</label>
-                        <div class="mx-2">ชาย</div>
+                        <div class="mx-2">{{ student.gender }}</div>
                       </div>
                       <!-- ปุ่มติดต่อ -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
@@ -112,14 +112,12 @@
                 </div>
             </div>
         </div>
-
-        
-
     </div>
 </template>
   
   <script>
-  // import axios from "axios";
+  import dayjs from 'dayjs';
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
     required,
@@ -150,9 +148,11 @@
     },
     data() {
       return {
+        registerStudents: [],
         imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
         previousRoutes: [],
         mainColor: "#BC2C2C",
+        tutor_id: "",
         username: "",
         password: "",
         confirmPassword: "",
@@ -205,44 +205,64 @@
       },
   },
     mounted() {
-
+      this.getRegisterStudent()
     },
     methods: {
-      handleFileUpload(event) {
-      const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด
-      this.error = null;
-      if (file) {
-        // ตรวจสอบว่าไฟล์เป็นรูปภาพหรือไม่
-        if (!file.type.startsWith("image/")) {
-          this.error = "Please upload a valid image file.";
-          this.imageUrl = null;
-          return;
-        }
-        // อ่านไฟล์และสร้าง Data URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imageUrl = e.target.result; // URL ของภาพ
+      getRegisterStudent() {
+        const data = {
+            account_id: this.$cookies.get("account").account_id,
+          };
+        axios.post("http://localhost:3000/tutor/teacher/info/byAccount", data)
+          .then((res) => {
+              this.tutor_id = res.data.tutor.tutor_id
+              
+              return axios.post("http://localhost:3000/tutor/student/register", { tutor_id: this.tutor_id });
+          })  
+          .then((res) => {
+              this.registerStudents = res.data.registerStudents;
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+    },
+    formatTimestamp(timestamp) {
+      return dayjs(timestamp).format('DD-MM-YYYY');
+    },
+    Accept(study_id, index) {
+      const data = {
+          study_id: study_id
         };
-        reader.readAsDataURL(file);
-      }
-      },
+      axios.post("http://localhost:3000/tutor/enroll/accept", data)
+        .then((response) => {
+          alert(response.data.message); 
+          this.registerStudents.splice(index, 1); 
+        })  
+        .catch((err) => {
+          alert(err.response.data.details.message);
+        });   
+    },
+    unAccept(study_id, index) {
+      const data = {
+          study_id: study_id
+        };
+      axios.post("http://localhost:3000/tutor/enroll/unaccept", data)
+        .then((response) => {
+          alert(response.data.message); 
+          this.registerStudents.splice(index, 1); 
+        })  
+        .catch((err) => {
+          alert(err.response.data.details.message);
+        });   
+    },
 
-  
-      submit() {
-        // // Validate all fields
-          // this.v$.$touch();
-          this.$router.push({ path: "/student/profile/edit" });
-   
-        },
-  
-      back() {
-        if (this.previousRoutes.length > 0) {
-          const previousRoute = this.previousRoutes.pop();
-          this.$router.push(previousRoute);
-        } else {
-          this.$router.go(-1);
-        }
-      },
+    back() {
+      if (this.previousRoutes.length > 0) {
+        const previousRoute = this.previousRoutes.pop();
+        this.$router.push(previousRoute);
+      } else {
+        this.$router.go(-1);
+      }
+    },
 
     },
     watch: {
@@ -257,5 +277,13 @@
 <style>
 img {
     object-fit: cover;
+}
+.button{
+  transition: transform 0.2s ease;
+  
+}
+.button:hover{
+  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
 }
 </style>

@@ -12,26 +12,26 @@
     </div>
     <div
       class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
-      style="width: 50vw;"
+      style="width: 80vw;"
     >
-      <div :class="center" :style="{fontSize: '4vh',}">ข้อมูลผู้สอน</div>
+      <div :class="center" :style="{fontSize: '2vw',}">ข้อมูลผู้สอน</div>
       <!-- form -->
       <form name="Information">
         <!-- name -->
         <div class="row my-2">
           <div class="form-group col-12">
             <label class="form-label" for="tutorName">ชื่อติวเตอร์*</label>
-            <input
-              class="form-control"
-              :class="{ 'border-danger': v$.tutorName.$error }"
-              type="text"
-              id="tutorName"
-              name="tutorName"
-              required
-              placeholder="ชื่อที่แสดงให้นักเรียนเห็น"
-              maxlength="20"
-              v-model="tutorName"
-            />
+              <input
+                class="form-control information"
+                :class="{ 'border-danger': v$.tutorName.$error }"
+                type="text"
+                id="tutorName"
+                name="tutorName"
+                required
+                placeholder="ชื่อที่แสดงให้นักเรียนเห็น"
+                maxlength="20"
+                v-model="tutorName"
+              />
             <template v-if="v$.tutorName.$error">
               <p class="text-danger m-0 p-0" v-if="v$.tutorName.required.$invalid">
                 ต้องกรอกข้อมูลช่องนี้
@@ -45,7 +45,7 @@
           <div class="form-group col-6">
             <label class="form-label" for="facebook">Facebook</label>
             <input
-              class="form-control"
+              class="form-control information"
               type="facebook"
               id="facebook"
               required
@@ -58,7 +58,7 @@
           <div class="form-group col-6">
             <label class="form-label" for="line">Line</label>
             <input
-              class="form-control"
+              class="form-control information"
               type="text"
               id="line"
               required
@@ -75,7 +75,7 @@
           <div class="form-group col-12">
             <label class="form-label" for="introduce">ข้อความแนะนำตัว*</label>
             <textarea
-              class="form-control"
+              class="form-control information"
               :class="{ 'border-danger': v$.introduce.$error }"
               type="text"
               id="introduce"
@@ -99,7 +99,7 @@
           <div class="form-group col-12">
             <label class="form-label" for="describe">ประสบการณ์สอน และ ความน่าสนใจ*</label>
             <textarea
-              class="form-control"
+              class="form-control information"
               :class="{ 'border-danger': v$.describe.$error }"
               type="text"
               id="describe"
@@ -121,79 +121,77 @@
         <!-- ประวัติการศึกษา -->
         <div class="row my-2 ">
           <label class="form-label" for="academy">ประวัติการศึกษา</label>
-            <div class="form-group col-2 mx-0 pe-0" style="width: auto;">
-              <select v-model="status" class="form-control">
+            <div class="form-group col-2 mx-0 pe-1" style="width: auto;">
+              <select v-model="status" class="form-control information">
                 <option value="">สถานะ</option>
                 <option value="กำลังศึกษา">กำลังศึกษา</option>
                 <option value="จบการศึกษา">จบการศึกษา</option>
               </select>
             </div>
-            <div class="form-group col-2 mx-0 px-0" style="width: auto;">
-              <select v-model="degree" class="form-control">
+            <div class="form-group col-2 mx-0 px-1" style="width: auto;">
+              <select v-model="degree" class="form-control information">
                 <option value="">ระดับ</option>
                 <option value="ปริญญาตรี">ปริญญาตรี</option>
                 <option value="ปริญญาโท">ปริญญาโท</option>
                 <option value="ปริญญาเอก">ปริญญาเอก</option>
               </select>
             </div>
-            <div class="form-group col-3 mx-0 px-0">
+            <div class="form-group col-3 mx-0 px-1">
               <input
                 v-model="school_name"
                 type="text"
-                placeholder="ชื่อสถานศึกษา*"
-                class="form-control"
+                placeholder="คณะหรือสถานศึกษา*"
+                class="form-control information"
               />
             </div>
-            <div class="form-group col-2 mx-0 px-0">
+            <div class="form-group col-2 mx-0 px-1">
               <input
                 v-model="honor"
                 type="text"
                 placeholder="เกียรนิยม"
-                class="form-control"
+                class="form-control information"
               />
             </div>
-            <div class="form-group col-2 mx-0 px-0" >
+            <div class="form-group col-2 mx-0 px-1" >
               <input
                 v-model="grade"
                 type="text"
                 placeholder="เกรดเฉลี่ย"
-                class="form-control"
+                class="form-control information"
               />
             </div>
             <!-- ปุ่มเพิ่มประวัติ -->
-            <div class="form-group col-1 mx-0 px-1">
-              <button type="button" @click="addAcademy" class="btn btn-secondary ">เพิ่ม</button>
+            <div class="form-group col-1 mx-0">
+              <button type="button" @click="addAcademy" class="btn btn-secondary information">เพิ่ม</button>
             </div>
             <!-- แสดงรายการการศึกษา -->
-            <ul v-if="academys.length" class="m-1 border-bottom border-2 mb-4">
-              <li
-                v-for="(academy, index) in academys"
-                :key="academy.graduate_id"
-                class="d-flex justify-content-between align-items-center my-2"
-              >
-                <span>
-                  - {{ academy.status }} {{ academy.degree }} {{ academy.school_name }} {{ academy.honor }} {{ academy.grade }}
-                </span>
-                <button type="button" @click="removeAcademy(academy.graduate_id, index)" class="btn btn-danger btn-sm">ลบ</button>
-              </li>
-            </ul>
+            <div class="information mt-3">
+              <ul v-if="academys.length" class="m-1 border-bottom border-2 mb-4">
+                <li
+                  v-for="(academy, index) in academys"
+                  :key="academy.graduate_id"
+                  class="d-flex justify-content-between align-items-center my-2"
+                >
+                  <span>
+                    - {{ academy.status }} {{ academy.degree }} {{ academy.school_name }} {{ academy.honor }} {{ academy.grade }}
+                  </span>
+                  <button type="button" @click="removeAcademy(academy.graduate_id, index)" class="btn btn-danger btn-sm information">ลบ</button>
+                </li>
+              </ul>
+            </div>
         </div>
 
 
         <div class="form-group d-flex justify-content-center">
-          <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="submit()">
-            สมัครติวเตอร์
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
+            กลับ
+          </div>
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
+            ยืนยันข้อมูลผู้สอน
           </div>
         </div>
 
-        <div class="form-group" :class="center">
-          <label :style="{fontSize: '3vh', color: 'black',}">มีบัญชีอยู่แล้ว</label>
-          <router-link to="/login" style="text-decoration: none">
-            <div class="register mx-2" :style="{fontSize: '3vh', color: 'black', fontWeight: 500}">เข้าสู่ระบบ</div>
-          </router-link>
-        </div>
 
-                  
       </form>
     </div>
 
@@ -264,7 +262,7 @@ export default {
         const data = {
             account_id: this.$cookies.get("account").account_id,
           };
-        axios.post("http://localhost:3000/tutor/teacher/info", data)
+        axios.post("http://localhost:3000/tutor/teacher/info/byAccount", data)
           .then((res) => {
               this.tutor_id = res.data.tutor.tutor_id
               this.tutorName = res.data.tutor.displayname
@@ -386,5 +384,18 @@ export default {
 </script>
 
 <style>
-
+.button{
+  transition: transform 0.2s ease;
+  
+}
+.button:hover{
+  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+}
+.form-label{
+  font-size: 1.5vw;
+}
+.information{
+  font-size: 1.2vw;
+}
 </style>

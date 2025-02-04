@@ -18,10 +18,9 @@
       <!-- form -->
       <form name="Information">
         <!-- สถานทีสอน -->
-         <!-- Map -->
+         <!-- Leaflet Map -->
          <label class="form-label" for="place">สถานที่สอน</label>
-         <div id="map" style="height: 60vh; width: 100%;"></div>
-         <input id="placeInput" type="text" placeholder="ค้นหาสถานที่" class="form-control information" />
+         <div id="map" style="height: 40vh; width: 100%;"></div>
         <div class="row my-4">
           <!-- พิกัดสถานที่ -->
             <div class="form-group col-6 mx-0">
@@ -123,88 +122,9 @@
                 class="form-control information"
               />
             </div>
-  
-            <!-- คำอธิบายรายวิชา -->
-            <div class="row my-2">
-              <div class="form-group col-12">
-                <label class="form-label" for="subjectDescribe">คำอธิบายรายวิชา</label>
-                <textarea
-                  class="form-control information"
-                  type="text"
-                  id="subjectDescribe"
-                  name="subjectDescribe"
-                  required
-                  placeholder="รายละเอียดการสอน"
-                  v-model="subjectDescribe"
-                  style="height: 15vh;"
-                >
-                </textarea>
-              </div>
-            </div>
-              <!-- สถานที่สอนแต่ละวิชา -->
-              <div class="row my-2">
-              <div class="form-group col-12">
-                  <div class="btn-group col-6 mx-1">
-                    <button
-                      type="button"
-                      class="btn col-3"
-                      :class="{'btn-dark': subjectPlace === 'ออนไซต์ และ ออนไลน์', 'btn-outline-secondary': subjectPlace !== 'ออนไซต์ และ ออนไลน์'}"
-                      @click="subjectPlace = 'ออนไซต์ และ ออนไลน์'"
-                      style="font-size: 1vw;"
-                    >
-                      ออนไซต์ และ ออนไลน์
-                    </button>
-                    <button
-                      type="button"
-                      class="btn col-3"
-                      :class="{'btn-dark': subjectPlace === 'ออนไซต์', 'btn-outline-secondary': subjectPlace !== 'ออนไซต์'}"
-                      @click="subjectPlace = 'ออนไซต์'"
-                      style="font-size: 1vw;"
-                    >
-                      ออนไซต์
-                    </button>
-                    <button
-                      type="button"
-                      class="btn col-3"
-                      :class="{'btn-dark': subjectPlace === 'ออนไลน์', 'btn-outline-secondary': subjectPlace !== 'ออนไลน์'}"
-                      @click="subjectPlace = 'ออนไลน์'"
-                      style="font-size: 1vw;"
-                    >
-                      ออนไลน์
-                    </button>
-                  </div>
-                   <!-- ปุ่มเพิ่มวิชา -->
-                  <div class="btn-group mx-5 col-1">
-                      <button type="button" @click="addSubject" class="btn btn-secondary information">เพิ่มวิชา</button>
-                  </div>
-              </div>
-            </div>
-            <template v-if="v$.subjectPlace.$error">
-                <p class="text-danger mx-5 p-0" v-if="v$.subjectPlace.required.$invalid" style="font-size: 1vw;">
-                    ต้องเลือก ประเภทสถานที่สอน
-                </p>
-            </template>
-
-            <div v-if="showSubjectDetail" class="popup-overlay">
-              <div class="popup">
-                <div class="mb-2" style="font-size: 2vw;">รายละเอียดวิชา</div>
-                <div class="my-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">รหัสวิชา:</strong> {{ subjectDetail.subject_id }}</div>
-                <div class="my-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">ผู้สอน:</strong> {{ subjectDetail.displayname }}</div>
-                <div class="my-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">หมวดวิชา:</strong> {{ subjectDetail.category }}</div>
-                <div class="my-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">ชื่อวิชา:</strong> {{ subjectDetail.subject_name }}</div>
-                <div class="row my-2">
-                  <div class="col-3" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">ระดับ:</strong> {{ subjectDetail.degree_level || '-'}}</div>
-                  <div class="col-6" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">สอน:</strong> {{ subjectDetail.subject_place}}</div>
-                </div>
-                <div class="row my-2">
-                  <div class="col-3" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">ราคา/ชั่วโมง:</strong> {{ subjectDetail.price+" บาท" || '-'}}</div>
-                  <div class="col-6" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">จำนวนนักเรียนที่เคยเรียน:</strong> {{ subjectDetail.student_count+" คน" || '-'}}</div>
-                </div>
-                <div class="my-2" style="font-size: 1.2vw; white-space: pre-line;"><strong style="font-size: 1.1vw;">รายละเอียด:</strong> {{ subjectDetail.description || '-'}}</div>
-                <div class="d-flex justify-content-end mt-3">
-                  <button @click="closePopup" class="btn btn-secondary">ปิด</button>
-                </div>
-              </div>
+            <!-- ปุ่มเพิ่มวิชา -->
+            <div class="form-group col-2 mx-0">
+              <button type="button" @click="addSubject" class="btn btn-secondary information">เพิ่มวิชา</button>
             </div>
             <!-- แสดงรายการวิชาที่เพิ่ม -->
             <div class="information mt-3">
@@ -218,18 +138,14 @@
                   <!-- {{ index + 1 }}. หมวด: {{ subject.category }} | ชื่อวิชา: {{ subject.subject_name }} {{ subject.degree_level }} {{ subject.price }} บาท/ชั่วโมง -->
                      {{ index + 1 }}. หมวด {{ subject.category }} | {{ subject.subject_name }} {{ subject.degree_level }} {{ subject.price }} บาท/ชั่วโมง
                 </span>
-                <div>
-                  <button type="button" @click="SubjectDescribe(subject.subject_id, index)" class="btn btn-warning btn-sm information mx-2">รายละเอียดวิชา</button>
-                  <button type="button" @click="removeSubject(subject.subject_id, index)" class="text-light btn btn-danger btn-sm information mx-2">ลบ</button>
-                </div>
-                
+                <button type="button" @click="removeSubject(subject.subject_id, index)" class="btn btn-danger btn-sm information">ลบ</button>
               </li>
             </ul>
             </div>
         </div>
 
         <div class="form-group d-flex justify-content-center">
-          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="back()">
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
             กลับ
           </div>
           <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
@@ -249,6 +165,9 @@ import useVuelidate from "@vuelidate/core";
 import {
   required,
 } from "@vuelidate/validators";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+
 export default {
   name: "TeachingInfoPage",
   setup() {
@@ -267,6 +186,7 @@ export default {
       introduce: this.$cookies.get("tutor") ? this.$cookies.get("tutor").introduce_message : "",
       describe: this.$cookies.get("tutor") ? this.$cookies.get("tutor").description : "",
 
+
       map: null,       // เก็บอ็อบเจกต์แผนที่
       marker: null,    // เก็บตำแหน่ง Marker
       placeName: "", 
@@ -278,11 +198,10 @@ export default {
       subjectName: "", // ชื่อวิชาที่กรอก
       subjectDegree: "",
       subjectPrice: "",
-      subjectDescribe: "",
-      subjectPlace: null,
-      showSubjectDetail: false,
-      subjectDetail: {},
       subjects: [], // Array เก็บวิชาที่เพิ่ม
+      topicName: "",
+      topicPrice: "",
+      topics: [],
       error: "",
       center: {
         "d-flex": true,
@@ -294,103 +213,20 @@ export default {
       }
     };
   },
-  validations() {
-      return{
-      introduce: {
-        required: required,
-      },
-      describe: {
-        required: required,
-      },
-      subjectPlace:{
-        required: required,
-      },
-      }
+  validations: {
+  introduce: {
+    required: required,
   },
+  describe: {
+    required: required,
+  },
+
+},
   mounted() {
-    this.initGoogleMap();
+    this.initMap(); // เรียกใช้ฟังก์ชันสร้างแผนที่
     this.teacherInfo();
   },
   methods: {
-    initGoogleMap() {
-    const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย API Key จริงของคุณ
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
-    script.async = true;
-    script.defer = true;
-    window.initMap = this.setupGoogleMap;
-    document.head.appendChild(script);
-  },
-  setupGoogleMap() {
-  // สร้างแผนที่
-  console.log("Google Maps API Loaded:", window.google);
-  if (!window.google) {
-      this.initGoogleMap();
-      return;
-  }
-
-  const defaultLocation = { lat: 13.736717, lng: 100.523186 };
-  this.map = new google.maps.Map(document.getElementById("map"), {
-      center: defaultLocation,
-      zoom: 13,
-  });
-  // สร้าง Autocomplete
-  const input = document.getElementById('placeInput');
-  const autocomplete = new google.maps.places.Autocomplete(input);
-  autocomplete.bindTo('bounds', this.map);
-  autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        console.log(place)
-        if (!place.geometry || !place.geometry.location) {
-          alert("ไม่สามารถค้นหาตำแหน่งนี้ได้ กรุณาลองใหม่อีกครั้ง");
-          return;
-          
-        }
-        if (place.geometry) {
-          const location = place.geometry.location;
-          const { lat, lng } = place.geometry.location.toJSON();
-          this.placeName = place.name || "";
-          this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
-          if (place.geometry.viewport) {
-          this.map.fitBounds(place.geometry.viewport);
-        } else {
-            if (!this.marker) {
-            // ถ้า marker ยังไม่ได้ถูกสร้าง
-            this.marker = new google.maps.Marker({
-                position: location,
-                map: this.map,
-                draggable: true
-            });
-            } else {
-                // ถ้า marker ถูกสร้างแล้ว
-                this.marker.setPosition(location);
-            }
-          this.setCenter(place.geometry.location);
-          this.setZoom(15); // ซูมใกล้ตำแหน่ง
-        }
-        } else {
-          alert("ไม่สามารถดึงข้อมูลสถานที่ได้");
-        }
-      });
-      // คลิกบนแผนที่เพื่อเพิ่ม Marker
-      this.map.addListener("click", (event) => {
-        const { lat, lng } = event.latLng.toJSON();
-        this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
-
-        if (!this.marker) {
-          this.marker = new google.maps.Marker({
-            position: event.latLng,
-            map: this.map,
-            draggable: true
-          });
-        } else {
-          this.marker.setPosition(event.latLng);
-        }
-
-        this.map.setCenter(event.latLng);
-      });
-
-},
     teacherInfo() {
         const data = {
             account_id: this.$cookies.get("account").account_id,
@@ -437,16 +273,13 @@ export default {
       this.places.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
     },
     addSubject() {
-      this.v$.$touch();
-      if (this.subjectName && !this.v$.$invalid){
+      if (this.subjectName){
         const data = {
             tutor_id: this.tutor_id,
             selectedCategory: this.selectedCategory, // หมวดวิชาที่เลือก
             subjectName: this.subjectName, // ชื่อวิชาที่กรอก
             subjectDegree: this.subjectDegree,
             subjectPrice: this.subjectPrice,
-            subjectDescribe: this.subjectDescribe,
-            subjectPlace: this.subjectPlace,
           };
         axios
           .post("http://localhost:3000/tutor/subject/add", data)
@@ -456,8 +289,6 @@ export default {
             this.subjectName = ''
             this.subjectDegree = ''
             this.subjectPrice = ''
-            this.subjectDescribe = ''
-            this.subjectPlace = null
           })
           .catch((err) => {
             alert(err);
@@ -512,14 +343,23 @@ export default {
           });
       }
     },
-    SubjectDescribe(subject_id, index) {
-      // ดึงข้อมูลวิชาจาก index หรือ subject_id
-      const subject = this.subjects[index];
-      this.subjectDetail = subject; // เก็บข้อมูลใน subjectDetail
-      this.showSubjectDetail = true; // เปิด popup
+  
+    addTopic() {
+      if (this.topicName && this.topicPrice) {
+        // เพิ่มวิชาใหม่เข้าไปใน Array
+        this.topics.push({
+          name: this.topicName,
+          price: this.topicPrice,
+        });
+        // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
+        this.topicName = "";
+        this.topicPrice = "";
+      } else {
+        alert("กรุณากรอกหัวข้อการสอนและกำหนดราคาให้ครบถ้วน");
+      }
     },
-    closePopup() {
-      this.showSubjectDetail = false; // ปิด popup
+    removeTopic(index) {
+      this.topics.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
     },
 
     submit() {
@@ -535,6 +375,32 @@ export default {
       } else {
         this.$router.go(-1);
       }
+    },
+
+    initMap() {
+      // สร้างแผนที่และกำหนดตำแหน่งเริ่มต้น
+      this.map = L.map("map").setView([13.736717, 100.523186], 13); // Bangkok
+
+      // เพิ่มแผนที่จาก OpenStreetMap
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+      }).addTo(this.map);
+
+      // เพิ่ม Marker เมื่อมีการคลิกบนแผนที่
+      this.map.on("click", this.onMapClick);
+    },
+    onMapClick(e) {
+      const { lat, lng } = e.latlng; // ดึงพิกัดจากการคลิก
+      this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+
+      // ลบ Marker ตัวเก่าถ้ามี
+      if (this.marker) {
+        this.map.removeLayer(this.marker);
+      }
+
+      // เพิ่ม Marker ใหม่ที่ตำแหน่งคลิก
+      this.marker = L.marker([lat, lng]).addTo(this.map);
     },
   },
   watch: {
@@ -572,25 +438,5 @@ export default {
 }
 .information{
   font-size: 1.2vw;
-}
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.popup {
-  background-color: white;
-  padding: 20px;
-  border-radius: 5px;
-  width: 70vw;
-  max-width: 70vw;
 }
 </style>

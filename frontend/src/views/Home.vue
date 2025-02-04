@@ -131,61 +131,39 @@
         <!-- Tutor -->
         <div class="container py-4" style="background-color: #E5DBD9;">
           <div class="row justify-content-center g-3">
-            <!-- Card 1 -->
-            
-            <div class="col-md-4">
-              <router-link to="/tutor/profile" style="text-decoration: none;">
+   
+             <div class="col-md-4" v-for="(tutor, index) in tutors" :key="index">
+              <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
               <div class="card shadow-sm text-center">
                 <div class="card-body">
                   <div class="rounded-circle bg-light mx-auto mb-3" style="width: 100px; height: 100px;">
-                    <img :src="require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" />
+                    <!-- <img :src="require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" /> -->
+                    <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" />
                   </div>
-                  <h5 class="card-title">พี่หนึ่ง</h5>
+                  <h5 class="card-title">{{ tutor.displayname }}</h5>
+                  <!-- วิชา -->
                   <div class="mb-3">
-                    <span class="badge me-2 text-dark" :style="{backgroundColor: Education}">คณิตศาสตร์</span>
-                    <span class="badge text-dark" :style="{backgroundColor: Education}">ฟิสิกส์</span>
+                    <span class="badge me-2 text-dark" 
+                      v-for="(subject, index) in tutor.subject_names" 
+                      :key="index" 
+                      :style="{backgroundColor: this.categoryColors[tutor.categories[index]]}"
+                    >
+                      {{ subject }}
+                    </span>
                   </div>
                   <p class="text-muted">
-                    สวัสดีครับ พี่หนึ่งเองครับ จบจากคณะวิศวกรรมศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย เรียนกับพี่แล้วความเข้าใจจะเพิ่มขึ้นแน่นอนครับ สอนเป็นกันเองครับ
+                    {{ tutor.introduce_message }}
                   </p>
                   <div class="d-flex justify-content-center align-items-center gap-1">
-                    <span class="text-warning">★★★★</span>
-                    <span class="text-secondary">★</span>
-                    <span class="ms-2 text-muted">4.2/5</span>
+                    <span v-for="star in Math.floor(tutor.rating_score)" :key="star" class="text-warning">★</span>
+                    <span v-for="empty in (5 - Math.floor(tutor.rating_score))" :key="empty" class="text-secondary">★</span>
+                    <span class="ms-2 text-muted">{{ tutor.rating_score }}/5</span>
                   </div>
+
                 </div>
               </div>
             </router-link>
             </div>
-
-            <!-- Card 2 -->
-            <div class="col-md-4">
-              <div class="card shadow-sm text-center">
-                <div class="card-body">
-                  <div class="rounded-circle bg-light mx-auto mb-3" style="width: 100px; height: 100px;">
-                    <img :src="require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" />
-                  </div>
-                  <h5 class="card-title">ครูสอง</h5>
-                  <div class="mb-3">
-                    <span class="badge me-2 text-dark" :style="{backgroundColor: Language}">ภาษาอังกฤษ</span>
-                    <span class="badge text-dark" :style="{backgroundColor: Education}">ชีวะ</span>
-                  </div>
-                  <p class="text-muted">
-                    เอกภาษาอังกฤษ มหาวิทยาลัยเกษตรศาสตร์ เน้นเข้าใจง่าย ช่วยผู้เรียนตั้งแต่ต้น ใจดี ไม่เข้าใจตรงไหนถามได้เสมอ
-                  </p>
-                  <div class="d-flex justify-content-center align-items-center gap-1">
-                    <span class="text-warning">★★★</span>
-                    <span class="text-secondary">★★</span>
-                    <span class="ms-2 text-muted">3.7/5</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            
-
-
-
           </div>
         </div>
 
@@ -203,6 +181,16 @@
         selectedGender: [], // เก็บค่าที่เลือก เช่น ['ชาย', 'หญิง']
         price: 500,
         rating: 0,
+        tutors: [],
+        categoryColors: {
+          "ภาษา": "#A8D5BA",
+          "วิชาการ": "#A7C7E7",
+          "ดนตรี": "#F6C78A",
+          "กีฬา": "#FFE7A1",
+          "คอมพิวเตอร์": "#C4B0E4",
+          "ทักษะชีวิต": "#B3D4E0",
+          "พัฒนาวิชาชีพ": "#F3BFC3"
+        },
         Language: "#A8D5BA",
         Education: "#A7C7E7",
         Music: "#F6C78A",
@@ -231,17 +219,19 @@
       };
     },
     mounted() {
+      this.getTutors()
     },
     methods: {
-      getTables() {
+      getTutors() {
         axios
-          .get("http://localhost:8080", {
+          .get("http://localhost:3000/tutor/teacher/info", {
             params: {
               search: this.search,
             },
           })
           .then((response) => {
-            this.tables = response.data;
+            this.tutors = response.data;
+            console.log(this.tutors)
           })
           .catch((err) => {
             console.log(err);

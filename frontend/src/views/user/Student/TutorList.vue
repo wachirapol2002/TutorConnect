@@ -3,19 +3,17 @@
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
           <div class="fw-bold text-center" style="font-size: 5vh;">ประวัติการเรียน</div>
         </div>
-        <div class="container-fluid rounded-4  border border-dark p-3 py-4" :style="{ backgroundColor: 'white' }" style="width: 80vw;">
+        <div v-for="(tutor, index) in tutors" :key="index" class="container-fluid rounded-4 border border-dark p-1 py-2 mb-5" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 80vw;">
           <div class="row" :style="{ backgroundColor: '' }">
             <div class="col-3" style="" :style="{ backgroundColor: '' }">
               <section class="container mt-4">
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
                           <!-- แสดงภาพตัวอย่าง -->
-                          <div :class="center" style="height:12vw; width: 12  vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                            <img v-if="imageUrl"
-                              :src="imageUrl"
-                              alt="Preview"
-                              style="width: 100%; height: 100%; object-fit: cover;"
-                              />
+                          <div :class="center" style="height:8vw; width: 8vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                            <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                            style="width: 100%; height: 100%; object-fit: cover;"
+                          />
                           </div>
                           
                         </div>
@@ -27,57 +25,58 @@
                    <!-- ชื่อผู้ใช้งาน -->
                    <div class="row my-2">
                       <div class="form-group col-8 d-flex" :style="{ backgroundColor: '' }">
-                        <label class="form-label fw-bold m-0" :style="{ fontSize: '2vw' }" for="tutorname">พี่หนึ่ง</label>
+                        <label class="form-label fw-bold m-0" :style="{ fontSize: '2vw' }" for="tutorname">{{tutor.displayname}}</label>
                         <div class="ms-3">
-                            <span class="text-warning" :style="{ fontSize: '2vw' }">★★★★★</span>
-                            <small class="ms-1" :style="{ fontSize: '2vw' }">4.2/5</small>
+                            <span v-for="star in Math.floor(tutor.rating_score)" :key="star" class="text-warning" :style="{ fontSize: '2vw' }">★</span>
+                            <span v-for="empty in (5 - Math.floor(tutor.rating_score))" :key="empty" class="text-secondary" :style="{ fontSize: '2vw' }">★</span>
+                            <small class="ms-1" :style="{ fontSize: '2vw' }">{{ tutor.rating_score}}/5</small>
                         </div>
                       </div>
                       <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
                         <label class="form-label fw-bold" for="date">วันที่เริ่มเรียน</label>
-                        <div class="mx-2">20/12/2567</div>
+                        <div class="mx-2">{{formatTimestamp(tutor.first_approve_timestamp)}}</div>
                       </div>
                     </div>
 
                     <!-- วิชาที่สอน -->
-                    <div class="row my-2">
-                      <div class="form-group col-8 d-flex">
-                        <label class="form-label m-0" :style="{ fontSize: '1.5vw' }" for="subject">วิชาที่สอน</label>
-                        <div class="mx-2">
-                            <span class="badge bg-primary mx-1" :style="{ fontSize: '1vw' }">คณิตศาสตร์</span>
-                            <span class="badge bg-primary mx-1" :style="{ fontSize: '1vw' }">ฟิสิกส์</span>
-                        </div>
-                      </div>
-                      <!-- วิชา -->
-                      <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: 'white' }">
-                        <label class="form-label fw-bold m-0" for="date">วิชา:</label>
-                        <div class="mx-2">คณิตศาสตร์ มัธยมปลาย</div>
+                    <div class="d-flex align-items-center">
+
+                      <div class="" :style="{ fontSize: '2vw', whiteSpace: 'nowrap' }">วิชาที่เรียน</div>
+                      <div class="m-2" style="background-color: '';">
+                          <span class="badge m-1 text-dark"  
+                          v-for="(subject, index) in parseSubjects(tutor)" 
+                          :key="index" 
+                          :style="{backgroundColor: categoryColors[parseCategories(tutor)[index]], fontSize: '1vw'}"
+                        >
+                          {{ subject}}
+                        </span>
                       </div>
                     </div>
                     <!-- แนะนำตัว -->
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex align-items-center">
                         <p class="my-2" :style="{ fontSize: '1vw' }">
-                          สวัสดีครับ พี่หนึ่งนะครับ จบจากคณะวิศวกรรมศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย
-                          เรียนกับพี่เน้นความเข้าใจ แก้ปัญหาการลืมสูตรได้ สอนเป็นกันเองครับ
+                          {{ tutor.introduce_message }}
                         </p>
                       </div>
-
                     </div>
 
-                    <!-- ติดต่อ -->
-                    <div class="row my-2">
-                      <div class="form-group col-8 d-flex align-items-center">
+
+
+                    
+                        <!-- ช่องทางการติดต่อ -->
+                        <div class="d-flex align-items-center">
                         <!-- ไอคอน Facebook -->
-                        <img class="" :src="require('@/assets/facebook.png')" alt="Facebook" width="7%" height="auto"/>
+                          <img class="LinkIcon" :src="require('@/assets/facebook.png')" alt="Facebook" width="5%" height="auto" 
+                            @click="openFacebookInNewTab(tutor.facebook_link)"
+                          />
                         <!-- ไอคอน LINE -->
-                        <img class="mx-4 me-2" :src="require('@/assets/line.png')" alt="Line" width="7%" height="auto"/>
-                        <div :style="{ fontWeight: '400', fontSize: '1.5vw'}">:Id12345</div>
-                        <div class="ms-4 fw-light" :style="{ fontWeight: '400', fontSize: '1.5vw'}">เบอร์ติดต่อ: <i>0991234569</i></div>
-                        
-                      </div>
-     
-                    </div>
+                          <img class="LinkIcon mx-4 me-2" :src="require('@/assets/line.png')" alt="Line" width="5%" height="auto"
+                            @click="openLineInNewTab(tutor.line_id)"
+                          />
+                          <div :style="{ fontWeight: '400', fontSize: '1.5vw'}">:{{ tutor.line_id }}</div>
+                          <div class="ms-4 fw-light" :style="{ fontWeight: '400', fontSize: '1.5vw'}">เบอร์ติดต่อ: <i>{{ tutor.phone }}</i></div>
+                        </div>
 
                      <!-- ส่งข้อความ -->
                      <div class="row mt-3">
@@ -96,7 +95,8 @@
 </template>
   
   <script>
-  // import axios from "axios";
+  import dayjs from 'dayjs';
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
     required,
@@ -110,6 +110,7 @@
     },
     data() {
       return {
+        tutors: [],
         currentRating: 0, // ดาวที่ถูกให้คะแนน
         commentInput: "", // ข้อความคอมเมนต์จาก input
         comments: [ // คอมเมนต์ที่แสดงไว้เริ่มต้น
@@ -129,7 +130,16 @@
         },
         red:{
           backgroundColor: 'red'
-        }
+        },
+        categoryColors: {
+          "ภาษา": "#A8D5BA",
+          "วิชาการ": "#A7C7E7",
+          "ดนตรี": "#F6C78A",
+          "กีฬา": "#FFE7A1",
+          "คอมพิวเตอร์": "#C4B0E4",
+          "ทักษะชีวิต": "#B3D4E0",
+          "พัฒนาวิชาชีพ": "#F3BFC3"
+        },
       };
     },
     validations: {
@@ -142,93 +152,49 @@
   
   },
     mounted() {
-
+      this.getTutors()
     },
     methods: {
+    getTutors() {
+        const data = {
+            account_id: this.$cookies.get("account").account_id,
+          };
+        axios.post("http://localhost:3000/student/tutorlist", data)
+          .then((res) => {
+              this.tutors = res.data.tutors
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+    },
+    parseSubjects(tutor) {
+    return tutor.subject_list.split(', ');
+    },
+    parseCategories(tutor) {
+      return tutor.category_list.split(', ');
+    },
+    formatTimestamp(timestamp) {
+      return dayjs(timestamp).format('DD-MM-YYYY');
+    },
+    formatText(text) {
+        return text.replace(/\n/g, "<br>");
+    },
+    openFacebookInNewTab(facebook) {
+      window.open(facebook, '_blank');
+    },
+    openLineInNewTab(line) {
+      window.open('https://line.me/ti/p/~'+line, '_blank');
+    },
+
     setRating(n) {
         this.currentRating = n;
     },
-      addAcademy() {
-        if (this.academy) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
-          this.academys.push({
-            name: this.academy,
-          });
-          // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-          this.academy = "";
-        } else {
-          alert("กรุณากรอกประวัติการศึกษาก่อน");
-        }
-      },
-      removeAcademy(index) {
-        this.academys.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
-      },
-      addPlace() {
-        if (this.placeName) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
-          if (this.placePosition == "") {
-            this.places.push({
-              position: "สอนออนไลน์",
-              name: this.placeName,
-            });
-          }else{
-            this.places.push({
-            position: this.placePosition,
-            name: this.placeName,
-          });
-          }
-          // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-          this.placePosition = "";
-          this.placeName = "";
-        } else {
-          alert("กรุณาระบุสถานที่สอนก่อน");
-        }
-      },
-      removePlace(index) {
-        this.places.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
-      },
-      addSubject() {
-        if (this.selectedCategory && this.subjectName) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
-          this.subjects.push({
-            category: this.selectedCategory,
-            name: this.subjectName,
-          });
-          // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-          this.selectedCategory = "";
-          this.subjectName = "";
-        } else {
-          alert("กรุณาเลือกหมวดวิชาและกรอกชื่อวิชาให้ครบถ้วน");
-        }
-      },
-      removeSubject(index) {
-        this.subjects.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
-      },
-      addTopic() {
-        if (this.topicName && this.topicPrice) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
-          this.topics.push({
-            name: this.topicName,
-            price: this.topicPrice,
-          });
-          // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-          this.topicName = "";
-          this.topicPrice = "";
-        } else {
-          alert("กรุณากรอกหัวข้อการสอนและกำหนดราคาให้ครบถ้วน");
-        }
-      },
-      removeTopic(index) {
-        this.topics.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
-      },
-  
-      submit() {
+    submit() {
         // // Validate all fields
           this.v$.$touch();
    
-        },
-  
-      back() {
+    },
+    back() {
         if (this.previousRoutes.length > 0) {
           const previousRoute = this.previousRoutes.pop();
           this.$router.push(previousRoute);
@@ -250,5 +216,23 @@
 <style>
 img {
     object-fit: cover;
+}
+.button{
+  transition: transform 0.2s ease;
+}
+.button:hover{
+  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+}
+.LinkIcon{
+  transition: transform 0.2s ease;
+  
+}
+.LinkIcon:hover{
+  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+}
+.information{
+  font-size: 1.2vw;
 }
 </style>

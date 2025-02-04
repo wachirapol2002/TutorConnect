@@ -4,9 +4,10 @@
           <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศ</div>
         </div>
 
-        <div class="container-fluid rounded-4 border border-dark mt-0 p-0 d-flex flex-column justify-content-center align-items-center" :style="{ backgroundColor: 'white' }" style="width: 80vw; overflow: hidden;">
+        <div v-for="(announce, index) in announces" :key="index" class="container-fluid rounded-4 border border-dark my-0 p-0 d-flex flex-column justify-content-center align-items-center mt-5" :style="{ backgroundColor: 'white' }" style="width: 80vw; overflow: hidden;">
+          
           <div class="row rounded-top border-bottom border-1 border-dark" :style="{ backgroundColor: '#D9D9D9' }" style="width: 100%; font-size: 1.5vw; ">  
-            <div class="col-12">หมายเลขประกาศ 0001</div>
+            <div class="col-12">หมายเลขประกาศ {{ announce.announce_id }}</div>
           </div>
             <div clas="container" style="width: 70%; font-size: 1.5vw;" :style="{ backgroundColor: '' }">
               <form name="Register">
@@ -16,7 +17,7 @@
                     <div class="mx-2">ผู้ลงประกาศ</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">เรียนดี อยากเรียน</div>
+                    <div class="mx-2">{{ announce.firstname+" "+announce.lastname}}</div>
                   </div>
                 </div>
                 <!-- วิชา -->
@@ -25,7 +26,7 @@
                     <div class="mx-2">วิชาที่ต้องการเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">คณิตศาสตร์ มัธยมปลาย</div>
+                    <div class="mx-2">{{ announce.subject_to_learn}}</div>
                   </div>
                 </div>
                 <!--สถานที่  -->
@@ -34,7 +35,7 @@
                     <div class="mx-2">กำหนดสถานที่</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">ออนไลน์</div>
+                    <div class="mx-2">{{ announce.place_to_learn}}</div>
                   </div>
                 </div>
                 <!--อายุ  -->
@@ -43,7 +44,7 @@
                     <div class="mx-2">ช่วงอายุของผู้เรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">มัธยมปลาย</div>
+                    <div class="mx-2">{{ announce.student_age}}</div>
                   </div>
                 </div>
 
@@ -53,7 +54,7 @@
                     <div class="mx-2">วันที่สะดวก</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">วันจันทร์-วันเสาร์</div>
+                    <div class="mx-2">{{ announce.convenient_day}}</div>
                   </div>
                 </div>
                 
@@ -63,7 +64,7 @@
                     <div class="mx-2">ช่วงเวลา</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">เย็น</div>
+                    <div class="mx-2">{{ announce.convenient_time}}</div>
                   </div>
                 </div>
 
@@ -73,7 +74,7 @@
                     <div class="mx-2">รูปแบบการเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">ตัวต่อตัว</div>
+                    <div class="mx-2">{{ announce.learning_style}}</div>
                   </div>
                 </div>
 
@@ -83,7 +84,7 @@
                     <div class="mx-2">วันที่เริ่มเรียนได้</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">ทันทีที่เจอติวเตอร์ที่ต้องการ</div>
+                    <div class="mx-2">{{formatTimestamp(announce.starting_time) }}</div>
                   </div>
                 </div>
 
@@ -93,7 +94,7 @@
                     <div class="mx-2">เป้าหมายการเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">เตรียมสอบ</div>
+                    <div class="mx-2">{{ announce.objective}}</div>
                   </div>
                 </div>
                 
@@ -103,7 +104,7 @@
                     <div class="mx-2">วันที่ลงประกาศ</div>
                   </div>
                   <div class="form-group col-8">
-                    <div class="mx-2">20/12/2567</div>
+                    <div class="mx-2">{{formatTimestamp(announce.timestamp)}}</div>
                   </div>
                 </div>
 
@@ -112,9 +113,11 @@
                   <div class="form-group col-10">
                   </div>
                   <div class="form-group col-2">
-                    <div class="button rounded-3 text-light" :style="{backgroundColor: mainColor,}" @click="contact()">
-                      ดูข้อมูลติดต่อ
-                    </div>
+                    <router-link :to="'/tutor/studentinfo/?id='+ announce.account_id" style="text-decoration: none;">
+                      <div class="button rounded-3 text-light" :style="{backgroundColor: mainColor,}">
+                        ดูข้อมูลติดต่อ
+                      </div>
+                    </router-link>
                   </div>
                 </div>
               </form>
@@ -135,7 +138,8 @@
 </template>
   
   <script>
-  // import axios from "axios";
+  import dayjs from 'dayjs';
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
     required,
@@ -167,6 +171,7 @@
     data() {
       return {
         imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
+        announces: [],
         previousRoutes: [],
         mainColor: "#BC2C2C",
         username: "",
@@ -221,9 +226,15 @@
       },
   },
     mounted() {
-
+      this.initAnnounce()
     },
     methods: {
+      formatText(text) {
+        return text.replace(/\n/g, "<br>");
+      },
+      formatTimestamp(timestamp) {
+      return dayjs(timestamp).format('DD-MM-YYYY');
+      },
       handleFileUpload(event) {
       const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด
       this.error = null;
@@ -242,9 +253,18 @@
         reader.readAsDataURL(file);
       }
       },
-      contact(){
-        this.$router.push({ path: "/tutor/studentinfo" });
-      },
+      initAnnounce() {
+        const data = {
+            account_id: this.account_id,
+          };
+        axios.post("http://localhost:3000/tutor/announce", data)
+        .then((res) => {
+            this.announces = res.data.announces;
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+        },
 
   
       submit() {

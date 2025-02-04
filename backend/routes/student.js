@@ -72,5 +72,359 @@ router.post('/student/register', async (req, res, next) => {
 })
 
 
+//StudentSubjectRegister
+router.post('/student/subject/register', async (req, res, next) => {
+    const Schema = Joi.object({
+        account_id: Joi.required(),
+        tutor_id: Joi.required(),
+        subject_id: Joi.required()
+    })
+    try {
+        await Schema.validateAsync(req.body, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const account_id = req.body.account_id
+    const tutor_id = req.body.tutor_id
+    const subject_id = req.body.subject_id
+    try {
+        const [rows] = await conn.query(
+            `SELECT * FROM studys WHERE account_id = ? AND tutor_id = ? AND subject_id = ?`,
+            [account_id, tutor_id, subject_id]
+        );
+        if (rows.length > 0) {
+            // หากพบข้อมูลซ้ำ
+            throw new Error('คุณส่งคำขอสมัครเรียนแล้ว');
+        } else {
+            // หากไม่มีข้อมูลซ้ำ ให้ทำการ INSERT
+            await conn.query(
+                `INSERT INTO studys(account_id, tutor_id, subject_id, status) VALUES (?, ?, ?, 'รออนุมัติ')`,
+                [account_id, tutor_id, subject_id]
+            );
+            await conn.query(
+                `UPDATE subjects SET register_count = register_count + 1 WHERE subject_id = ?`,
+                [subject_id]
+            );
+        }
+        conn.commit()
+        res.status(201).send()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json({ message: err.message });
+    } finally {
+        conn.release()
+    }
+})
+    // ดูติวเตอร์ที่เคยเรียนด้วย
+    router.post("/student/tutorlist", async function (req, res, next) {
+        const Schema = Joi.object({
+            account_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const account_id = req.body.account_id
+
+        let sql = `
+        SELECT
+          studys.*,
+          tutors.*,
+          subjects.*,
+          accounts.portrait_path,
+          accounts.phone,
+        GROUP_CONCAT(DISTINCT subjects.subject_name ORDER BY subjects.subject_id SEPARATOR ', ') AS subject_list,
+        GROUP_CONCAT(DISTINCT subjects.category ORDER BY subjects.subject_id SEPARATOR ', ') AS category_list,
+        MIN(studys.approve_timestamp) AS first_approve_timestamp
+        FROM studys
+        JOIN tutors ON studys.tutor_id = tutors.tutor_id
+        JOIN subjects ON studys.subject_id = subjects.subject_id
+        JOIN accounts ON tutors.account_id = accounts.account_id
+        WHERE studys.account_id = ? AND studys.status = 'อนุมัติคำขอ'
+        GROUP BY tutors.tutor_id
+        ORDER BY first_approve_timestamp DESC;
+        `
+        try {
+            const [tutors] = await conn.query(sql, [account_id])
+            conn.commit()
+            res.status(200).json({'tutors': tutors})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+
+    // เช็คว่าเคยเรียน
+    router.post("/student/checkStudy", async function (req, res, next) {
+        const Schema = Joi.object({
+            tutor_id: Joi.any().required(),
+            account_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const tutor_id = req.body.tutor_id
+        const account_id = req.body.account_id
+        let sql = `
+        SELECT * FROM studys WHERE tutor_id = ? AND account_id= ? AND status = 'อนุมัติคำขอ'
+        `
+        try {
+            const [study] = await conn.query(sql, [tutor_id, account_id])
+            await conn.commit();
+            if (study.length > 0) {
+                res.status(200).json({ study: true });
+            } else {
+                res.status(200).json({ study: false });
+            }
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+
+    // ให้คะแนนรีวิว
+    router.post("/student/rating", async function (req, res, next) {
+        const Schema = Joi.object({
+            account_id: Joi.any().required(),
+            tutor_id: Joi.any().required(),
+            score: Joi.number().integer().min(1).max(5).required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const account_id = req.body.account_id
+        const tutor_id = req.body.tutor_id
+        const score = req.body.score
+        try {
+            const [existingRating] = await conn.query(
+                'SELECT rating_id FROM ratings WHERE account_id = ? AND tutor_id = ?',
+                [account_id, tutor_id]
+            );
+            if (existingRating.length > 0) {
+                //อัปเดตคะแนน
+                await conn.query(
+                    'UPDATE ratings SET score = ?, timestamp = current_timestamp() WHERE account_id = ? AND tutor_id = ?',
+                    [score, account_id, tutor_id]
+                );
+            } else {
+                //เพิ่มข้อมูล
+                await conn.query(
+                    'INSERT INTO ratings(account_id, tutor_id, score, timestamp) VALUES (?, ?, ?, current_timestamp())',
+                    [account_id, tutor_id, score]
+                );
+            }
+            await conn.query(
+                'UPDATE tutors t SET t.rating_score = (SELECT AVG(r.score) FROM ratings r WHERE r.tutor_id = ?) WHERE t.tutor_id = ?',
+                [tutor_id, tutor_id]
+            );
+            conn.commit()
+            res.status(200).json({ message: 'ให้คะแนนผู้สอนสำเร็จ' });
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+      // ดึงคะแนนรีวิว
+      router.post("/student/getRating", async function (req, res, next) {
+        const Schema = Joi.object({
+            account_id: Joi.any().required(),
+            tutor_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const account_id = req.body.account_id
+        const tutor_id = req.body.tutor_id
+        try {
+            const [rating] = await conn.query(
+                'SELECT * FROM ratings WHERE account_id = ? AND tutor_id = ?',
+                [account_id, tutor_id]
+            );
+            conn.commit()
+            if (rating.length > 0) {
+                res.status(200).json({ score: rating[0].score });
+            } else {
+                res.status(200).json({ score: 0 });
+            }
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+
+    // ส่งcomment
+    router.post("/student/comment", async function (req, res, next) {
+        const Schema = Joi.object({
+            account_id: Joi.any().required(),
+            tutor_id: Joi.any().required(),
+            message: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        console.log(req.body)
+        const account_id = req.body.account_id
+        const tutor_id = req.body.tutor_id
+        const message = req.body.message
+        try {
+            await conn.query(
+                'INSERT INTO comments(account_id, tutor_id, message) VALUES (?, ?, ?)',
+                [account_id, tutor_id, message]
+            )
+            let sql = `SELECT comments.*, accounts.portrait_path, accounts.firstname, accounts.lastname
+            FROM comments
+            JOIN accounts ON comments.account_id = accounts.account_id
+            WHERE comments.tutor_id=?`
+            const [comments] = await conn.query(
+                sql, [tutor_id]
+            )
+            conn.commit()
+            res.status(200).json({'comments': comments})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+      // ลบ comment
+        router.post("/student/comment/delete", async function (req, res, next) {
+            const conn = await pool.getConnection()
+            await conn.beginTransaction()
+            const comment_id = req.body.comment_id
+            try {
+                await conn.query(
+                    'DELETE FROM comments WHERE comment_id = ?;',
+                    [comment_id]
+                )  
+                conn.commit()
+                res.status(201).send()
+            } catch (err) {
+                conn.rollback()
+                res.status(400).json(err.toString());
+            } finally {
+                conn.release()
+            }
+    });
+
+       // ดูประกาศ
+       router.post("/student/announce", async function (req, res, next) {
+        // const Schema = Joi.object({
+        //     account_id: Joi.any().required(),
+        //     status: Joi.optional(),
+        //     degree: Joi.optional(),
+        //     school_name: Joi.string().required(),
+        //     honor: Joi.optional(),
+        //     grade: Joi.optional(),
+        // })
+        // try {
+        //     await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        // } catch (err) {
+        //     return res.status(400).send(err)
+        // }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const account_id = req.body.account_id
+        try {
+            const [announces] = await conn.query(
+                'SELECT announces.*, accounts.firstname, accounts.lastname FROM announces JOIN accounts ON announces.account_id = accounts.account_id WHERE announces.account_id=? ORDER BY announces.announce_id DESC', 
+                [account_id]
+            )
+            conn.commit()
+            res.status(200).json({'announces': announces})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+});
+
+    // เพิ่มประกาศ
+        router.post("/student/announce/add", async function (req, res, next) {
+            // const Schema = Joi.object({
+            //     account_id: Joi.any().required(),
+            //     status: Joi.optional(),
+            //     degree: Joi.optional(),
+            //     school_name: Joi.string().required(),
+            //     honor: Joi.optional(),
+            //     grade: Joi.optional(),
+            // })
+            // try {
+            //     await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+            // } catch (err) {
+            //     return res.status(400).send(err)
+            // }
+            const conn = await pool.getConnection()
+            await conn.beginTransaction()
+            console.log(req.body)
+            const account_id = req.body.account_id
+            const subject_to_learn = req.body.subject_to_learn
+            const place_to_learn = req.body.place_to_learn
+            const student_age = req.body.student_age
+            const convenient_day = req.body.convenient_day
+            const convenient_time = req.body.convenient_time
+            const learning_style = req.body.learning_style
+            const starting_time = req.body.starting_time
+            const objective = req.body.objective
+            try {
+                await conn.query(
+                    'INSERT INTO announces(account_id, subject_to_learn, place_to_learn, student_age, convenient_day, convenient_time, learning_style, starting_time, objective) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [account_id, subject_to_learn, place_to_learn, student_age, convenient_day, convenient_time, learning_style, starting_time, objective]
+                )
+                const [announces] = await conn.query(
+                    'SELECT announces.*, accounts.firstname, accounts.lastname FROM announces JOIN accounts ON announces.account_id = accounts.account_id WHERE announces.account_id=? ORDER BY announces.announce_id DESC', 
+                    [account_id]
+                )
+                conn.commit()
+                res.status(200).json({'announces': announces})
+            } catch (err) {
+                conn.rollback()
+                res.status(400).json(err.toString());
+            } finally {
+                conn.release()
+            }
+  });
+
+
+ 
+
+
+
+
 
 exports.router = router;
