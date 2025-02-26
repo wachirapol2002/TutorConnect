@@ -6,7 +6,7 @@
                 <div :class="center" class="m-0 p-0" style="width: 25vw;" :style="{ backgroundColor: '' }">
                 <!-- รูปโปรไฟล์ -->
                     <div class="m-0 rounded-circle bg-light" :class="center" :style="{ backgroundColor: 'white' }" style="height:13vw; width: 13vw; background-color: white; border: 1px solid black; overflow: hidden;">
-                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" />
+                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle profile-img" />
                     </div>
                 </div>
                 <div class="container" style="width: 40vw;" :style="{ backgroundColor: '' }">
@@ -53,15 +53,40 @@
                         
                     </div>
                     <!-- ปุ่มส่งข้อความ -->
-                    <div class="d-flex align-items-center mt-3">
+                    <div class="d-flex align-items-center justify-content-between mt-3">
                       <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat()">
                           ส่งข้อความ
                       </div>
+                      <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" :style="{}" @click="unlicense()">
+                          ลบสิทธิ์การสอน
+                      </div>
                     </div>
-                
                 </div>
             </div>
         </div>
+
+        <!-- ลบสิทธิ์การสอน -->
+        <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
+          <div class="popup" style="width: 50%;">
+            <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
+
+            <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
+            <div class="mb-3 text-center">
+              <label for="unlicenseReason" class="form-label" style="font-size: 1vw;">กรุณาระบุเหตุผล</label>
+              <textarea v-model="unlicenseReason" id="unlicenseReason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-center mt-3">
+              <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+                ย้อนกลับ
+              </div>
+              <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unlicenseAccept">
+                ยืนยัน
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <div class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}" style="width: 80vw;">
             <div :class="center" :style="{fontSize: '2vw',}">ข้อมูลการสอน</div>
@@ -102,7 +127,7 @@
 
                 <!-- หัวข้อการสอนและราคา -->
                 <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">หัวข้อการสอนและราคา</div>
-                <div class="information mt-2">
+                <!-- <div class="information mt-2">
                   <ul v-if="subjects.length" >
                     <li v-for="(subject, index) in subjects" 
                       :key="subject.subject_id"
@@ -120,9 +145,106 @@
                       </div>
                     </li>
                   </ul>
+                </div> -->
+
+                <div class="information mt-2">
+                  <ul v-if="unStudySubjects.length" class="m-0 p-0">
+                    <li v-for="(subject, index) in unStudySubjects" 
+                      :key="subject.subject_id"
+                      class="d-flex justify-content-start align-items-center my-2"
+                    >
+                      <div class="col-1 text-center bg-light" :class="center">
+                        <!-- ✅ เช็คเงื่อนไข status -->
+                        <button 
+                          v-if="!subject.status" 
+                          type="button" 
+                          @click="enrollSubject(subject.subject_id)" 
+                          class="button btn btn-success btn-sm fw-bold text-light w-100"
+                        >
+                          สมัครเรียน
+                        </button>
+
+                        <button 
+                          v-else-if="subject.status === 'รออนุมัติ'" 
+                          type="button" 
+                          @click="cancelEnroll(subject.subject_id, subject.study_id)" 
+                          class="button btn btn-danger btn-sm fw-bold text-light w-100"
+                        >
+                          ยกเลิกสมัคร
+                        </button>
+                      </div>
+
+                      <div class="col-10">
+                        <div class="ms-3">
+                        {{ subject.subject_name + " " + subject.degree_level }}
+                        <strong>{{ subject.price }} บาท/ชั่วโมง</strong>
+                        </div>
+                      </div>
+
+                      <div class="col-1 text-center" :class="center">
+                        <button 
+                          type="button" 
+                          @click="unSubjectDescribe(index)" 
+                          class="button btn btn-secondary btn-sm fw-bold text-light"
+                        >
+                          รายละเอียดเพิ่มเติม
+                        </button>
+                      </div>
+                    </li>
+                  </ul>
                 </div>
 
-                <div v-if="showSubjectDetail" class="popup-overlay">
+
+                <!-- วิชาที่เคยเรียน -->
+                <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">วิชาที่เคยเรียน</div>
+                <div class="information mt-2">
+                  <ul v-if="studySubjects.length" class="m-0 p-0">
+                    <li v-for="(subject, index) in studySubjects" 
+                      :key="subject.subject_id"
+                      class="d-flex justify-content-start align-items-center my-2"
+                    >
+                      <div class="col-1 text-center bg-light" :class="center">
+                        <!-- ✅ เช็คเงื่อนไข status -->
+                        <button 
+                          type="button" 
+                          @click="SubjectRating(index, subject.study_id)" 
+                          class="button btn btn-warning btn-sm fw-bold text-dark w-100"
+                        >
+                          ให้คะแนน
+                        </button>
+                      </div>
+
+                      <div class="col-10">
+                        <div class="ms-3">
+                        {{ subject.subject_name + " " + subject.degree_level }}
+                        <strong>{{ subject.price }} บาท/ชั่วโมง</strong>
+                        </div>
+                      </div>
+
+                      <div class="col-1 text-center" :class="center">
+                        <button 
+                          type="button" 
+                          @click="SubjectDescribe(index)" 
+                          class="button btn btn-secondary btn-sm fw-bold text-light"
+
+                        >
+                          รายละเอียดเพิ่มเติม
+                        </button>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+
+
+
+
+
+
+
+
+            <!-- รายละเอียดวิชา -->
+            <div v-if="showSubjectDetail" class="popup-overlay">
               <div class="popup">
                 <div class="mb-2" style="font-size: 2vw;">รายละเอียดวิชา</div>
                 <div class="my-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">รหัสวิชา:</strong> {{ subjectDetail.subject_id }}</div>
@@ -144,6 +266,33 @@
               </div>
             </div>
 
+            <!-- ให้คะแนนวิชา -->
+            <div v-if="showSubjectRating" class="popup-overlay">
+              <div class="popup">
+                <div class="mb-2" style="font-size: 2vw;">ประเมินการสอน</div>
+
+                <div class="row my-2">
+                  <div class="col-2" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">รหัสวิชา:</strong> {{ subjectDetail.subject_id }}</div>
+                  <div class="col-6" style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">ผู้สอน:</strong> {{ subjectDetail.displayname }}</div>
+                </div>
+                <div class="my-2">
+                  <div style="font-size: 1.2vw;"><strong style="font-size: 1.1vw;">หัวข้อ:</strong>{{" "+subjectDetail.subject_name + " " + subjectDetail.degree_level}}</div>
+                </div>
+                <div class="mt-4">
+                    <div v-if="this.currentSubjectRating<=0" class="fw-bold" style="font-size: 1.4rem;">ให้คะแนนวิชาสอน</div>
+                    <div v-if="this.currentSubjectRating>0" class="fw-bold" style="font-size: 1.4rem;">ให้คะแนนวิชา {{ this.currentSubjectRating }} ดาว</div>
+                    <div id="rating" class="d-flex align-items-center">
+                        <!-- ดาว -->
+                        <span v-for="n in 5" :key="n" @click="setSubjectRating(n, subjectDetail.study_id, subjectDetail.subject_id)" :class="{'text-warning': n <= this.currentSubjectRating}" 
+                            class="me-2 fs-3" style="cursor: pointer;">★</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                  <button @click="closePopup" class="btn btn-secondary">ปิด</button>
+                </div>
+              </div>
+            </div>
+
             </div>
         </div>
 
@@ -157,15 +306,15 @@
        </template>
 
         <template v-if="this.study==true">
-          <!-- ให้คะแนน -->
-          <div class="mt-4">
+ 
+          <!-- <div class="mt-4">
               <div class="fw-bold" style="font-size: 1.5rem;">ให้คะแนนผู้สอน</div>
               <div id="rating" class="d-flex align-items-center">
-                  <!-- ดาว -->
+       
                   <span v-for="n in 5" :key="n" @click="setRating(n)" :class="{'text-warning': n <= currentRating}" 
                       class="me-2 fs-3" style="cursor: pointer;">★</span>
               </div>
-          </div>
+          </div> -->
           <!-- แสดงความคิดเห็น -->
           <div class="mt-4">
               <div class="fw-bold" style="font-size: 1.5rem;">แสดงความคิดเห็น</div>
@@ -187,17 +336,17 @@
         <!-- ความคิดเห็นที่แสดง -->
         <div class="mt-5">
             <div class="fw-bold" style="font-size: 1.5rem;">ความคิดเห็นผู้เรียน</div>
-            <div v-for="(comment, index) in comments" :key="comment.comment_id" class="comment-card p-4 my-4">
+            <div v-for="(comment, index) in comments" :key="comment.comment_id" class="comment-card p-4 py-3 my-4">
                 <div class="row">
                     <!-- รูปโปรไฟล์ -->
                     <div class="col-1">
                       <img :src="'http://localhost:3000' + comment.portrait_path || require('@/assets/user.png')" 
-                          alt="โปรไฟล์" class="comment-img">
+                          alt="โปรไฟล์" class="comment-img profile-img">
                     </div>
                     <!-- ข้อความความคิดเห็น -->
       
                       <div class="col-11">
-                        <div class="comment-content">
+                        <div class="comment-content p-0">
                           <div class="row" style="font-size: 1.4vw;">
                             <div class="d-flex justify-content-between align-items-center">
                             <div class="">
@@ -238,10 +387,11 @@
     },
     data() {
       return {
-        tutor_id: "",
+        tutor_id: this.$route.query.id,
         account_id: this.$cookies.get('account').account_id,
         study: false,
         currentRating: 0, // ดาวที่ถูกให้คะแนน
+        currentSubjectRating: 0,
         commentInput: "", // ข้อความคอมเมนต์จาก input
         comments: [],
         imageUrl: null, // เก็บ URL ภาพที่อัปโหลด
@@ -268,6 +418,9 @@
         subjects: [], // Array เก็บวิชาที่เพิ่ม
         graduates: [],
         showSubjectDetail: false,
+        showSubjectRating: false,
+        showUnlicense: false,
+        unlicenseReason: "",
         subjectDetail: {},
         error: "",
         center: {
@@ -302,12 +455,20 @@
       this.initInfo()
       this.checkStudy()
     },
+    computed: {
+    unStudySubjects() {
+      return this.subjects.filter(subject => subject.status !== 'อนุมัติคำขอ');
+    },
+    studySubjects() {
+      return this.subjects.filter(subject => subject.status == 'อนุมัติคำขอ');
+    }
+  },
     methods: {
     formatText(text) {
         return text.replace(/\n/g, "<br>");
     },
     formatTimestamp(timestamp) {
-      return dayjs(timestamp).format('DD-MM-YYYY');
+      return dayjs(timestamp).format('DD-MM-YYYY HH:mm:ss');
     },
     openFacebookInNewTab() {
       window.open(this.tutor.facebook_link, '_blank');
@@ -333,10 +494,11 @@
           })  
           .then((res) => {
             this.graduates = res.data.graduates;
-            return axios.post("http://localhost:3000/tutor/subject", { tutor_id: this.tutor.tutor_id });
+            return axios.post("http://localhost:3000/student/subject", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
           })
           .then((res) => {
             this.subjects = res.data.subjects;
+            console.log(this.subjects)
             return axios.post("http://localhost:3000/tutor/comment", { tutor_id: this.tutor.tutor_id });
           })
           .then((res) => {
@@ -379,6 +541,42 @@
           .catch((err) => {
             alert(err.response.data.details.message);
           });
+        axios.post("http://localhost:3000/tutor/teacher/info", {tutor_id: this.$route.query.id})
+          .then((res) => {
+            this.tutor= res.data.tutor
+            this.rating_score = res.data.tutor.rating_score
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });
+    },
+    setSubjectRating(rating, study_id, subject_id) {
+        this.currentSubjectRating = rating;
+        const data = {
+            rating: rating,
+            study_id: study_id,
+            subject_id: subject_id,
+            tutor_id: this.$route.query.id,
+          };
+        axios.post("http://localhost:3000/student/subject/rating", data)
+          .then((res) => {
+            alert(res.data.message)
+            this.currentSubjectRating = rating
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });
+          axios.post("http://localhost:3000/student/subject", { tutor_id: this.$route.query.id, account_id: this.account_id})
+          .then((res) => {
+            this.subjects = res.data.subjects;
+            console.log(this.subjects)
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });
+
+
+
         axios.post("http://localhost:3000/tutor/teacher/info", {tutor_id: this.$route.query.id})
           .then((res) => {
             this.tutor= res.data.tutor
@@ -435,7 +633,10 @@
       }
     },
     chat(){
-      this.$router.push({ path: "/chat" });
+      console.log(this.tutor.account_id)
+      this.$router.push({ name: 'ChatPage', params: { receiver_id: this.tutor.account_id } });
+      this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
+      this.$cookies.set("receiver_id", this.tutor.account_id);
     },
     handleKeydown(event) {
         if (event.key === "Enter" && !event.shiftKey) {
@@ -506,19 +707,79 @@
             .post("http://localhost:3000/student/subject/register", data)
             .then(() => {
               alert("ส่งคำขอไปที่ผู้สอนแล้ว");
+              return axios.post("http://localhost:3000/student/subject", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
+            })
+            .then((res) => {
+              this.subjects = res.data.subjects;
             })
             .catch((err) => {
               alert(err.response.data.message);
             });
       },
-      SubjectDescribe(index) {
-      // ดึงข้อมูลวิชาจาก index หรือ subject_id
-      const subject = this.subjects[index];
-      this.subjectDetail = subject; // เก็บข้อมูลใน subjectDetail
+      cancelEnroll(subject_id, study_id) {
+        const data = {
+            study_id: study_id,
+            tutor_id: this.tutor_id,
+            account_id: this.account_id,
+            subject_id: subject_id,
+          };
+          axios
+            .post("http://localhost:3000/student/subject/cancelRegister", data)
+            .then(() => {
+              alert("ยกเลิกสมัครเรียนแล้ว");
+              return axios.post("http://localhost:3000/student/subject", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
+            })
+            .then((res) => {
+              this.subjects = res.data.subjects;
+            })
+            .catch((err) => {
+              alert(err.response.data.message);
+            });
+      },
+    unSubjectDescribe(index) {
+      // ดึงข้อมูลวิชาจาก index
+      this.subjectDetail = this.unStudySubjects[index]; // เก็บข้อมูลใน subjectDetail
       this.showSubjectDetail = true; // เปิด popup
+    },
+    SubjectDescribe(index) {
+      // ดึงข้อมูลวิชาจาก index
+      this.subjectDetail = this.studySubjects[index]; // เก็บข้อมูลใน subjectDetail
+      this.showSubjectDetail = true; // เปิด popup
+    },
+    SubjectRating(index, study_id) {
+      console.log(study_id)
+      // ดึงข้อมูลวิชาจาก index
+      const subject = this.studySubjects[index];
+      this.subjectDetail = subject; // เก็บข้อมูลใน subjectDetail
+      axios.post("http://localhost:3000/student/subject/rating/view", {study_id: study_id})
+            .then((res) => {
+              console.log(res.data.rating)
+              this.currentSubjectRating = res.data.rating;
+            })
+            .catch((err) => {
+              alert(err.response.data.message);
+            });
+      this.showSubjectRating = true; // เปิด popup
+    },
+    unlicense() {
+      this.showUnlicense = true; // เปิด popup
+    },
+    unlicenseAccept(){
+      axios.post("http://localhost:3000/admin/verify/unaccept", {tutor_id: this.$route.query.id})
+            .then(() => {
+              alert("ลบสิทธิ์การสอนแล้ว");
+              this.$router.push({ path: "/" });
+            })
+            .catch((err) => {
+              alert(err.response.data.message);
+            });
+      
     },
     closePopup() {
       this.showSubjectDetail = false; // ปิด popup
+      this.showSubjectRating = false;
+      this.showUnlicense = false;
+      this.unlicenseReason = "";
     },
   
       submit() {

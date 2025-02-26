@@ -48,10 +48,20 @@
                   </div>
                 </div>
 
+                <!--ระดับ  -->
+                <div class="row my-3" :class="center">
+                  <div class="form-group col-4">
+                    <div class="mx-2">ระดับของผู้เรียน</div>
+                  </div>
+                  <div class="form-group col-8">
+                    <div class="mx-2">{{ announce.student_degree}}</div>
+                  </div>
+                </div>
+
                 <!--วันที่สะดวก -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">วันที่สะดวก</div>
+                    <div class="mx-2">วันที่สะดวกเรียน</div>
                   </div>
                   <div class="form-group col-8">
                     <div class="mx-2">{{ announce.convenient_day}}</div>
@@ -61,7 +71,7 @@
                 <!--ช่วงเวลา -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">ช่วงเวลา</div>
+                    <div class="mx-2">ช่วงเวลาเรียน</div>
                   </div>
                   <div class="form-group col-8">
                     <div class="mx-2">{{ announce.convenient_time}}</div>

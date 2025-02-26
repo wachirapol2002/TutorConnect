@@ -338,13 +338,21 @@ export default {
       previousRoutes: [],
       mainColor: "#BC2C2C",
       file: null,
-      username: "",
-      password: "",
-      confirmPassword: "",
-      email: "",
-      phone: "",
-      firstname: "",
-      lastname: "",
+      // username: "",
+      // password: "",
+      // confirmPassword: "",
+      // email: "",
+      // phone: "",
+      // firstname: "",
+      // lastname: "",
+      username: "tutor",
+      firstname: "Wachirapol",
+      lastname: "Klinkasorn",
+      email: "wachirapol2545@gmail.com",
+      phone: "0909209945",
+      password: "Kami28062545",
+      confirmPassword: "Kami28062545",
+      
       gender: null,
       showpassword: false,
       error: "",
@@ -418,35 +426,6 @@ export default {
         reader.readAsDataURL(file);
       }
       },
-
-    submits() {
-        // Validate all fields
-        this.v$.$touch();
-        // เช็คว่าในฟอร์มไม่มี error
-        if (!this.v$.$invalid) {
-          const data = {
-            username: this.username,
-            firstname: this.firstname,
-            lastname: this.lastname,
-            gender: this.gender,
-            email: this.email,
-            phone: this.phone,
-            password: this.password,
-            confirmPassword: this.confirmPassword,
-          };
-          axios
-            .post("http://localhost:3000/student/register", data)
-            .then(() => {
-              this.$router.push({ path: "/login" });
-              alert("สมัครสมาชิกสำเร็จ");
-            })
-            .catch((err) => {
-              alert(err.response.data.details.message);
-              console.log(err)
-            });
-        }
-      },
-
     submit() {
         // Validate all fields
         this.v$.$touch();
@@ -480,8 +459,8 @@ export default {
                 phone: res.data.account.phone,
               };
               this.$cookies.set("account", account);
-              alert("ขั้นตอนสมัครบัญชีสำเร็จ");
-              this.$router.push({ path: "/tutor/teacher/info" });
+              alert("สมัครบัญชีติวเตอร์สำเร็จ");
+              this.$router.push({ path: "/tutor/verify" });
               
             })
             .catch((error) => {

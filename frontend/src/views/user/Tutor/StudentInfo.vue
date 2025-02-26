@@ -11,26 +11,18 @@
             <!-- ข้อมูส่วนตัว -->
             <div class="row" :style="{ backgroundColor: '' }">
                 <div class="col-3" style="" :style="{ backgroundColor: '' }">
-                <!-- รูปโปรไฟล์ -->
-                    <section class="container mt-4">
-                      <div class="content">
-                        <div class="file d-flex flex-column justify-content-center align-items-end">
-                          <!-- แสดงภาพตัวอย่าง -->
-                        <div :class="center" style="height:12vw; width: 12  vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                          <img v-if="imageUrl"
-                            :src="imageUrl"
-                            alt="Preview"
+                  <!-- รูปโปรไฟล์ -->
+                  <section class="container mt-4">
+                    <div class="content">
+                      <div class="file d-flex flex-column justify-content-center align-items-end">
+                        <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                          <img :src="'http://localhost:3000' + this.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
                             style="width: 100%; height: 100%; object-fit: cover;"
-                            />
+                          />
                         </div>
-                          
-                        </div>
-                        <!-- แสดงข้อความ Error -->
-                        <p v-if="error" class="px-3 py-2 my-3 alert alert-danger">
-                          {{ error }}
-                        </p>
                       </div>
-                    </section>
+                    </div>
+                  </section>
                 </div>
                 <div class="col-9" :style="{ backgroundColor: '' }">
                   <section class="container mt-4" style="font-size: 3vh;">
@@ -38,7 +30,7 @@
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex" :style="{ backgroundColor: '' }">
                         <label class="form-label fw-bold" for="username">ชื่อผู้ใช้งาน:</label>
-                        <div class="mx-2">IamStudent</div>
+                        <div class="mx-2">{{ this.username }}</div>
                       </div>
                       
                     </div>
@@ -46,7 +38,7 @@
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex">
                         <label class="form-label fw-bold" for="permission">ระดับบัญชี:</label>
-                        <div class="mx-2">นักเรียน</div>
+                        <div class="mx-2">{{this.permission}}</div>
                       </div>
                       
                     </div>     
@@ -54,7 +46,7 @@
                     <div class="row my-2">
                       <div class="form-group col-8">
                         <label class="form-label fw-bold" for="email">อีเมล</label>
-                        <div class="mx-2">Student01@gmail.com</div>
+                        <div class="mx-2">{{this.email}}</div>
                       </div>
 
                     </div>
@@ -62,12 +54,12 @@
                       <!-- ชื่อจริง -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="firstname">ชื่อจริง</label>
-                        <div class="mx-2">Wachirapol</div>
+                        <div class="mx-2">{{this.firstname}}</div>
                       </div>
                       <!-- นามสกุล -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="lastname">นามสกุล</label>
-                        <div class="mx-2">Klinkasorn</div>
+                        <div class="mx-2">{{this.lastname}}</div>
                       </div>
                      
                     </div>
@@ -75,16 +67,16 @@
                       <!-- เบอร์ติดต่อ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="phone">เบอร์ติดต่อ</label>
-                        <div class="mx-2">0965812475</div>
+                        <div class="mx-2">{{this.phone}}</div>
                       </div>
                       <!-- เพศ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="gender">เพศ</label>
-                        <div class="mx-2">ชาย</div>
+                        <div class="mx-2">{{this.gender}}</div>
                       </div>
                       <!-- ปุ่มติดต่อ -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}">
+                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat(this.student_id)">
                           ส่งข้อความ
                         </div>
                       </div>
@@ -100,7 +92,7 @@
 </template>
   
   <script>
-  // import axios from "axios";
+  import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
     required,
@@ -131,20 +123,17 @@
     },
     data() {
       return {
-        imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
+        student_id: this.$route.query.id,
+        portrait_path: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
         previousRoutes: [],
         mainColor: "#BC2C2C",
         username: "",
-        password: "",
-        confirmPassword: "",
+        permission: "",
         email: "",
         phone: "",
         firstname: "",
         lastname: "",
-        genders: ["ชาย", "หญิง", "ไม่ระบุ"], // หมวดวิชาที่มีให้เลือก
-        selectedGender: "", // หมวดวิชาที่เลือก
-        gender: null,
-        showpassword: false,
+        gender: "",
         error: "",
         center: {
           "d-flex": true,
@@ -184,37 +173,36 @@
       confirmPassword: {
         sameAs: sameAs("password"),
       },
-  },
+    },
     mounted() {
-
+      this.initInfo()
     },
     methods: {
-      handleFileUpload(event) {
-      const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด
-      this.error = null;
-      if (file) {
-        // ตรวจสอบว่าไฟล์เป็นรูปภาพหรือไม่
-        if (!file.type.startsWith("image/")) {
-          this.error = "Please upload a valid image file.";
-          this.imageUrl = null;
-          return;
-        }
-        // อ่านไฟล์และสร้าง Data URL
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.imageUrl = e.target.result; // URL ของภาพ
-        };
-        reader.readAsDataURL(file);
-      }
-      },
+      initInfo() {
+        const data = {
+            student_id: this.student_id,
+          };
+        axios.post("http://localhost:3000/tutor/student/info", data)
+          .then((res) => {
+              this.username = res.data.student.username
+              this.permission = res.data.student.permission
+              this.email = res.data.student.email
+              this.firstname = res.data.student.firstname
+              this.lastname = res.data.student.lastname
+              this.phone = res.data.student.phone
+              this.gender = res.data.student.gender
+              this.portrait_path = res.data.student.portrait_path
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+    },
 
-  
-      submit() {
-        // // Validate all fields
-          // this.v$.$touch();
-          this.$router.push({ path: "/student/profile/edit" });
-   
-        },
+      chat(receiver_id){
+      this.$router.push({ name: 'ChatPage'});
+      this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
+      this.$cookies.set("receiver_id", receiver_id);
+    },
   
       back() {
         if (this.previousRoutes.length > 0) {

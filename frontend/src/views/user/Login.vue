@@ -67,7 +67,7 @@
             {{ error }}
           </p>
           <div class="form-group d-flex justify-content-center">
-            <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="submit()">
+            <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="login()">
               เข้าสู่ระบบ
             </div>
           </div>
@@ -123,15 +123,14 @@
     mounted() {
     },
     methods: {
-      submit() {
+      login() {
         this.v$.$touch();
         if (!this.v$.$invalid) {
           const data = {
             username: this.username,
             password: this.password,
           };
-          axios
-            .post("http://localhost:3000/user/login/", data)
+          axios.post("http://localhost:3000/user/login/", data)
             .then((res) => {
               const account = {
                 account_id:res.data.account.account_id,
@@ -143,13 +142,30 @@
                 gender: res.data.account.gender,
                 email: res.data.account.email,
                 phone: res.data.account.phone,
+                tutor_id: res.data.tutor_id
               };
+              console.log(res.data)
               this.$cookies.set("account", account);
               alert("เข้าสู่ระบบสำเร็จ");
               if(this.$cookies.get("account").permission == 'ติวเตอร์'){
-                this.$router.push({ path: "/tutor/teacher/info" });
+                
+                axios.post("http://localhost:3000/tutor/teacher/info/byAccount", {account_id: this.$cookies.get("account").account_id,})
+                .then((res) => {
+                  const profile_status = res.data.tutor.profile_status
+                  console.log(profile_status)
+                  if(profile_status === 'สมัครติวเตอร์'){
+                    this.$router.push({ path: "/tutor/verify" });
+                  }else if(profile_status === 'รอตรวจสอบ'){
+                    this.$router.push({ path: "/tutor/wait" });
+                  }else if(profile_status === 'พร้อมสอน'){
+                    this.$router.push({ path: "/teacher/profile" });
+                  }
+                })
+                .catch((error) => {
+                    this.error = error.response.data.message;
+                });
               }else{
-                this.$router.push({ path: "/student/profile" });
+                this.$router.push({ path: "/" });
               }
               
             })

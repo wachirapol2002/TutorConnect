@@ -39,22 +39,42 @@ const routes = [
     {
         path: '/tutor/register',
         name: 'RegisterTutorPage',
-        component: () => import('../views/user/Tutor/RegisterTutor.vue')
+        component: () => import('../views/user/Tutor/register/RegisterTutor.vue')
+    },
+    {
+        path: '/tutor/verify',
+        name: 'VerifyTutorPage',
+        component: () => import('../views/user/Tutor/register/VerifyTutor.vue')
     },
     {
         path: '/tutor/teacher/info',
         name: 'TeacherInfoPage',
-        component: () => import('../views/user/Tutor/TeacherInfo.vue')
+        component: () => import('../views/user/Tutor/register/TeacherInfo.vue')
     },
     {
         path: '/tutor/teaching/info',
         name: 'TeachingInfoPage',
-        component: () => import('../views/user/Tutor/TeachingInfo.vue')
+        component: () => import('../views/user/Tutor/register/TeachingInfo.vue')
+    },
+    {
+        path: '/tutor/wait',
+        name: 'TutorWaitPage',
+        component: () => import('../views/user/Tutor/register/waitApprove.vue')
     },
     {
         path: '/tutor/profile',
         name: 'TutorProfilePage',
         component: () => import('../views/user/Student/TutorProfile.vue')
+    },
+    {
+        path: '/teacher/profile',
+        name: 'TeacherProfilePage',
+        component: () => import('../views/user/Tutor/TeacherProfile.vue')
+    },
+    {
+        path: '/teacher/profile/edit',
+        name: 'TeacherProfileEditPage',
+        component: () => import('../views/user/Tutor/TeacherProfileEdit.vue')
     },
     {
         path: '/tutor/announce',
@@ -77,14 +97,15 @@ const routes = [
         component: () => import('../views/user/Tutor/StudentList.vue')
     },
     {
-        path: '/admin/approve',
+        path: '/admin/verify',
         name: 'ApproveTutorPage',
-        component: () => import('../views/ApproveTutor.vue')
+        component: () => import('../views/user/Admin/ApproveTutor.vue')
     },
     {
         path: '/chat',
         name: 'ChatPage',
-        component: () => import('../views/Chat.vue')
+        component: () => import('../views/Chat.vue'),
+        props: route => ({ receiverId: route.params.receiver_id }) // รับ props จาก params
     },
 ]
 

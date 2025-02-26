@@ -183,10 +183,10 @@
 
 
         <div class="form-group d-flex justify-content-center">
-          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
-            กลับ
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light bg-dark" :style="{backgroundColor: mainColor,}" @click="back()">
+            ย้อนกลับ
           </div>
-          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light bg-dark" :style="{backgroundColor: mainColor,}" @click="submit()">
             ยืนยันข้อมูลผู้สอน
           </div>
         </div>
@@ -365,12 +365,7 @@ export default {
       },
 
     back() {
-      if (this.previousRoutes.length > 0) {
-        const previousRoute = this.previousRoutes.pop();
-        this.$router.push(previousRoute);
-      } else {
-        this.$router.go(-1);
-      }
+      this.$router.push({ path: "/tutor/verify" });
     },
 
   },

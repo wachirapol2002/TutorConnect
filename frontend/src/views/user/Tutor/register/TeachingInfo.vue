@@ -229,10 +229,10 @@
         </div>
 
         <div class="form-group d-flex justify-content-center">
-          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="back()">
-            กลับ
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light bg-dark" :style="{backgroundColor: mainColor,}" @click="back()">
+            ย้อนกลับ
           </div>
-          <div class="button rounded-3 my-4 px4- mx-2 information text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
+          <div class="button rounded-3 my-4 px4- mx-2 information text-light bg-dark" :style="{backgroundColor: mainColor,}" @click="submit()">
             ยืนยันข้อมูลการสอน
           </div>
         </div>
@@ -523,18 +523,24 @@ export default {
     },
 
     submit() {
-      // // Validate all fields
-        this.v$.$touch();
-        this.$router.push({ path: "/tutor/profile" });
+      this.v$.$touch();
+      const data = {
+            tutor_id: this.tutor_id,
+          };
+          axios
+            .post("http://localhost:3000/tutor/sentVerify", data)
+            .then(() => {
+              alert('ข้อมูลของคุณกำลังรอผู้ดูแลตรวจสอบ');
+              this.$router.push({ path: "/teacher/profile" });
+            })
+            .catch((err) => {
+              alert(err.response.data.details.message);
+              console.log(err)
+            });
       },
 
-    back() {
-      if (this.previousRoutes.length > 0) {
-        const previousRoute = this.previousRoutes.pop();
-        this.$router.push(previousRoute);
-      } else {
-        this.$router.go(-1);
-      }
+      back() {
+        this.$router.push({ path: "/tutor/teacher/info" });
     },
   },
   watch: {

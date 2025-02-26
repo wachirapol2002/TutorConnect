@@ -31,6 +31,9 @@ const usernameValidator = async (value) => {
 }
 
 
+
+
+
 router.get("/tutor/teacher/info", async function (req, res, next) {
     try {
       const search = req.query.search || ''
@@ -38,26 +41,36 @@ router.get("/tutor/teacher/info", async function (req, res, next) {
       SELECT
         tutors.*,
         accounts.portrait_path,
-        GROUP_CONCAT(DISTINCT subjects.subject_name ORDER BY subjects.subject_id) AS subject_names,
-        GROUP_CONCAT(DISTINCT subjects.category ORDER BY subjects.subject_id) AS categories
+        accounts.gender,
+        GROUP_CONCAT(subjects.subject_name ORDER BY subjects.subject_id) AS subject_names,
+        GROUP_CONCAT(subjects.category ORDER BY subjects.subject_id) AS categories,
+        GROUP_CONCAT(subjects.subject_place ORDER BY subjects.subject_id) AS places,
+        max(subjects.price) AS max_price
       FROM tutors
       JOIN accounts ON tutors.account_id = accounts.account_id
       LEFT JOIN subjects ON tutors.tutor_id = subjects.tutor_id
+      WHERE tutors.profile_status = 'พร้อมสอน'
       `
       let cond = []
       if (search.length > 0) {
-        sql += ' WHERE tutors.account_id = ?';
+        sql += ' AND tutors.account_id = ?';
         cond = [search]
       }
-      sql += ' GROUP BY tutors.tutor_id';
+      sql += ` GROUP BY tutors.tutor_id 
+      ORDER BY tutors.rating_score DESC, tutors.revisit_score DESC;`;
       const [rows, fields] = await pool.query(sql, cond);
       const processedRows = rows.map(row => {
         const subjectNames = row.subject_names ? row.subject_names.split(',') : [];
         const categories = row.categories ? row.categories.split(',') : [];
+        const places = row.places ? row.places.split(',') : [];
+        const normalizedPlaces = places.flatMap(place => 
+            place.includes(" และ ") ? place.split(" และ ") : place
+          );
         return {
           ...row,
           subject_names: subjectNames,
-          categories: categories
+          categories: categories,
+          places: normalizedPlaces
         };
       });
   
@@ -66,6 +79,39 @@ router.get("/tutor/teacher/info", async function (req, res, next) {
     } catch (err) {
       return res.status(500).json(err)
     }
+  });
+
+  //   ดึงข้อมูลติวเตอร์จาก account_id
+  router.post("/tutor/findId", async function (req, res, next) {
+    const Schema = Joi.object({
+        account_id: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const account_id =req.body.account_id
+    let sql = `
+    SELECT
+      tutor_id
+    FROM tutors
+    WHERE account_id = ?
+    `
+    try {      
+        const [tutors] = await conn.query(sql, [account_id])
+        const tutor = tutors[0]
+        conn.commit()
+        res.status(200).json({'tutor': tutor})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+    
   });
 
 //   ดึงข้อมูลติวเตอร์จาก account_id
@@ -179,12 +225,17 @@ router.post('/tutor/register', upload.single('portrait'), async (req, res, next)
             [username]
         )
         const account = accounts[0]
-        await conn.query(
+        const [tutorResult] = await conn.query(
             'INSERT INTO tutors(account_id) VALUES (?)',
             [account.account_id]
         )
+        const tutor_id = tutorResult.insertId;
+        await conn.query(
+            'INSERT INTO verifications(tutor_id) VALUES (?)',
+            [tutor_id]
+        )
         conn.commit()
-        res.status(200).json({'account': account})
+        res.status(200).json({'account': account,'tutor_id': tutor_id})
     } catch (err) {
         conn.rollback()
         res.status(400).json(err.toString());
@@ -194,13 +245,137 @@ router.post('/tutor/register', upload.single('portrait'), async (req, res, next)
 })
 
 
+//updateVerify
+router.post('/tutor/verify/update', upload.fields([{ name: 'document'},{ name: 'selfie'}]), async (req, res, next) => {
+    const updateSchema = Joi.object({
+        tutor_id: Joi.any().required(),
+    })
+    try {
+        await updateSchema.validateAsync({
+            tutor_id: req.body.tutor_id,
+        }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    console.log(req.body.tutor_id)
+    const tutor_id =req.body.tutor_id
+    const documentFile = req.files['document']
+    const selfieFile = req.files['selfie']
+    try {
+        if (!documentFile && !selfieFile ){
+            conn.commit()
+        }
+        else{
+            let updateQuery = 'UPDATE verifications SET '
+            let queryParams = []
+
+            if (documentFile && documentFile[0]) {
+                const document_path = '/static/document/' + documentFile[0].filename;
+                updateQuery += 'document_path = ?'
+                queryParams.push(document_path)
+            }
+            if (selfieFile && selfieFile[0]) {
+                const selfie_path = '/static/selfie/' + selfieFile[0].filename;
+                if (queryParams.length > 0) {
+                    updateQuery += ', selfie_path = ?'
+                } else {
+                    updateQuery += 'selfie_path = ?'
+                }
+                queryParams.push(selfie_path)
+            }
+
+            updateQuery += ' WHERE tutor_id = ?'
+            queryParams.push(tutor_id)
+            
+            await conn.query(updateQuery, queryParams)
+            conn.commit()
+        }
+        res.status(200).json()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+})
+
+//ดึงข้อมูลภาพเอกสาร
+router.post("/tutor/verify/path", async function (req, res, next) {
+    const Schema = Joi.object({
+        tutor_id: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const tutor_id =req.body.tutor_id
+    let sql = `
+    SELECT
+        document_path,
+        selfie_path
+    FROM verifications
+    WHERE tutor_id = ?
+    `
+    try {      
+        const [paths] = await conn.query(sql, [tutor_id])
+        const path = paths[0]
+        conn.commit()
+        res.status(200).json({'path': path})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+    
+  });
+
+  //อัพเดทส่งข้อมูลรอผู้ดูแลยืนยัน
+  router.post('/tutor/sentVerify', async (req, res, next) => {
+    const updateSchema = Joi.object({
+        tutor_id: Joi.any().required(),
+    })
+    try {
+        await updateSchema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const tutor_id =req.body.tutor_id
+    try {
+        await conn.query(
+            'UPDATE tutors SET profile_status=? WHERE tutor_id =?;',
+            ['รอตรวจสอบ', tutor_id]
+        )
+        await conn.query(
+            'UPDATE verifications SET status=? WHERE tutor_id =?;',
+            ['รอตรวจสอบ', tutor_id]
+        )
+        conn.commit()
+        res.status(200).json()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+})
+
+
+
 //updateTeacherInfo
 router.post('/tutor/teacher/update', async (req, res, next) => {
     const updateSchema = Joi.object({
         account_id: Joi.any().required(),
         tutorName: Joi.string().required().min(2).max(30),
-        facebook: Joi.string().optional(),
-        line: Joi.string().optional(),
+        facebook: Joi.optional(),
+        line: Joi.optional(),
         introduce: Joi.string().required(),
         describe: Joi.string().required(),
     })
@@ -217,7 +392,6 @@ router.post('/tutor/teacher/update', async (req, res, next) => {
     const line = req.body.line
     const introduce = req.body.introduce
     const describe = req.body.describe
-    console.log(req.body.describe)
     try {
         await conn.query(
             'UPDATE tutors SET displayname=?, facebook_link=?, line_id=?, introduce_message=?, description=? WHERE account_id=?;',
@@ -620,7 +794,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     let sql = `SELECT comments.*, accounts.portrait_path, accounts.firstname, accounts.lastname
             FROM comments
             JOIN accounts ON comments.account_id = accounts.account_id
-            WHERE comments.tutor_id=?`
+            WHERE comments.tutor_id=? ORDER BY comments.timestamp DESC`
     try {
 
         const [comments] = await conn.query(
@@ -642,7 +816,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
         await conn.beginTransaction()
         try {
             const [announces] = await conn.query(
-                'SELECT announces.*, accounts.firstname, accounts.lastname FROM announces JOIN accounts ON announces.account_id = accounts.account_id ORDER BY announces.announce_id ASC', 
+                'SELECT announces.*, accounts.firstname, accounts.lastname FROM announces JOIN accounts ON announces.account_id = accounts.account_id ORDER BY announces.announce_id DESC', 
                 []
             )
             conn.commit()
@@ -654,5 +828,45 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
             conn.release()
         }
       });
+
+    //   ดึงข้อมูลนักเรียนที่ต้องการดูข้อมูล
+    router.post("/tutor/student/info", async function (req, res, next) {
+        const Schema = Joi.object({
+            student_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const student_id =req.body.student_id
+        let sql = `
+        SELECT
+        accounts.portrait_path,
+        accounts.username,
+        accounts.permission,
+        accounts.firstname,
+        accounts.lastname,
+        accounts.gender,
+        accounts.email,
+        accounts.phone
+        FROM accounts
+        WHERE account_id = ?
+        `
+        try {      
+            const [students] = await conn.query(sql, [student_id])
+            const student = students[0]
+            conn.commit()
+            res.status(200).json({'student': student})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+        
+    });
 
 exports.router = router;

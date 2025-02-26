@@ -15,20 +15,16 @@
                     <div class="mx-2">วิชาที่ต้องการเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      required
-                      placeholder="วิชาที่ต้องการหาคนมาสอน"
-                      v-model="subject"
-                    /> -->
+
                     <input v-model="subject" class="form-control" :style="{ fontSize: '1.2vw' }" list="subjectsList" required  placeholder="วิชาที่ต้องการหาคนมาสอน"/>
                     <datalist id="subjectsList">
                       <option v-for="subject in subjects" :key="subject" :value="subject"></option>
                     </datalist>
+                    <template v-if="v$.subject.$error">
+                      <p class="text-danger m-0 p-0" style="font-size: 0.7em;" v-if="v$.subject.required.$invalid">
+                        ต้องกรอก วิชาที่ต้องการเรียน
+                      </p>
+                    </template>
 
                   </div>
                 </div>
@@ -38,29 +34,16 @@
                     <div class="mx-2">กำหนดสถานที่</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="place"
-                      name="place"
-                      required
-                      placeholder="สถานที่เรียน (ชื่อสถานที่, จังหวัด, ออนไลน์)"
-                      v-model="place"
-                    /> -->
+   
                     <input v-model="place" class="form-control" :style="{ fontSize: '1.2vw' }" list="placesList" required  placeholder="ระบุสถานที่"/>
                     <datalist id="placesList">
                       <option v-for="place in places" :key="place" :value="place"></option>
                     </datalist>
-
-                    <!-- <select v-model="place" class="form-control" :style="{ fontSize: '1.2vw' }" required>
-                      <option value="" disabled>เลือกสถานที่</option>
-                      <option v-for="place in places" :key="place" :value="place">
-                        {{ place }}
-                      </option>
-                    </select> -->
-                   
-
+                    <template v-if="v$.place.$error">
+                      <p class="text-danger m-0 p-0" style="font-size: 0.7em;" v-if="v$.place.required.$invalid">
+                        ต้องกรอก สถานที่
+                      </p>
+                    </template>
                   </div>
                 </div>
                 <!--อายุ  -->
@@ -69,53 +52,54 @@
                     <div class="mx-2">ช่วงอายุของผู้เรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="age"
-                      name="age"
-                      required
-                      placeholder="อายุ หรือ ระดับการศึกษา"
-                      v-model="age"
-                    /> -->
-                    <select v-model="age" class="form-control" :style="{ fontSize: '1.2vw' }" required>
+                    <input v-model="age" class="form-control" :style="{ fontSize: '1.2vw' }" list="agesList" required  placeholder="อายุของผู้เรียน"/>
+                    <datalist id="agesList">
+                      <option v-for="age in ages" :key="age" :value="age"></option>
+                    </datalist>
+                    <template v-if="v$.age.$error">
+                      <p class="text-danger m-0 p-0" style="font-size: 0.7em;" v-if="v$.age.required.$invalid">
+                        ต้องกรอก อายุของผู้เรียน
+                      </p>
+                    </template>
+                  </div>
+                </div>
+
+                <!--ระดับ  -->
+                <div class="row my-3" :class="center">
+                  <div class="form-group col-4">
+                    <div class="mx-2">ระดับของผู้เรียน</div>
+                  </div>
+                  <div class="form-group col-8">
+
+                    <select v-model="degree" class="form-control" :style="{ fontSize: '1.2vw' }" required>
                       <option value="" disabled>เลือกระดับผู้เรียน</option>
-                      <option v-for="age in ages" :key="age" :value="age">
-                        {{ age }}
+                      <option v-for="degree in degrees" :key="degree" :value="degree">
+                        {{ degree }}
                       </option>
                     </select>
+                    
                   </div>
                 </div>
 
                 <!--วันที่สะดวก -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">วันที่สะดวก</div>
+                    <div class="mx-2">วันที่สะดวกเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="day"
-                      name="day"
-                      required
-                      placeholder="ระบุวันจันทร์-วันอาทิตย์"
-                      v-model="day"
-                    /> -->
                     <div class="border rounded p-2" style="max-height: 20vh; overflow-y: auto;">
-                    <div class="form-check" v-for="day in days" :key="day">
-                      <input 
-                        class="form-check-input" 
-                        type="checkbox" 
-                        :id="day" 
-                        :value="day" 
-                        v-model="selectedDays"
-                        placeholder="ระบุวันจันทร์-วันอาทิตย์"
-                      />
-                      <label class="form-check-label" :for="day" :style="{ fontSize: '1.2vw' }">{{ day }}</label>
-                    </div>
+                      <div class="d-flex flex-wrap gap-4">
+                        <div class="form-check" v-for="day in days" :key="day">
+                          <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            :id="day" 
+                            :value="day" 
+                            v-model="selectedDays"
+                          />
+                          <label class="form-check-label" :for="day" :style="{ fontSize: '1.2vw' }">{{ day }}</label>
+                        </div>
+                      </div>
                   </div>
 
                   </div>
@@ -124,21 +108,11 @@
                 <!--ช่วงเวลา -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">ช่วงเวลา</div>
+                    <div class="mx-2">ช่วงเวลาเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="time"
-                      name="time"
-                      required
-                      placeholder="ระบุเวลา หรือช่วงเวลา (เช้า, เย็น)"
-                      v-model="time"
-                    /> -->
                     <select v-model="time" class="form-control" :style="{ fontSize: '1.2vw' }" required>
-                      <option value="" disabled>เลือกเวลา</option>
+                      <option value="" disabled>เลือกเวลาเรียน</option>
                       <option v-for="time in times" :key="time" :value="time">
                         {{ time }}
                       </option>
@@ -152,22 +126,17 @@
                     <div class="mx-2">รูปแบบการเรียน</div>
                   </div>
                   <div class="form-group col-8">
-                    <!-- <input
-                      class="form-control"
-                      :style="{fontSize: '1.2vw',}"
-                      type="text"
-                      id="learning"
-                      name="learning"
-                      required
-                      placeholder="ตัวต่อตัว, เป็นกลุ่ม, อื่น ๆ"
-                      v-model="learning"
-                    /> -->
                     <select v-model="learning" class="form-control" :style="{ fontSize: '1.2vw' }" required>
                       <option value="" disabled>เลือกรูปแบบการเรียน</option>
                       <option v-for="learning in learnings" :key="learning" :value="learning">
                         {{ learning }}
                       </option>
                     </select>
+                    <template v-if="v$.learning.$error">
+                      <p class="text-danger m-0 p-0" style="font-size: 0.7em;" v-if="v$.learning.required.$invalid">
+                        ต้องเลือกรูปแบบการเรียน
+                      </p>
+                    </template>
                   </div>
                 </div>
 
@@ -187,6 +156,11 @@
                       placeholder="ระบุวันที่"
                       v-model="start"
                     />
+                    <template v-if="v$.start.$error">
+                      <p class="text-danger m-0 p-0" style="font-size: 0.7em;" v-if="v$.start.required.$invalid">
+                        ต้องเลือกวันที่สามารถเริ่มเริ่มเรียน
+                      </p>
+                    </template>
                   </div>
                 </div>
 
@@ -203,7 +177,7 @@
                       id="objective"
                       name="objective"
                       required
-                      placeholder="เป้าหมายการเรียนหรือสิ่งที่คาดหวัง"
+                      placeholder="เป้าหมายการเรียนหรือสิ่งที่คาดหวัง / ความต้องการเพิ่มเติม"
                       v-model="objective"
                     />
                   </div>
@@ -272,10 +246,20 @@
                   </div>
                 </div>
 
+                <!--ระดับ  -->
+                <div class="row my-3" :class="center">
+                  <div class="form-group col-4">
+                    <div class="mx-2">ระดับของผู้เรียน</div>
+                  </div>
+                  <div class="form-group col-8">
+                    <div class="mx-2">{{ announce.student_degree}}</div>
+                  </div>
+                </div>
+
                 <!--วันที่สะดวก -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">วันที่สะดวก</div>
+                    <div class="mx-2">วันที่สะดวกเรียน</div>
                   </div>
                   <div class="form-group col-8">
                     <div class="mx-2">{{ announce.convenient_day}}</div>
@@ -285,7 +269,7 @@
                 <!--ช่วงเวลา -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">ช่วงเวลา</div>
+                    <div class="mx-2">ช่วงเวลาเรียน</div>
                   </div>
                   <div class="form-group col-8">
                     <div class="mx-2">{{ announce.convenient_time}}</div>
@@ -322,7 +306,7 @@
                   </div>
                 </div>
                 
-                <!--เป้าหมาย -->
+                <!--วันที่ลง -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
                     <div class="mx-2">วันที่ลงประกาศ</div>
@@ -337,7 +321,7 @@
                   <div class="form-group col-10">
                   </div>
                   <div class="form-group col-2">
-                    <div class="button rounded-3 text-light" :style="{backgroundColor: mainColor,}" @click="del()">
+                    <div class="button rounded-3 text-light" :style="{backgroundColor: mainColor,}" @click="del(announce.announce_id, index)">
                       ลบประกาศ
                     </div>
                   </div>
@@ -361,24 +345,8 @@
   import useVuelidate from "@vuelidate/core";
   import {
     required,
-    email,
-    minLength,
-    maxLength,
-    sameAs,
-    helpers,
   } from "@vuelidate/validators";
 
-
-    function phone(value) {
-    return !helpers.req(value) || !!value.match(/0[0-9]{9}/);
-  }
-
-  function complexPassword(value) {
-    if (value.match(/[a-z]/) && value.match(/[A-Z]/) && value.match(/[0-9]/)) {
-      return true;
-    }
-    return false;
-  }
 
   export default {
     name: "StudentAnnouncePage",
@@ -438,13 +406,15 @@
         subject: "",
         places: ["เรียนออนไลน์", "กรุงเทพฯ", "สถาบันกวดวิชา" ,"บ้านของผู้เรียน", "ห้องสมุด", "มหาวิทยาลัยหรือโรงเรียน"],
         place: "",
-        ages: ["ต่ำกว่า 12 ปี", "13-18 ปี", "19-25 ปี", "26 ปีขึ้นไป", "ประถมศึกษา", "มัธยมต้น", "มัธยมปลาย", "ปริญญาตรีขึ้นไป"],
+        ages: ["ระบุอายุของผู้เรียน", "ต่ำกว่า 12 ปี", "13-18 ปี", "19-25 ปี", "26 ปีขึ้นไป"],
         age: "",
+        degrees: ["ประถมศึกษา", "มัธยมต้น", "มัธยมปลาย", "ปริญญาตรีขึ้นไป", "ปวช.", "ปวส."],
+        degree: "",
         days: ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"],
         selectedDays: [],
         times: ["เช้า (08:00-12:00)", "บ่าย (13:00-17:00)", "เย็น (18:00-20:00)"],
         time: "",
-        learnings: ["ตัวต่อตัว", "เรียนเป็นกลุ่ม", "วิดีโอสอน", "แบบฝึกหัด", "อบรม"],
+        learnings: ["ตัวต่อตัว", "เรียนเป็นกลุ่ม"],
         learning: "",
         start: "",
         objective: "",
@@ -453,32 +423,20 @@
       };
     },
     validations: {
-      username: {
-        required: required,
-        minLength: minLength(5),
-        maxLength: maxLength(20),
-      },
-      firstname: {
+      subject: {
         required: required,
       },
-      lastname: {
+      place: {
         required: required,
       },
-      email: {
+      age: {
         required: required,
-        email: email,
       },
-      phone: {
+      learning: {
         required: required,
-        phone: phone,
       },
-      password: {
+      start: {
         required: required,
-        minLength: minLength(8),
-        complex: complexPassword,
-      },
-      confirmPassword: {
-        sameAs: sameAs("password"),
       },
   },
     mounted() {
@@ -523,34 +481,52 @@
         },
 
       submit() {
-        const dayOrder = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"];
-        const data = {
-            account_id: this.account_id,
-            subject_to_learn: this.subject,
-            place_to_learn: this.place,
-            student_age: this.age,
-            convenient_day: this.selectedDays.sort((a, b) => {return dayOrder.indexOf(a) - dayOrder.indexOf(b);}).join(","),
-            convenient_time: this.time,
-            learning_style: this.learning,
-            starting_time: this.start,
-            objective: this.objective,
-          };
-        axios.post("http://localhost:3000/student/announce/add", data)
+        this.v$.$touch();
+        if (!this.v$.$invalid) {
+          const dayOrder = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"];
+          const data = {
+              account_id: this.account_id,
+              subject_to_learn: this.subject,
+              place_to_learn: this.place,
+              student_age: this.age,
+              student_degree: this.degree || "-",
+              convenient_day: this.selectedDays.sort((a, b) => {return dayOrder.indexOf(a) - dayOrder.indexOf(b);}).join(",") || "-",
+              convenient_time: this.time || "-",
+              learning_style: this.learning,
+              starting_time: this.start,
+              objective: this.objective || "-"
+            };
+          axios.post("http://localhost:3000/student/announce/add", data)
+          .then((res) => {
+              alert(res.data.message); 
+              this.announces = res.data.announces;
+              this.subject = "",
+              this.place = "",
+              this.age = "",
+              this.degree = "",
+              this.selectedDays = [],
+              this.time = "",
+              this.learning = "",
+              this.start = "",
+              this.objective = ""
+            })  
+            .catch((err) => {
+              alert(err);
+            });   
+        }
+
+        },
+      del(announce_id, index) {
+        axios.post("http://localhost:3000/student/announce/del", {announce_id: announce_id})
         .then((res) => {
-            this.announces = res.data.announces;
-            this.subject = "",
-            this.place = "",
-            this.age = "",
-            this.selectedDays = [],
-            this.time = "",
-            this.learning = "",
-            this.start = "",
-            this.objective = ""
+          alert(res.data.message); 
+          this.announces.splice(index, 1); 
           })  
           .catch((err) => {
             alert(err);
           });   
-        },
+
+      },
   
       back() {
         if (this.previousRoutes.length > 0) {

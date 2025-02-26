@@ -19,7 +19,7 @@
                     <section class="container mt-4">
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
-                          <div :class="center" style="height:8vw; width: 8vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                          <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
                             <img :src="'http://localhost:3000' + student.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
                               style="width: 100%; height: 100%; object-fit: cover;"
                             />
@@ -103,7 +103,7 @@
                       </div>
                       <!-- ปุ่มติดต่อ -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}">
+                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat(student.account_id)">
                           ส่งข้อความ
                         </div>
                       </div>
@@ -226,7 +226,7 @@
           });   
     },
     formatTimestamp(timestamp) {
-      return dayjs(timestamp).format('DD-MM-YYYY');
+        return dayjs(timestamp).format('DD-MM-YYYY');
     },
     Accept(study_id, index) {
       const data = {
@@ -254,6 +254,11 @@
           alert(err.response.data.details.message);
         });   
     },
+    chat(receiver_id){
+      this.$router.push({ name: 'ChatPage'});
+      this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
+      this.$cookies.set("receiver_id", receiver_id);
+    },
 
     back() {
       if (this.previousRoutes.length > 0) {
@@ -274,16 +279,25 @@
   };
   </script>
   
-<style>
-img {
-    object-fit: cover;
-}
-.button{
-  transition: transform 0.2s ease;
+  <style>
+  img {
+      object-fit: cover;
+  }
+  .button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #D9D9D9; /* กรอบ */
+    width: auto; /* ขนาดกล่อง */
+    height: auto;
+    text-align: center;
+    transition: transform 0.2s ease;;
+    color: white;
+    
+  }
+  .button:hover{
+    transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
+    cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+  }
   
-}
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
-}
-</style>
+  </style>

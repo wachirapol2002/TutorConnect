@@ -31,6 +31,9 @@
               <template v-if="this.$cookies.get('account').permission =='ติวเตอร์'">
                   <div class="px-3" :style="{fontSize: '3vh'}">บัญชี: ติวเตอร์</div>
               </template>
+              <template v-if="this.$cookies.get('account').permission =='ผู้ดูแลระบบ'">
+                  <div class="px-3" :style="{fontSize: '3vh'}">บัญชี: ผู้ดูแลระบบ</div>
+              </template>
             </template>
             
             
@@ -69,6 +72,9 @@
               <router-link class="router-link" to="/" :class="center" style="text-decoration: none; color: white;">
                 <div class="px-3" :style="{fontSize: '3vh'}">หาติวเตอร์</div>
               </router-link>
+              <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ข้อความ</div>
+              </router-link>
             </div>
           </template>
           <!-- ติวเตอร์ -->
@@ -89,7 +95,7 @@
                     <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ส่วนตัว</router-link>
                   </li>
                   <li>
-                    <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ผู้สอน</router-link>
+                    <router-link to="/teacher/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ผู้สอน</router-link>
                   </li>
                   <li>
                     <div class="dropdown-item" @click="logout" style="cursor: pointer;">ออกจากระบบ</div>
@@ -105,10 +111,46 @@
               <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
                 <div class="px-3" :style="{fontSize: '3vh'}">หางาน</div>
               </router-link>
+              <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ข้อความ</div>
+              </router-link>
             </div>
           </template>
-          <!-- ผู้ดูแล -->
-          <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ผู้ดูแล'">
+          <!-- ผู้ดูแลระบบ -->
+          <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ผู้ดูแลระบบ'">
+            <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">    
+              <div class="bell ms-2 me-3" :class="center" style="text-decoration: none; color: #ffcc00;">
+                <font-awesome-icon icon="bell" class="" style="font-size: 2rem; cursor: pointer;" />
+              </div>
+              <div class="dropdown">
+                <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
+                  <div class="px-3" :style="{fontSize: '3vh'}">
+                    <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
+                    {{ this.$cookies.get('account').username }}
+                  </div>
+                </div>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ส่วนตัว</router-link>
+                  </li>
+                  <li>
+                    <div class="dropdown-item" @click="logout" style="cursor: pointer;">ออกจากระบบ</div>
+                  </li>
+                </ul>
+              </div>
+              <router-link class="router-link" to="/admin/verify" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ยืนยันตัวตนผู้สอน</div>
+              </router-link>
+              <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ดูประกาศ</div>
+              </router-link>
+              <router-link class="router-link" to="/" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ผู้สอนในระบบ</div>
+              </router-link>
+              <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
+                <div class="px-3" :style="{fontSize: '3vh'}">ข้อความ</div>
+              </router-link>
+            </div>
           </template>
           <!-- ผู้ใช้งานทั่วไป -->
           <template v-if="!this.$cookies.isKey('account')">
@@ -243,6 +285,11 @@ export default {
 .dropdown-toggle {
   display: flex;
   align-items: center;
+}
+.profile-img {
+  width: 100%;   /* ทำให้รูปขยายเต็มขนาดของ div */
+  height: 100%;  /* ทำให้รูปเต็มขนาดของ div */
+  object-fit: cover; /* ป้องกันภาพบิดเบี้ยว และครอบรูปให้อยู่ในกรอบ */
 }
 
 </style>

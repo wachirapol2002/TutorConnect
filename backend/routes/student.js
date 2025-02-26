@@ -72,7 +72,7 @@ router.post('/student/register', async (req, res, next) => {
 })
 
 
-//StudentSubjectRegister
+//สมัครเรียน
 router.post('/student/subject/register', async (req, res, next) => {
     const Schema = Joi.object({
         account_id: Joi.required(),
@@ -117,6 +117,56 @@ router.post('/student/subject/register', async (req, res, next) => {
         conn.release()
     }
 })
+
+//ยกเลิกการสมัครเรียน
+router.post('/student/subject/cancelRegister', async (req, res, next) => {
+    const Schema = Joi.object({
+        study_id: Joi.required(),
+        account_id: Joi.required(),
+        tutor_id: Joi.required(),
+        subject_id: Joi.required()
+    })
+    try {
+        await Schema.validateAsync(req.body, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const study_id = req.body.study_id
+    const account_id = req.body.account_id
+    const tutor_id = req.body.tutor_id
+    const subject_id = req.body.subject_id
+    try {
+        const [rows] = await conn.query(
+            `SELECT * FROM studys WHERE study_id = ?`,
+            [study_id]
+        );
+        if (rows.length > 0) {
+            // หากมีข้อมูล
+            await conn.query(
+                'DELETE FROM studys WHERE study_id = ?;',
+                [study_id]
+            );
+            await conn.query(
+                `UPDATE subjects SET register_count = register_count - 1 WHERE subject_id = ?`,
+                [subject_id]
+            );
+            
+        } else {
+            // หากไม่มีข้อมูล
+            throw new Error('คุณยกเลิกการสมัครแล้ว');
+        }
+        conn.commit()
+        res.status(201).send()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json({ message: err.message });
+    } finally {
+        conn.release()
+    }
+})
+
     // ดูติวเตอร์ที่เคยเรียนด้วย
     router.post("/student/tutorlist", async function (req, res, next) {
         const Schema = Joi.object({
@@ -161,6 +211,44 @@ router.post('/student/subject/register', async (req, res, next) => {
         }
       });
 
+      // ดูวิชาที่่ต้องการสมัครหรือเรียน
+    router.post("/student/subject", async function (req, res, next) {
+        const Schema = Joi.object({
+            tutor_id: Joi.any().required(),
+            account_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const tutor_id = req.body.tutor_id
+        const account_id = req.body.account_id
+        let sql = `
+                SELECT subjects.*, tutors.displayname, studys.study_id, studys.status, studys.rating_study, studys.register_timestamp, studys.approve_timestamp
+                FROM subjects
+                JOIN tutors ON subjects.tutor_id = tutors.tutor_id
+                LEFT JOIN studys ON subjects.subject_id = studys.subject_id AND studys.account_id = ?
+                WHERE subjects.tutor_id = ?
+                ORDER BY subjects.timestamp ASC
+                `
+        try {
+
+            const [subjects] = await conn.query(
+                sql, [account_id, tutor_id]
+            )
+            conn.commit()
+            res.status(200).json({'subjects': subjects})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+  });
+
 
     // เช็คว่าเคยเรียน
     router.post("/student/checkStudy", async function (req, res, next) {
@@ -195,6 +283,80 @@ router.post('/student/subject/register', async (req, res, next) => {
             conn.release()
         }
       });
+
+      // ให้คะแนนรีวิววิชา
+      router.post("/student/subject/rating/view", async function (req, res, next) {
+        const Schema = Joi.object({
+            study_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const study_id = req.body.study_id
+        console.log(study_id)
+        let sql = `
+        SELECT studys.rating_study FROM studys WHERE study_id = ?;
+        `
+        try {
+            const [rating] = await conn.query(sql, [study_id])
+
+            conn.commit()
+            res.status(200).json({'rating': rating[0].rating_study})
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+      });
+
+
+
+        // ให้คะแนนรีวิววิชา
+        router.post("/student/subject/rating", async function (req, res, next) {
+            const Schema = Joi.object({
+                tutor_id: Joi.any().required(),
+                study_id: Joi.any().required(),
+                rating: Joi.number().integer().min(1).max(5).required(),
+                subject_id: Joi.any().required(),
+            })
+            try {
+                await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+            } catch (err) {
+                return res.status(400).send(err)
+            }
+            const conn = await pool.getConnection()
+            await conn.beginTransaction()
+            const tutor_id = req.body.tutor_id
+            const study_id = req.body.study_id
+            const rating = req.body.rating
+            const subject_id = req.body.subject_id
+            try {
+                await conn.query(
+                    'UPDATE studys SET rating_study = ? WHERE study_id = ?',
+                    [rating, study_id]
+                );
+                await conn.query(
+                    'UPDATE subjects s SET s.rating_subject = (SELECT AVG(studys.rating_study) FROM studys WHERE studys.subject_id = ?) WHERE s.subject_id = ?',
+                    [subject_id, subject_id]
+                );
+                await conn.query(
+                    'UPDATE tutors t SET t.rating_score = (SELECT AVG(s.rating_subject) FROM subjects s WHERE s.tutor_id = ?) WHERE t.tutor_id = ?',
+                    [tutor_id, tutor_id]
+                );
+                conn.commit()
+                res.status(200).json({ message: 'ให้คะแนนวิชาสำเร็จ' });
+            } catch (err) {
+                conn.rollback()
+                res.status(400).json(err.toString());
+            } finally {
+                conn.release()
+            }
+          });
 
 
     // ให้คะแนนรีวิว
@@ -307,7 +469,7 @@ router.post('/student/subject/register', async (req, res, next) => {
             let sql = `SELECT comments.*, accounts.portrait_path, accounts.firstname, accounts.lastname
             FROM comments
             JOIN accounts ON comments.account_id = accounts.account_id
-            WHERE comments.tutor_id=?`
+            WHERE comments.tutor_id=? ORDER BY comments.timestamp DESC`
             const [comments] = await conn.query(
                 sql, [tutor_id]
             )
@@ -396,6 +558,7 @@ router.post('/student/subject/register', async (req, res, next) => {
             const subject_to_learn = req.body.subject_to_learn
             const place_to_learn = req.body.place_to_learn
             const student_age = req.body.student_age
+            const student_degree = req.body.student_degree
             const convenient_day = req.body.convenient_day
             const convenient_time = req.body.convenient_time
             const learning_style = req.body.learning_style
@@ -403,15 +566,16 @@ router.post('/student/subject/register', async (req, res, next) => {
             const objective = req.body.objective
             try {
                 await conn.query(
-                    'INSERT INTO announces(account_id, subject_to_learn, place_to_learn, student_age, convenient_day, convenient_time, learning_style, starting_time, objective) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    [account_id, subject_to_learn, place_to_learn, student_age, convenient_day, convenient_time, learning_style, starting_time, objective]
+                    'INSERT INTO announces(account_id, subject_to_learn, place_to_learn, student_age, student_degree, convenient_day, convenient_time, learning_style, starting_time, objective) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                    [account_id, subject_to_learn, place_to_learn, student_age, student_degree, convenient_day, convenient_time, learning_style, starting_time, objective]
                 )
                 const [announces] = await conn.query(
                     'SELECT announces.*, accounts.firstname, accounts.lastname FROM announces JOIN accounts ON announces.account_id = accounts.account_id WHERE announces.account_id=? ORDER BY announces.announce_id DESC', 
                     [account_id]
                 )
+                console.log(announces)
                 conn.commit()
-                res.status(200).json({'announces': announces})
+                res.status(200).json({'announces': announces, message: "ลงประกาศแล้ว" })
             } catch (err) {
                 conn.rollback()
                 res.status(400).json(err.toString());
@@ -419,6 +583,30 @@ router.post('/student/subject/register', async (req, res, next) => {
                 conn.release()
             }
   });
+
+   // ลบประกาศ
+   router.post("/student/announce/del", async function (req, res, next) {
+    const announce_id = req.body.announce_id
+    console.log(announce_id)
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    try {
+        await conn.query(
+            `DELETE FROM announces WHERE announce_id =?`,
+            [announce_id]
+        )
+        conn.commit()
+        res.status(200).json({ message: "ลบประกาศแล้ว" });
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+});
+
+
+
 
 
  
