@@ -6,7 +6,7 @@
                 <div :class="center" class="m-0 p-0" style="width: 25vw;" :style="{ backgroundColor: '' }">
                 <!-- รูปโปรไฟล์ -->
                     <div class="m-0 rounded-circle bg-light" :class="center" :style="{ backgroundColor: 'white' }" style="height:13vw; width: 13vw; background-color: white; border: 1px solid black; overflow: hidden;">
-                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle profile-img" />
+                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" style="width: 100%; height: 100%; object-fit: cover;"/>
                     </div>
                 </div>
                 <div class="container" style="width: 40vw;" :style="{ backgroundColor: '' }">
@@ -54,38 +54,77 @@
                     </div>
                     <!-- ปุ่มส่งข้อความ -->
                     <div class="d-flex align-items-center justify-content-between mt-3">
-                      <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat()">
+                      <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat()">
                           ส่งข้อความ
                       </div>
-                      <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" :style="{}" @click="unlicense()">
-                          ลบสิทธิ์การสอน
+                      <div class="d-flex flex-row">
+                        <div v-if="this.$route.query.id != this.$cookies.get('account').account_id" class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="report()">
+                            รายงาน
+                        </div>
+                        <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me- bg-danger text-white fw-bold" :style="{}" @click="unlicense()">
+                            ลบสิทธิ์การสอน
+                        </div>
                       </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ลบสิทธิ์การสอน -->
-        <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
-          <div class="popup" style="width: 50%;">
-            <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
 
-            <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
-            <div class="mb-3 text-center">
-              <label for="unlicenseReason" class="form-label" style="font-size: 1vw;">กรุณาระบุเหตุผล</label>
-              <textarea v-model="unlicenseReason" id="unlicenseReason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+          <!-- รายงาน -->
+      <div v-if="showReport" class="popup-overlay" style="width: 100%;">
+        <div class="popup" style="width: 50%;">
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการรายงานผู้สอนหรือไม่</div>
+
+          <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
+          <div class="mb-3 text-center">
+            <label for="reason" class="form-label" style="font-size: 1vw;">ระบุเหตุผล เพื่อให้ผู้สอนปรับปรุง</label>
+            <textarea v-model="reason" id="reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+          </div>
+          <template v-if="v$.reason.$error">
+            <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
+              กรุณากรอกเหตุผลของการรายงาน
+            </p>
+          </template>
+
+          <div class="d-flex align-items-center justify-content-center mt-3">
+            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+              ย้อนกลับ
             </div>
-
-            <div class="d-flex align-items-center justify-content-center mt-3">
-              <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-                ย้อนกลับ
-              </div>
-              <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unlicenseAccept">
-                ยืนยัน
-              </div>
+            <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" @click="submitReport">
+              ยืนยัน
             </div>
           </div>
         </div>
+      </div>
+
+
+        <!-- ลบสิทธิ์การสอน -->
+      <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
+        <div class="popup" style="width: 50%;">
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
+
+          <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
+          <div class="mb-3 text-center">
+            <label for="reason" class="form-label" style="font-size: 1vw;">ระบุเหตุผล แจ้งเตือนไปยังผู้สอน</label>
+            <textarea v-model="reason" id="reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+          </div>
+          <template v-if="v$.reason.$error">
+            <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
+              กรุณากรอกเหตุผลของการยกเลิกสิทธิ์
+            </p>
+          </template>
+
+          <div class="d-flex align-items-center justify-content-center mt-3">
+            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+              ย้อนกลับ
+            </div>
+            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unlicenseAccept">
+              ยืนยัน
+            </div>
+          </div>
+        </div>
+      </div>
 
 
         <div class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}" style="width: 80vw;">
@@ -420,7 +459,8 @@
         showSubjectDetail: false,
         showSubjectRating: false,
         showUnlicense: false,
-        unlicenseReason: "",
+        showReport: false,
+        reason: "",
         subjectDetail: {},
         error: "",
         center: {
@@ -443,6 +483,9 @@
       };
     },
     validations: {
+    reason: {
+      required: required,
+    },
     introduce: {
       required: required,
     },
@@ -634,7 +677,7 @@
     },
     chat(){
       console.log(this.tutor.account_id)
-      this.$router.push({ name: 'ChatPage', params: { receiver_id: this.tutor.account_id } });
+      this.$router.push({ name: 'ChatPage'});
       this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
       this.$cookies.set("receiver_id", this.tutor.account_id);
     },
@@ -761,25 +804,56 @@
             });
       this.showSubjectRating = true; // เปิด popup
     },
+    report(){
+      this.showReport = true; // เปิด popup
+    },
     unlicense() {
       this.showUnlicense = true; // เปิด popup
     },
     unlicenseAccept(){
-      axios.post("http://localhost:3000/admin/verify/unaccept", {tutor_id: this.$route.query.id})
-            .then(() => {
-              alert("ลบสิทธิ์การสอนแล้ว");
-              this.$router.push({ path: "/" });
-            })
-            .catch((err) => {
-              alert(err.response.data.message);
-            });
-      
+      this.v$.$touch();
+      if (!this.v$.$invalid) {
+        const data = {
+            tutor_id: this.$route.query.id,
+            message: this.reason
+          };
+        axios.post("http://localhost:3000/admin/verify/unaccept", data)
+              .then(() => {
+                alert("ลบสิทธิ์การสอนแล้ว");
+                this.closePopup()
+                this.reason = ""
+                this.$router.push({ path: "/" });
+              })
+              .catch((err) => {
+                alert(err.response.data.message);
+              });
+      }
+    },
+    submitReport(){
+      this.v$.$touch();
+      if (!this.v$.$invalid) {
+        const data = {
+            account_id: this.tutor.account_id,
+            reporter_id: this.$cookies.get('account').account_id,
+            message: this.reason
+          };
+        axios.post("http://localhost:3000/report", data)
+              .then((res) => {
+                alert(res.data.message); 
+                this.closePopup()
+                this.reason = ""
+              })
+              .catch((err) => {
+                alert(err.response.data.message);
+              });
+      }
     },
     closePopup() {
       this.showSubjectDetail = false; // ปิด popup
       this.showSubjectRating = false;
       this.showUnlicense = false;
-      this.unlicenseReason = "";
+      this.showReport = false;
+      this.reason = "";
     },
   
       submit() {

@@ -81,7 +81,7 @@
                      <!-- ส่งข้อความ -->
                      <div class="row mt-3">
                       <div class="form-group col-8 d-flex align-items-center">
-                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}">
+                        <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat(tutor.account_id)">
                           ส่งข้อความ
                         </div>
                       </div>
@@ -193,6 +193,11 @@
         // // Validate all fields
           this.v$.$touch();
    
+    },
+    chat(account_id){
+      this.$router.push({ name: 'ChatPage'});
+      this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
+      this.$cookies.set("receiver_id", account_id);
     },
     back() {
         if (this.previousRoutes.length > 0) {

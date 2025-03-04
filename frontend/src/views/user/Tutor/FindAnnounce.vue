@@ -124,7 +124,7 @@
                   </div>
                   <div class="form-group col-2">
                     <router-link :to="'/tutor/studentinfo/?id='+ announce.account_id" style="text-decoration: none;">
-                      <div class="button rounded-3 text-light" :style="{backgroundColor: mainColor,}">
+                      <div class="button rounded-3 bg-dark text-light" :style="{backgroundColor: mainColor,}">
                         ดูข้อมูลติดต่อ
                       </div>
                     </router-link>

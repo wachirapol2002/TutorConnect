@@ -63,65 +63,17 @@
                     <!-- รับสอน -->
                     <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
                       <div class="button rounded-3 me-5 bg-success fw-bold text-light" :style="{}"
-                        @click="showAccept()"
+                        @click="showAccept(tutor.tutor_id, index)"
                       >
                         อนุมัติ
                       </div>
                       <div class="button rounded-3 m-0 bg-danger fw-bold text-light" :style="{}"
-                        @click="showUnAccept()"
+                        @click="showUnAccept(tutor.tutor_id, index)"
                       >
                         ปฏิเสธ
                       </div>
                     </div>
                   </div>
-
-                  <!-- ยืนยัน -->
-                  <div v-if="showlicense" class="popup-overlay" style="width: 100%;">
-                    <div class="popup" style="width: 50%;">
-                      <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
-
-                      <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
-                      <div class="mb-3 text-center">
-                        <label for="Reason" class="form-label" style="font-size: 1vw;">กรุณาระบุเหตุผล</label>
-                        <textarea v-model="Reason" id="Reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
-                      </div>
-
-                      <div class="d-flex align-items-center justify-content-center mt-3">
-                        <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-                          ย้อนกลับ
-                        </div>
-                        <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="Accept(tutor.tutor_id, index)">
-                          ยืนยัน
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <!-- ปฏิเสธ -->
-                  <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
-                    <div class="popup" style="width: 50%;">
-                      <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
-
-                      <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
-                      <div class="mb-3 text-center">
-                        <label for="Reason" class="form-label" style="font-size: 1vw;">กรุณาระบุเหตุผล</label>
-                        <textarea v-model="Reason" id="Reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
-                      </div>
-
-                      <div class="d-flex align-items-center justify-content-center mt-3">
-                        <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-                          ย้อนกลับ
-                        </div>
-                        <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unAccept(tutor.tutor_id, index)">
-                          ยืนยัน
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-
-
 
                   <div class="row my-2">
                     <!-- เบอร์ติดต่อ -->
@@ -136,8 +88,8 @@
                     </div>
                     <!-- ปุ่มติดต่อ -->
                     <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                      <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}">
-                        ส่งข้อความ
+                      <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat(tutor.account_id)">
+                          ส่งข้อความ
                       </div>
                     </div>
                   </div>
@@ -170,6 +122,50 @@
       </div>
 
 
+      <!-- ยืนยัน -->
+      <div v-if="showlicense" class="popup-overlay" style="width: 100%;">
+        <div class="popup" style="width: 50%;">
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยืนยันสิทธิ์การสอนหรือไม่</div>
+          <div class="d-flex align-items-center justify-content-center mt-3">
+            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+              ย้อนกลับ
+            </div>
+            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-success text-white fw-bold" @click="Accept(this.select_tutor_id, select_index)">
+              ยืนยัน
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- ปฏิเสธ -->
+      <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
+        <div class="popup" style="width: 50%;">
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการปฏิเสธสิทธิ์การสอนหรือไม่</div>
+
+          <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
+          <div class="mb-3 text-center">
+            <label for="reason" class="form-label" style="font-size: 1vw;">ระบุเหตุผล แจ้งเตือนไปยังผู้สมัคร</label>
+            <textarea v-model="reason" id="reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+          </div>
+          <template v-if="v$.reason.$error">
+            <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
+              กรุณากรอกเหตุผลของการปฏิเสธ
+            </p>
+          </template>
+
+          <div class="d-flex align-items-center justify-content-center mt-3">
+            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+              ย้อนกลับ
+            </div>
+            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unAccept(this.select_tutor_id, select_index)">
+              ยืนยัน
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
 
       
@@ -181,6 +177,10 @@
 import dayjs from 'dayjs';
 import axios from "axios";
 import useVuelidate from "@vuelidate/core";
+
+import {
+    required,
+} from "@vuelidate/validators";
 
 export default {
   name: "ApproveTutorPage",
@@ -194,7 +194,8 @@ export default {
       imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
       previousRoutes: [],
       mainColor: "#BC2C2C",
-      tutor_id: "",
+      select_tutor_id: "",
+      select_index: "",
       username: "",
       password: "",
       confirmPassword: "",
@@ -202,9 +203,8 @@ export default {
       phone: "",
       firstname: "",
       lastname: "",
-      genders: ["ชาย", "หญิง", "ไม่ระบุ"], // หมวดวิชาที่มีให้เลือก
-      selectedGender: "", // หมวดวิชาที่เลือก
-      gender: null,
+ 
+      reason: "",
       showlicense: false,
       showUnlicense: false,
       error: "",
@@ -219,7 +219,10 @@ export default {
     };
   },
   validations: {
-},
+      reason: {
+        required: required,
+      },
+  },
   mounted() {
     this.getTutors()
   },
@@ -240,41 +243,58 @@ export default {
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
           alert(response.data.message); 
-          this.tutors.splice(index, 1); 
+          this.tutors.splice(index, 1);
+          this.closePopup()
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
         });   
     },
     unAccept(tutor_id, index) {
-      const data = {
-          tutor_id: tutor_id
-        };
-        axios.post("http://localhost:3000/admin/verify/unaccept", data)
-        .then((response) => {
-          alert(response.data.message); 
-          this.tutors.splice(index, 1); 
-        })  
-        .catch((err) => {
-          alert(err.response.data.details.message);
-        });   
+      this.v$.$touch();
+      if (!this.v$.$invalid) {
+        const data = {
+            tutor_id: tutor_id,
+            message: this.reason
+          };
+          axios.post("http://localhost:3000/admin/verify/unaccept", data)
+          .then((response) => {
+            alert(response.data.message); 
+            this.tutors.splice(index, 1);
+            this.closePopup()
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });
+      }
     },
-    showAccept() {
+    showAccept(tutor_id, index) {
+      this.select_tutor_id = tutor_id
+      this.select_index = index
       this.showlicense = true;
-      this.Reason = "";
+      this.reason = "";
     },
-    showUnAccept() {
+    showUnAccept(tutor_id, index) {
+      this.select_tutor_id = tutor_id
+      this.select_index = index
       this.showUnlicense = true;
-      this.Reason = "";
+      this.reason = "";
     },
     closePopup() {
       this.showlicense = false;
       this.showUnlicense = false;
-      this.Reason = "";
+      this.select_tutor_id = ""
+      this.select_index = ""
+      this.reason = "";
     },
   formatTimestamp(timestamp) {
     return dayjs(timestamp).format('DD-MM-YYYY');
   },
+  chat(account_id){
+      this.$router.push({ name: 'ChatPage'});
+      this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
+      this.$cookies.set("receiver_id", account_id);
+    },
   back() {
     if (this.previousRoutes.length > 0) {
       const previousRoute = this.previousRoutes.pop();

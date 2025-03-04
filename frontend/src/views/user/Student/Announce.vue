@@ -183,7 +183,7 @@
                   </div>
                 </div>
                 <div class="form-group d-flex justify-content-center">
-                  <div class="button rounded-3 my-4 px4- mx-2 text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
+                  <div class="button rounded-3 my-4 px4- mx-2 bg-dark text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
                     ลงประกาศ
                   </div>
                 </div>

@@ -68,7 +68,17 @@ router.post("/admin/verify/accept", async function (req, res, next) {
             `UPDATE verifications SET status = 'พร้อมสอน' WHERE tutor_id = ?;`,
             [tutor_id]
         )
+
+        const [accounts] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+        const account_id = accounts[0].account_id
+
+        await conn.query(
+            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+            [account_id, "ได้รับสิทธิ์เป็นผู้สอน", "ผู้ดูแลระบบตรวจสอบข้อมูลยืนยันตัวตนของคุณแล้ว"]
+        )
         conn.commit()
+
         res.status(200).json({ message: "อนุมัติคำขอแล้ว" });
     } catch (err) {
         conn.rollback()
@@ -83,6 +93,7 @@ router.post("/admin/verify/accept", async function (req, res, next) {
 router.post("/admin/verify/unaccept", async function (req, res, next) {
     const Schema = Joi.object({
         tutor_id: Joi.any().required(),
+        message: Joi.required(),
     })
     try {
         await Schema.validateAsync({ ...req.body }, { abortEarly: false })
@@ -92,7 +103,8 @@ router.post("/admin/verify/unaccept", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const tutor_id = req.body.tutor_id
-    console.log(tutor_id)
+    const message = req.body.message
+    console.log(message)
     try {
         await conn.query(
             `UPDATE tutors SET profile_status = 'สมัครติวเตอร์' WHERE tutor_id = ?;`,
@@ -101,6 +113,14 @@ router.post("/admin/verify/unaccept", async function (req, res, next) {
         await conn.query(
             `UPDATE verifications SET status = 'สมัครติวเตอร์' WHERE tutor_id = ?;`,
             [tutor_id]
+        )
+        const [accounts] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+        const account_id = accounts[0].account_id
+
+        await conn.query(
+            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+            [account_id, "ถูกปฏิเสธสิทธิ์เป็นผู้สอน", message]
         )
         conn.commit()
         res.status(200).json({ message: "ปฏิเสธคำขอแล้ว" });
@@ -111,6 +131,50 @@ router.post("/admin/verify/unaccept", async function (req, res, next) {
         conn.release()
     }
   });
+
+
+
+
+
+  router.post('/student/register', async (req, res, next) => {
+    const registerSchema = Joi.object({
+        username: Joi.string().required().min(5).max(20).external(usernameValidator),
+        password: Joi.string().required().custom(passwordValidator),
+        confirmPassword: Joi.ref('password'),
+        firstname: Joi.string().max(100).required(),
+        lastname: Joi.string().max(100).required(),
+        gender: Joi.string().required(),
+        email: Joi.string().email().required(),
+        phone: Joi.string().required().pattern(/0[0-9]{9}/),
+    })
+    try {
+        await registerSchema.validateAsync(req.body, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const username = req.body.username
+    const password = await bcrypt.hash(req.body.password, 5)
+    const firstname = req.body.firstname
+    const lastname = req.body.lastname
+    const gender = req.body.gender
+    const email = req.body.email
+    const phone = req.body.phone
+    try {
+        await conn.query(
+            'INSERT INTO accounts(username, password, permission, firstname, lastname, gender, email, phone) VALUES (?, ?, "นักเรียน", ?, ?, ?, ?,?)',
+            [username, password, firstname, lastname, gender, email, phone]
+        )
+        conn.commit()
+        res.status(201).send()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+})
 
 
   exports.router = router;

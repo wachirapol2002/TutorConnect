@@ -67,7 +67,7 @@
             {{ error }}
           </p>
           <div class="form-group d-flex justify-content-center">
-            <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="login()">
+            <div class="button rounded-3 my-4 px4- mx-2 bg-dark text-light" @click="login()">
               เข้าสู่ระบบ
             </div>
           </div>

@@ -358,6 +358,52 @@ router.post('/chat/history', async (req, res, next) => {
     }
 })
 
+//รายงาน
+router.post('/report', async (req, res, next) => {
+    const Schema = Joi.object({
+        account_id: Joi.any().required(),
+        reporter_id: Joi.any().required(),
+        message: Joi.required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const account_id = req.body.account_id
+    const reporter_id = req.body.reporter_id
+    const message = req.body.message
+    console.log(req.body)
+    try {
+        let sqlReport = `
+        INSERT INTO reports (account_id, reporter_id, message)
+            VALUES (?, ?, ?);
+        `
+        await conn.query(sqlReport, [account_id, reporter_id , message])
+
+        let sqlNotification = `
+        INSERT INTO notifications (account_id, type, message)
+            VALUES (?, ?, ?);
+        `
+        await conn.query(sqlNotification, [account_id, "ถูกรายงานโดยผู้ใช้งานอื่น", message])
+
+        let sqlUpdateCount = `UPDATE accounts SET report_count = report_count + 1 WHERE account_id = ?;`
+
+        await conn.query(sqlUpdateCount, [account_id]
+        )
+ 
+        conn.commit()
+        res.status(200).json({ message: "ส่งคำรายงานแล้ว" });
+    } catch (error) {
+        conn.rollback()
+        res.status(403).json({ message: error.message })
+    } finally {
+        conn.release()
+    }
+})
+
 
 
 

@@ -6,7 +6,7 @@
                 <div :class="center" class="m-0 p-0" style="width: 25vw;" :style="{ backgroundColor: '' }">
                 <!-- รูปโปรไฟล์ -->
                     <div class="m-0 rounded-circle bg-light" :class="center" :style="{ backgroundColor: 'white' }" style="height:13vw; width: 13vw; background-color: white; border: 1px solid black; overflow: hidden;">
-                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle profile-img" />
+                        <img :src="'http://localhost:3000' + this.tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" class="img-fluid rounded-circle" style="width: 100%; height: 100%; object-fit: cover;"/>
                     </div>
                 </div>
                 <div class="container" style="width: 40vw;" :style="{ backgroundColor: '' }">
@@ -52,7 +52,9 @@
                         <div class="ms-4 fw-light" :style="{ fontWeight: '400', fontSize: '1.5vw'}">เบอร์ติดต่อ: <i>{{ this.tutor.phone }}</i></div>
                         
                     </div>
-                    <!-- ปุ่มส่งข้อความ -->
+      
+
+                    
                     <div class="d-flex align-items-center mt-3">
                       
 

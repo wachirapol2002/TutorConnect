@@ -282,7 +282,7 @@
 
 
         <div class="form-group d-flex justify-content-center">
-          <div class="button rounded-3 my-4 px4- mx-2" :style="{backgroundColor: mainColor,}" @click="submit()">
+          <div class="button rounded-3 my-4 px4- mx-2 bg-dark text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
             สมัครติวเตอร์
           </div>
         </div>
@@ -457,6 +457,7 @@ export default {
                 gender: res.data.account.gender,
                 email: res.data.account.email,
                 phone: res.data.account.phone,
+                tutor_id: res.data.tutor_id,
               };
               this.$cookies.set("account", account);
               alert("สมัครบัญชีติวเตอร์สำเร็จ");

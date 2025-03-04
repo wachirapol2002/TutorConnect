@@ -103,7 +103,7 @@
                       </div>
                       <!-- ปุ่มติดต่อ -->
                       <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                        <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat(student.account_id)">
+                        <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat(student.account_id)">
                           ส่งข้อความ
                         </div>
                       </div>

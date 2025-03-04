@@ -137,8 +137,8 @@ export default {
   data() {
     return {
       tutor_id: this.$cookies.get('account').tutor_id,
-      documentPreview: null,
-      selfiePreview: null,
+      documentPreview: require('@/assets/IDcard.png'),
+      selfiePreview: require('@/assets/selfie.png'),
       documentFile: null,
       selfieFile: null,
       previousRoutes: [],
@@ -169,6 +169,7 @@ export default {
   },
   methods: {
     initPreview(){
+      console.log(this.$cookies.get('account').tutor_id)
       const data = {
             tutor_id: this.tutor_id
           };
