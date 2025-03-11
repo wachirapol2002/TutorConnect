@@ -1,20 +1,34 @@
 <template>
   <div id="app">
     <div class="fw-bold text-center my-4">
-      <img
-        :src="require('@/assets/logo.png')" class="my-3"
-        style="max-height:10vh; width: auto; border-radius: 0%"
-        
-      />
-      <!-- <br /> -->
-      <!-- TutorConnect -->
-       
+      <div class="my-2" :class="center" :style="{fontSize: '2vw',}">ข้อมูลการสอน</div>
+      <div class="step-container">
+        <!-- <div
+          v-for="step in totalSteps"
+          :key="step"
+          class="step"
+          :class="{ active: step === currentStep }"
+        >
+          {{ step }}
+        </div> -->
+        <router-link to="/tutor/verify" :class="center" style="text-decoration: none;">
+          <div class="step actived"> 1 </div>
+        </router-link>
+        <router-link to="/tutor/teacher/info" :class="center" style="text-decoration: none;">
+          <div class="step actived"> 2 </div>
+        </router-link>
+        <router-link to="" :class="center" style="text-decoration: none;">
+          <div class="step active"> 3 </div>
+        </router-link>
+        <router-link to="" :class="center" style="text-decoration: none;">
+          <div class="step"> 4 </div>
+        </router-link>
+      </div>
     </div>
     <div
       class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
       style="width: 80vw;"
     >
-      <div :class="center" :style="{fontSize: '2vw',}">ข้อมูลการสอน</div>
       <!-- form -->
       <form name="Information">
         <!-- สถานทีสอน -->
@@ -258,6 +272,8 @@ export default {
   data() {
     return {
       imageUrl: null, // เก็บ URL ภาพที่อัปโหลด
+      currentStep: 3,
+      totalSteps: 4,
       previousRoutes: [],
       mainColor: "#BC2C2C",
       tutor_id: '',
@@ -523,7 +539,6 @@ export default {
     },
 
     submit() {
-      this.v$.$touch();
       const data = {
             tutor_id: this.tutor_id,
           };
@@ -531,7 +546,7 @@ export default {
             .post("http://localhost:3000/tutor/sentVerify", data)
             .then(() => {
               alert('ข้อมูลของคุณกำลังรอผู้ดูแลตรวจสอบ');
-              this.$router.push({ path: "/teacher/profile" });
+              this.$router.push({ path: "/tutor/wait" });
             })
             .catch((err) => {
               alert(err.response.data.details.message);
@@ -598,5 +613,38 @@ export default {
   border-radius: 5px;
   width: 70vw;
   max-width: 70vw;
+}
+.step-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1vw;
+}
+
+/* ดีไซน์ตัวเลขของแต่ละขั้นตอน */
+.step {
+  width: 3vw;
+  height: 3vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #777;
+  transition: all 0.3s ease-in-out;
+}
+
+/* เมื่ออยู่ที่หน้าปัจจุบัน */
+.step.active {
+  background-color: #BC2C2C; /* สีแดงเข้ม */
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.step.actived {
+  background-color: black; /* สีแดงเข้ม */
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 </style>

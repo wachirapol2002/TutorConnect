@@ -14,7 +14,7 @@
         class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
         style="width: 50vw;"
       >
-        <div :class="center" :style="{fontSize: '4vh',}">เข้าสู่ระบบ</div>
+        <div :class="center" :style="{fontSize: '2vw',}">เข้าสู่ระบบ</div>
         <!-- form -->
         <form name="login">
           <!-- Username -->
@@ -73,10 +73,10 @@
           </div>
 
           <div class="form-group" :class="center">
-            <label :style="{fontSize: '3vh', color: 'black',}">ยังไม่มีบัญชี</label>
+            <label :style="{fontSize: '1.5vw', color: 'black',}">ยังไม่มีบัญชี</label>
             
             <router-link to="/student/register" style="text-decoration: none">
-              <div class="register mx-2" :style="{fontSize: '3vh', color: 'black', fontWeight: 500}">สมัครสมาชิก</div>
+              <div class="register mx-2" :style="{fontSize: '1.5vw', color: 'black', fontWeight: 500}">สมัครสมาชิก</div>
             </router-link>
           </div>
 
@@ -142,10 +142,22 @@
                 gender: res.data.account.gender,
                 email: res.data.account.email,
                 phone: res.data.account.phone,
-                tutor_id: res.data.tutor_id
+                tutor_id: res.data.tutor_id,
+                tutor_status: res.data.tutor_status
               };
-              console.log(res.data)
               this.$cookies.set("account", account);
+              if(this.$cookies.isKey('account')){
+                const data = {
+                  account_id: this.$cookies.get("account").account_id,
+                };
+                axios.post("http://localhost:3000/chat/unread/count", data)
+                .then((res) => {
+                  this.$cookies.set("unread_messages", res.data.unread.unread_count);
+                })  
+                .catch((err) => {
+                  alert(err.response.data.details.message);
+                });   
+              }
               alert("เข้าสู่ระบบสำเร็จ");
               if(this.$cookies.get("account").permission == 'ติวเตอร์'){
                 
@@ -174,6 +186,22 @@
             });
         }
       },
+    //   unReadCount() {
+    //   if(this.$cookies.isKey('account')){
+    //     const data = {
+    //       account_id: this.$cookies.get("account").account_id,
+    //     };
+    //     axios.post("http://localhost:3000/chat/unread/count", data)
+    //     .then((res) => {
+    //       console.log(res.data.unread.unread_count)
+    //       // res.data.unread
+    //       // this.$cookies.set("unread_messages", account);
+    //     })  
+    //     .catch((err) => {
+    //       alert(err.response.data.details.message);
+    //     });   
+    //   }
+    // },
     },
     watch: {
       $route(to, from) {

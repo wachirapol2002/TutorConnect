@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
-          <div class="fw-bold text-center" style="font-size: 5vh;">ประวัติการเรียน</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ประวัติการเรียน</div>
         </div>
         <div v-for="(tutor, index) in tutors" :key="index" class="container-fluid rounded-4 border border-dark p-1 py-2 mb-5" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 80vw;">
           <div class="row" :style="{ backgroundColor: '' }">
@@ -21,7 +21,7 @@
               </section>
             </div>
             <div class="col-9" :style="{ backgroundColor: '' }">
-              <section class="container mt-4" style="font-size: 3vh;">
+              <section class="container mt-4" style="font-size: 1.5vw;">
                    <!-- ชื่อผู้ใช้งาน -->
                    <div class="row my-2">
                       <div class="form-group col-8 d-flex" :style="{ backgroundColor: '' }">

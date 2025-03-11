@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
-          <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศ</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ประกาศ</div>
         </div>
 
         <div v-for="(announce, index) in announces" :key="index" class="container-fluid rounded-4 border border-dark my-0 p-0 d-flex flex-column justify-content-center align-items-center mt-5" :style="{ backgroundColor: 'white' }" style="width: 80vw; overflow: hidden;">

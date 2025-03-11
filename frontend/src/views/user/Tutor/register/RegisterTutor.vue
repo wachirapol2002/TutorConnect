@@ -1,20 +1,14 @@
 <template>
   <div id="app">
     <div class="fw-bold text-center my-4">
-      <img
-        :src="require('@/assets/logo.png')" class="my-3"
-        style="max-height:10vh; width: auto; border-radius: 0%"
-        
-      />
-      <!-- <br /> -->
-      <!-- TutorConnect -->
-       
+      <div class="my-2 text-danger" :class="center" :style="{fontSize: '2vw',}">*จำเป็นต้องส่งเอกสารยืนยันตัวตน</div>
+      
     </div>
     <div
       class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
       style="width: 50vw;"
     >
-      <div :class="center" :style="{fontSize: '4vh',}">สมัครสอน</div>
+      <div :class="center" :style="{fontSize: '2vw',}">สมัครสอน</div>
       <!-- form -->
       <form name="Register">
         <!-- file -->
@@ -288,10 +282,10 @@
         </div>
 
         <div class="form-group" :class="center">
-          <label :style="{fontSize: '3vh', color: 'black',}">มีบัญชีอยู่แล้ว</label>
+          <label :style="{fontSize: '1.5vw', color: 'black',}">มีบัญชีอยู่แล้ว</label>
           
           <router-link to="/login" style="text-decoration: none">
-            <div class="register mx-2" :style="{fontSize: '3vh', color: 'black', fontWeight: 500}">เข้าสู่ระบบ</div>
+            <div class="register mx-2" :style="{fontSize: '1.5vw', color: 'black', fontWeight: 500}">เข้าสู่ระบบ</div>
           </router-link>
         </div>
 
@@ -335,23 +329,25 @@ export default {
   data() {
     return {
       imageUrl: null, // เก็บ URL ภาพที่อัปโหลด
+      currentStep: 1,
+      totalSteps: 4,
       previousRoutes: [],
       mainColor: "#BC2C2C",
       file: null,
-      // username: "",
-      // password: "",
-      // confirmPassword: "",
-      // email: "",
-      // phone: "",
-      // firstname: "",
-      // lastname: "",
-      username: "tutor",
-      firstname: "Wachirapol",
-      lastname: "Klinkasorn",
-      email: "wachirapol2545@gmail.com",
-      phone: "0909209945",
-      password: "Kami28062545",
-      confirmPassword: "Kami28062545",
+      username: "",
+      password: "",
+      confirmPassword: "",
+      email: "",
+      phone: "",
+      firstname: "",
+      lastname: "",
+      // username: "tutor",
+      // firstname: "Wachirapol",
+      // lastname: "Klinkasorn",
+      // email: "wachirapol2545@gmail.com",
+      // phone: "0909209945",
+      // password: "Kami28062545",
+      // confirmPassword: "Kami28062545",
       
       gender: null,
       showpassword: false,
@@ -492,5 +488,33 @@ export default {
 </script>
 
 <style>
+.step-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1vw;
+}
+
+/* ดีไซน์ตัวเลขของแต่ละขั้นตอน */
+.step {
+  width: 3vw;
+  height: 3vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  color: #777;
+  transition: all 0.3s ease-in-out;
+}
+
+/* เมื่ออยู่ที่หน้าปัจจุบัน */
+.step.active {
+  background-color: #BC2C2C; /* สีแดงเข้ม */
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
 
 </style>

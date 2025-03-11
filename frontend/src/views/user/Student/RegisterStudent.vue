@@ -14,7 +14,7 @@
         class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
         style="width: 50vw;"
       >
-        <div :class="center" :style="{fontSize: '4vh',}">สมัครสมาชิก</div>
+        <div :class="center" :style="{fontSize: '2vw',}">สมัครสมาชิก</div>
         <!-- form -->
         <form name="Register">
           <!-- Username -->
@@ -236,10 +236,10 @@
           </div>
 
           <div class="form-group" :class="center">
-            <label :style="{fontSize: '3vh', color: 'black',}">มีบัญชีอยู่แล้ว</label>
+            <label :style="{fontSize: '1.5vw', color: 'black',}">มีบัญชีอยู่แล้ว</label>
             
             <router-link to="/login" style="text-decoration: none">
-              <div class="register mx-2" :style="{fontSize: '3vh', color: 'black', fontWeight: 500}">เข้าสู่ระบบ</div>
+              <div class="register mx-2" :style="{fontSize: '1.5vw', color: 'black', fontWeight: 500}">เข้าสู่ระบบ</div>
             </router-link>
           </div>
 

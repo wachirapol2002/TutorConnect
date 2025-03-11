@@ -89,7 +89,7 @@
 
           <div class="d-flex align-items-center justify-content-center mt-3">
             <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ย้อนกลับ
+              ปิด
             </div>
             <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" @click="submitReport">
               ยืนยัน
@@ -117,7 +117,7 @@
 
           <div class="d-flex align-items-center justify-content-center mt-3">
             <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ย้อนกลับ
+              ปิด
             </div>
             <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unlicenseAccept">
               ยืนยัน

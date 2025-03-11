@@ -42,13 +42,14 @@ router.post('/user/login', async (req, res, next) => {
         let tutor_id = null;
         if (account.permission === 'ติวเตอร์'){
             const [tutors] = await conn.query(
-                'SELECT tutor_id FROM tutors WHERE account_id = ?',
+                'SELECT tutor_id, profile_status FROM tutors WHERE account_id = ?',
                 [account.account_id])
             tutor_id = tutors[0].tutor_id
+            tutor_status = tutors[0].profile_status
         }
         
         conn.commit()
-        res.status(200).json({'account': account,'tutor_id': tutor_id})
+        res.status(200).json({'account': account,'tutor_id': tutor_id,'tutor_status': tutor_status})
     } catch (error) {
         conn.rollback()
         res.status(403).json({ message: error.message })
@@ -187,7 +188,9 @@ router.post('/chat/account', async (req, res, next) => {
             CASE 
                 WHEN m.sender_id = ? THEN t2.displayname 
                 ELSE t1.displayname 
-            END AS partner_displayname
+            END AS partner_displayname,
+
+            COALESCE(unread_counts.unread_count, 0) AS unread_messages
 
         FROM messages m
         JOIN (
@@ -213,9 +216,49 @@ router.post('/chat/account', async (req, res, next) => {
         LEFT JOIN tutors t1 ON a1.account_id = t1.account_id
         LEFT JOIN tutors t2 ON a2.account_id = t2.account_id
 
-        ORDER BY m.timestamp DESC;
+        LEFT JOIN (
+            SELECT sender_id, COUNT(*) AS unread_count
+            FROM messages
+            WHERE receiver_id = ? AND is_read = 0
+            GROUP BY sender_id
+        ) unread_counts ON unread_counts.sender_id = 
+            (CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END)
+        
+        UNION
+
+        SELECT 
+            NULL AS message_id,
+            NULL AS sender_id,
+            a.account_id AS receiver_id,
+            NULL AS message_text,
+            NULL AS timestamp,
+
+            a.account_id AS partner_id,
+            a.portrait_path AS partner_portrait,
+            a.username AS partner_username,
+            a.permission AS partner_permission,
+            a.firstname AS partner_firstname,
+            a.lastname AS partner_lastname,
+            a.gender AS partner_gender,
+            t.displayname AS partner_displayname,
+            0 AS unread_messages
+
+        FROM accounts a
+        LEFT JOIN tutors t ON a.account_id = t.account_id
+
+        WHERE a.permission = 'ผู้ดูแลระบบ'
+        AND a.account_id != ?
+        AND NOT EXISTS (
+            SELECT 1 FROM messages 
+            WHERE (messages.sender_id = ? AND messages.receiver_id = a.account_id)
+            OR (messages.receiver_id = ? AND messages.sender_id = a.account_id)
+        )
+        
+
+        
+        ORDER BY timestamp DESC;
         `
-        const [accounts] = await conn.query(sql,[account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id])
+        const [accounts] = await conn.query(sql,[account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id, account_id])
 
 
         conn.commit()
@@ -350,6 +393,42 @@ router.post('/chat/history', async (req, res, next) => {
 
         conn.commit()
         res.status(200).json({'messages': messages})
+    } catch (error) {
+        conn.rollback()
+        res.status(403).json({ message: error.message })
+    } finally {
+        conn.release()
+    }
+})
+
+
+
+//นับยังไม่อ่าน
+router.post('/chat/unread/count', async (req, res, next) => {
+    const Schema = Joi.object({
+        account_id: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const account_id =req.body.account_id
+    
+    try {
+        let sql = `
+        SELECT COUNT(*) AS unread_count
+        FROM messages
+        WHERE is_read = 0 AND receiver_id = ?;`
+        await conn.query(sql,[account_id])
+
+        // Check if username is correct
+        const [unread] = await conn.query(sql,[account_id])
+
+        conn.commit()
+        res.status(200).json({'unread': unread[0]})
     } catch (error) {
         conn.rollback()
         res.status(403).json({ message: error.message })

@@ -3,7 +3,7 @@
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
         
       <!-- <br /> -->
-          <div class="fw-bold text-center" style="font-size: 5vh;">ข้อมูลติดต่อนักเรียน</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ข้อมูลติดต่อนักเรียน</div>
        
         </div>
         
@@ -25,7 +25,7 @@
                   </section>
                 </div>
                 <div class="col-9" :style="{ backgroundColor: '' }">
-                  <section class="container mt-4" style="font-size: 3vh;">
+                  <section class="container mt-4" style="font-size: 1.5vw;">
                     <!-- ชื่อผู้ใช้งาน -->
                     <div class="row my-2">
                       <div class="form-group col-8 d-flex" :style="{ backgroundColor: '' }">

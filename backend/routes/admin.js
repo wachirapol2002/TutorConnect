@@ -45,6 +45,71 @@ router.post("/tutorlist/unverify", async function (req, res, next) {
   });
 
 
+//   ดึงข้อมูลติวเตอร์ทั้งหมด
+router.post("/tutorlist/info", async function (req, res, next) {
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    let sql = `
+    SELECT
+      tutors.*,
+      accounts.account_id,
+      accounts.portrait_path,
+      accounts.username,
+      accounts.firstname,
+      accounts.lastname,
+      accounts.email,
+      accounts.phone,
+      accounts.report_count,
+      verifications.document_path,
+      verifications.selfie_path,
+      verifications.status_timestamp
+    FROM tutors
+    JOIN accounts ON tutors.account_id = accounts.account_id
+    JOIN verifications ON tutors.tutor_id = verifications.tutor_id
+    ORDER BY accounts.account_id
+    `
+    try {      
+        const [tutors] = await conn.query(sql)
+        conn.commit()
+        res.status(200).json({'tutors': tutors})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+    
+  });
+
+
+
+
+//   นับติวเตอร์ที่รอยืนยัน
+  router.post("/tutorlist/unverify/count", async function (req, res, next) {
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    let sql = `
+    SELECT
+      COUNT(*) AS count
+    FROM tutors
+    JOIN accounts ON tutors.account_id = accounts.account_id
+    JOIN verifications ON tutors.tutor_id = verifications.tutor_id
+    WHERE tutors.profile_status = 'รอตรวจสอบ'
+    `
+    try {      
+        const [unverify] = await conn.query(sql)
+        conn.commit()
+        res.status(200).json({'count': unverify[0].count})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+    
+  });
+
+
 
   // อนุมัติติวเตอร์
 router.post("/admin/verify/accept", async function (req, res, next) {
@@ -136,45 +201,6 @@ router.post("/admin/verify/unaccept", async function (req, res, next) {
 
 
 
-  router.post('/student/register', async (req, res, next) => {
-    const registerSchema = Joi.object({
-        username: Joi.string().required().min(5).max(20).external(usernameValidator),
-        password: Joi.string().required().custom(passwordValidator),
-        confirmPassword: Joi.ref('password'),
-        firstname: Joi.string().max(100).required(),
-        lastname: Joi.string().max(100).required(),
-        gender: Joi.string().required(),
-        email: Joi.string().email().required(),
-        phone: Joi.string().required().pattern(/0[0-9]{9}/),
-    })
-    try {
-        await registerSchema.validateAsync(req.body, { abortEarly: false })
-    } catch (err) {
-        return res.status(400).send(err)
-    }
-    const conn = await pool.getConnection()
-    await conn.beginTransaction()
-    const username = req.body.username
-    const password = await bcrypt.hash(req.body.password, 5)
-    const firstname = req.body.firstname
-    const lastname = req.body.lastname
-    const gender = req.body.gender
-    const email = req.body.email
-    const phone = req.body.phone
-    try {
-        await conn.query(
-            'INSERT INTO accounts(username, password, permission, firstname, lastname, gender, email, phone) VALUES (?, ?, "นักเรียน", ?, ?, ?, ?,?)',
-            [username, password, firstname, lastname, gender, email, phone]
-        )
-        conn.commit()
-        res.status(201).send()
-    } catch (err) {
-        conn.rollback()
-        res.status(400).json(err.toString());
-    } finally {
-        conn.release()
-    }
-})
 
 
   exports.router = router;

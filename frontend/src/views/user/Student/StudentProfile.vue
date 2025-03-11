@@ -3,7 +3,7 @@
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
         
       <!-- <br /> -->
-          <div class="fw-bold text-center" style="font-size: 5vh;">ข้อมูลส่วนตัว</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ข้อมูลส่วนตัว</div>
        
         </div>
         
@@ -32,7 +32,7 @@
                               accept="image/*"
                               @change="handleFileUpload"
                             />
-                            <span class="file-cta mt-2 fw-bold text-center" style="font-size: 1.7vh;">
+                            <span class="file-cta mt-2 fw-bold text-center" style="font-size: 1vw;">
                               <span class="file-label"> เปลี่ยนรูปภาพ</span>
                             </span>
                           </label> -->
@@ -45,7 +45,7 @@
                     </section>
                 </div>
                 <div class="col-9" :style="{ backgroundColor: '' }">
-                  <section class="container mt-4" style="font-size: 3vh;">
+                  <section class="container mt-4" style="font-size: 1.5vw;">
                     <!-- ชื่อผู้ใช้งาน -->
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">

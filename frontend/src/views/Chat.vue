@@ -1,48 +1,52 @@
 <template>
     <div id="app" class="d-flex">
-        <div class="container-fluid rounded-4  border border-dark p-0 py-4 d-flex" :style="{ backgroundColor: 'white' }" style="width: 100vw; height: 90vh;">
+        <div class="container-fluid rounded-0 border-bottom border-dark p-0 d-flex" :style="{ backgroundColor: 'white' }" style="width: 100vw; height: 90vh;">
           <!-- Main Chat Area -->
-          <div class="chat-main flex-grow-1 d-flex flex-column" :style="{ width: '80%', backgroundColor: '#ffffff' }">
+          <div class="chat-main flex-grow-1 d-flex flex-column" :style="{ width: '75%', backgroundColor: '#ffffff' }">
                 <!-- Header -->
                 <div
-                  class="chat-header p-3 border-bottom"
-                  :style="{ backgroundColor: '#ffffff', borderBottom: '1px solid #ddd' }"
+                  class="chat-header px-3 py-2 border-bottom border-dark"
+                  :style="{ backgroundColor: chatFrame }"
                 >
+                  <!-- ชื่อผู้สนทนา -->
+                  <div class="d-flex align-items-center" style="background-color: '';">
+                      <img
+                        :src="receiver && receiver.portrait_path ? 'http://localhost:3000' + receiver.portrait_path : require('@/assets/user.png')"
+                        alt="User"
+                        class="rounded-circle me-3 profile-img"
+                        :style="{ 
+                          width: '70px', 
+                          height: '70px', 
+                          objectFit: 'cover', 
+                          maxWidth: '70px', 
+                          maxHeight: '70px' 
+                        }"
+                        v-if="receiver_id !== null"
+                      />
+                      <div class="d-flex flex-column">
+                        <div class="m-0" :style="{ fontSize: '1.2em' }"> {{ this.receiver.permission }}</div>
+                        <template v-if="this.receiver.displayname">
+                          <div class="m-0 fw-bold" :style="{ fontSize: '1.5em' }">{{ this.receiver.displayname + " ("+ this.receiver.username +")" || "เลือกคนที่ต้องการติดต่อ" }}</div>
+                        </template>
+                        <template v-if="!this.receiver.displayname">
+                          <div class="m-0 fw-bold" :style="{ fontSize: '1.5em' }">{{ this.receiver.username || "เลือกคนที่ต้องการติดต่อ" }}</div>
+                        </template>
+                        
+                      </div>
+                        
 
-                
-
-                <!-- ชื่อผู้สนทนา -->
-                 <div class="d-flex align-items-center">
-                    <img
-                      :src="receiver && receiver.portrait_path ? 'http://localhost:3000' + receiver.portrait_path : require('@/assets/user.png')"
-                      alt="User"
-                      class="rounded-circle me-3 profile-img"
-                      :style="{ 
-                        width: '80px', 
-                        height: '80px', 
-                        objectFit: 'cover', 
-                        maxWidth: '80px', 
-                        maxHeight: '80px' 
-                      }"
-                      v-if="receiver_id !== null"
-                    />
-                    <template v-if="this.receiver.displayname">
-                      <div class="m-0 fw-bold" :style="{ fontSize: '2vw' }">{{ this.receiver.displayname + " ("+ this.receiver.username +")" || "เลือกคนที่ต้องการติดต่อ" }}</div>
-                    </template>
-                    <template v-if="!this.receiver.displayname">
-                      <div class="m-0 fw-bold" :style="{ fontSize: '2vw' }">{{ this.receiver.username || "เลือกคนที่ต้องการติดต่อ" }}</div>
-                    </template>
-                 </div>
+                      
+                  </div>
 
                   
                 </div>
 
                 <!-- Chat Messages -->
-                <div class="chat-messages flex-grow-1 p-3" :style="{ overflowY: 'auto' }" ref="chatMessages">
+                <div class="chat-messages flex-grow-1 p-3 " :style="{ overflowY: 'auto' }" ref="chatMessages">
                     <div v-for="(message, index) in messages || []"
                       :key="index" class="d-flex mb-3"
                       :class="{
-                        'justify-content-end': message.sender_id == this.sender_id,
+                        'justify-content-start': message.sender_id == this.sender_id,
                         'justify-content-start': message.sender_id != this.sender_id,
                       }"
                     >
@@ -50,7 +54,7 @@
                         <div class="d-flex flex-row">
                           <img 
                               :src="message.sender_id == this.sender_id ? ( this.$cookies.get('account').portrait_path ? 'http://localhost:3000' + this.$cookies.get('account').portrait_path : require('@/assets/user.png')) : (this.receiver.portrait_path ? 'http://localhost:3000' + this.receiver.portrait_path : require('@/assets/user.png'))"
-                              class="rounded-circle profile-img" 
+                              class="rounded-circle profile-img mb-1" 
                               style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;"
                             />
                           <div class="d-flex flex-column">
@@ -58,10 +62,11 @@
                               <div style="font-size: 0.8em;"> {{formatTimestamp(message.timestamp) }}</div>
                           </div>
                         </div>
+                        <!-- backgroundColor: message.sender_id == this.sender_id ? '#d1f7c4' : '#f0f0f0', -->
                         <div class="p-2 rounded"
                           style="font-size: 1.3em;"
                           :style="{
-                            backgroundColor: message.sender_id == this.sender_id ? '#d1f7c4' : '#f0f0f0',
+                            backgroundColor: message.sender_id == this.sender_id ? '#f0f0f0' : '#c4c2c2',
                             width: 'auto',
                             maxWidth: '100%',
                             whiteSpace: 'pre-wrap',
@@ -71,8 +76,8 @@
                         >
                             {{ message.message_text }}
                         </div>
-                        <div v-if = "message.sender_id == this.sender_id">
-                          <span v-if="message.is_read">✔️ อ่านแล้ว</span>
+                        <div v-if = "(message.sender_id == this.sender_id) && (messages.length == index+1)" >
+                          <span v-if="message.is_read"></span>
                           <span v-else>❌ ยังไม่อ่าน</span>
                         </div>
                       </div>
@@ -100,15 +105,21 @@
 
               <!-- Sidebar รายชื่อผู้สนทนา -->
               <div
-                class="chat-sidebar p-3"
+                class="chat-sidebar py-3"
                 :style="{ 
-                  width: '20%', 
-                  backgroundColor: '#ffffff', 
+                  width: '25%',
+                  backgroundColor: chatFrame, 
                   borderLeft: '1px solid #ddd', 
                   overflowY: 'auto' /* เพิ่ม scroll bar เมื่อมีเนื้อหาเกิน */
                 }"
               >
-                <div class="search-bar mb-3">
+                <div 
+                  class="search-bar mb-3 px-3"
+                  :style="{
+                    height: '50px',
+                    backgroundColor: '',
+                  }"
+                  >
                   <input
                     v-model="searchQuery"
                     type="text"
@@ -117,12 +128,13 @@
                     :style="{ borderRadius: '20px', padding: '0.5rem 1rem' }"
                   />
                 </div>
+
                 <ul class="list-group list-unstyled">
                   <li
                     v-for="(contact, index) in filteredContacts"
                     :key="index"
-                    class="d-flex align-items-center p-2 mb-2"
-                    :style="{ cursor: 'pointer', backgroundColor: receiver_id === contact.partner_id ? '#f0f0f0' : 'transparent' }"
+                    class="d-flex align-items-center p-2"
+                    :style="{ cursor: 'pointer', backgroundColor: receiver_id === contact.partner_id ? '#f0f0f0' : 'white' , borderBottom: '1px solid #d9d7d7'}"
                     @click="selectContact(contact.partner_id)"
                   >
                     <img
@@ -138,7 +150,17 @@
                       }"
                     />
                     <div>
-                      <div class="fw-bold" style="font-size: 1.2em;">{{ contact.partner_displayname || contact.partner_username}} ({{ contact.partner_permission }})</div>
+                      <div :class="center" style="font-size: 1.3em;">{{ contact.partner_displayname || contact.partner_username}} ({{ contact.partner_permission }}) 
+                        
+                        <div v-if="contact.unread_messages != 0"
+                          class="num-box-chat ms-1 px-2" :class="center"
+                          style="width: auto; height: auto;"
+                          :style="{fontSize: '1.25vw'}"
+                        >
+                          {{ contact.unread_messages }}
+                        </div>
+
+                      </div>
                       <small class="text-muted" style="font-size: 1.1em;">{{ truncateText(contact.message_text, 15) }}</small>
                       <div class="text-muted" style="font-size: 0.8em;"> {{formatTimestamp(contact.timestamp) }}</div>
                     </div>
@@ -156,6 +178,8 @@
     name: "ChatPage",
     data() {
       return {
+        chatFrame: "#e3e1e1",
+        intervalID: null,
         socket: null,
         sender_id: this.$cookies.get('account').account_id,
         receiver_id: parseInt(this.$cookies.get('receiver_id')),
@@ -207,8 +231,6 @@
             message.is_read = true;
           }
         });
-
-
         this.messages.push({
           message_id: null,
           sender_id: sender,
@@ -221,8 +243,12 @@
 
         this.$nextTick(() => this.scrollToBottom());
       });
+      this.startInterval();
 
 
+  },
+  beforeUnmount() {
+    this.stopInterval(); // หยุด interval เมื่อ component ถูกทำลาย
   },
     computed: {
     filteredContacts() {
@@ -236,10 +262,18 @@
     },
   },
     methods: {
-      formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleString(); // แปลงเป็นวันที่และเวลาในรูปแบบที่อ่านง่าย
-      },
+      startInterval() {
+      this.intervalID = setInterval(() => {
+        this.getContacts();
+      }, 3000);
+    },
+      stopInterval() {
+      if (this.intervalID) {
+        clearInterval(this.intervalID);
+        this.intervalID = null; // ตั้งค่าให้เป็น null เพื่อป้องกันการ clear ซ้ำ
+      }
+    },
+      
       getContacts(){
         const data = {
           account_id: this.$cookies.get("account").account_id,
@@ -264,6 +298,7 @@
         this.receiver_id = receiver_id;
         this.getReceiver(receiver_id) //ข้อมูลผู้รับ
         this.socket.emit("joinRoom", { user1: this.sender_id, user2: receiver_id });
+        this.getContacts()
       },
       
       
@@ -329,9 +364,14 @@
           });
         }
       },
+      formatTimestamp(timestamp) {
+        if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString(); // แปลงเป็นวันที่และเวลาในรูปแบบที่อ่านง่าย
+      },
       truncateText(text, maxLength) {
-      if (!text) return "";
-      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+        if (!text) return " ";
+        return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
       },
       handleKeydown(event) {
         if (event.key === "Enter" && !event.shiftKey) {
@@ -403,5 +443,10 @@
 <style>
 img {
     object-fit: cover;
+}
+.num-box-chat {
+  background-color: #3fbd39;
+  color: white;
+  border-radius: 100px;
 }
 </style>

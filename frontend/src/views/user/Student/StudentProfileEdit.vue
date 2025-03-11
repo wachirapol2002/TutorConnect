@@ -3,7 +3,7 @@
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
         
       <!-- <br /> -->
-          <div class="fw-bold text-center" style="font-size: 5vh;">แก้ไขข้อมูลส่วนตัว</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">แก้ไขข้อมูลส่วนตัว</div>
        
         </div>
         
@@ -33,7 +33,7 @@
                               accept="image/*"
                               @change="handleFileUpload"
                             />
-                            <span class="file-cta mt-2 fw-bold text-center" style="font-size: 1.7vh;">
+                            <span class="file-cta mt-2 fw-bold text-center" style="font-size: 1vw;">
                               <span class="file-label"> เปลี่ยนรูปภาพ</span>
                             </span>
                           </label>
@@ -46,7 +46,7 @@
                     </section>
                 </div>
                 <div class="col-9" :style="{ backgroundColor: '' }">
-                  <section class="container mt-4" style="font-size: 3vh;">
+                  <section class="container mt-4" style="font-size: 1.5vw;">
                     <!-- ชื่อผู้ใช้งาน -->
                     <div class="row my-2">
                       <div class="form-group col-12 d-flex">
@@ -65,7 +65,7 @@
                     <div class="row my-2">
                       <div class="form-group col-8">
                         <label class="form-label fw-bold" for="email">อีเมล*</label>
-                        <input style="font-size: 3vh;"
+                        <input style="font-size: 1.5vw;"
                           class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.email.$error }"
                           type="email"
@@ -76,7 +76,7 @@
                           v-model="email"
                         />
                         <template  v-if="v$.email.$error">
-                          <div style="font-size: 2.5vh;">
+                          <div style="font-size: 1.25vw;">
                             <p class="text-danger m-0 p-0" v-if="v$.email.required.$invalid">
                               ต้องกรอก อีเมล
                             </p>
@@ -91,7 +91,7 @@
                       <!-- ชื่อจริง -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="firstname">ชื่อจริง*</label>
-                        <input style="font-size: 3vh;"
+                        <input style="font-size: 1.5vw;"
                           class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.firstname.$error }"
                           type="text"
@@ -102,7 +102,7 @@
                           v-model="firstname"
                         />
                         <template v-if="v$.firstname.$error">
-                          <div style="font-size: 2.5vh;">
+                          <div style="font-size: 1.25vw;">
                             <p class="text-danger m-0 p-0" v-if="v$.firstname.required.$invalid">
                               ต้องกรอก ชื่อจริง
                             </p>
@@ -112,7 +112,7 @@
                       <!-- นามสกุล -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="lastname">นามสกุล*</label>
-                        <input style="font-size: 3vh;"
+                        <input style="font-size: 1.5vw;"
                           class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.lastname.$error }"
                           type="text"
@@ -123,7 +123,7 @@
                           v-model="lastname"
                         />
                         <template v-if="v$.lastname.$error">
-                          <div style="font-size: 2.5vh;">
+                          <div style="font-size: 1.25vw;">
                             <p class="text-danger m-0 p-0" v-if="v$.lastname.required.$invalid">
                               ต้องกรอก นามสกุล
                             </p>
@@ -135,7 +135,7 @@
                       <!-- เบอร์ติดต่อ -->
                       <div class="form-group col-4">
                         <label class="form-label fw-bold" for="phone">เบอร์ติดต่อ*</label>
-                        <input style="font-size: 3vh;"
+                        <input style="font-size: 1.5vw;"
                           class="form-control p-0 px-2"
                           :class="{ 'border-danger': v$.phone.$error }"
                           type="text"
@@ -146,7 +146,7 @@
                           v-model="phone"
                         />
                         <template v-if="v$.phone.$error">
-                          <div style="font-size: 2.5vh;">
+                          <div style="font-size: 1.25vw;">
                             <p class="text-danger m-0 p-0" v-if="v$.phone.required.$invalid">
                               ต้องกรอก หมายเลขโทรศัพท์
                             </p>
@@ -159,7 +159,7 @@
                       <!-- เพศ -->
                       <div class="form-group col-2">
                         <label class="form-label fw-bold" for="gender">เพศ*</label>
-                          <select v-model="gender" class="form-control text-center p-0 px-2" style="font-size: 3vh; width: auto;">
+                          <select v-model="gender" class="form-control text-center p-0 px-2" style="font-size: 1.5vw; width: auto;">
                             <option value="" disabled>ระบุเพศ</option>
                             <option v-for="(gender, index) in genders" :key="index" :value="gender">
                               {{ gender }}

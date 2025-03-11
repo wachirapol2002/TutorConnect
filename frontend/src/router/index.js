@@ -102,6 +102,11 @@ const routes = [
         component: () => import('../views/user/Admin/ApproveTutor.vue')
     },
     {
+        path: '/admin/tutorlist',
+        name: 'TutorInfoListPage',
+        component: () => import('../views/user/Admin/TutorInfoList.vue')
+    },
+    {
         path: '/chat',
         name: 'ChatPage',
         component: () => import('../views/Chat.vue'),

@@ -62,10 +62,10 @@
       <!-- filter -->
         <div :class=center class="flex-column mb-0" :style="{backgroundColor: '', height: 'auto', minWidth: '100vw' }">
           <div v-if="showfilter == false" class="filter rounded-4 px-2 my-4 button text-dark" :style="{backgroundColor: '#F8AE1E'}">
-                <div class="" :style="{fontWeight: 'bold', fontSize: '3.2vh',}" @click="morefilter()">เพิ่มฟิลเตอร์</div>
+                <div class="" :style="{fontWeight: 'bold', fontSize: '1.6vw',}" @click="morefilter()">เพิ่มฟิลเตอร์</div>
           </div>
           <div v-if="showfilter == true" class="filter rounded-4 px-2 my-4 button text-dark" :style="{backgroundColor: '#F8AE1E'}">
-                <div class="" :style="{fontWeight: 'bold', fontSize: '3.2vh',}" @click="hidefilter()">ซ่อนฟิลเตอร์</div>
+                <div class="" :style="{fontWeight: 'bold', fontSize: '1.6vw',}" @click="hidefilter()">ซ่อนฟิลเตอร์</div>
           </div>
             <!-- ฟิลเตอร์ -->
           <div v-if="showfilter == true" class="filter-container rounded-4 p-4 mb-5 shadow-lg" :style="{backgroundColor: 'white', height: 'auto', minWidth: '65vw' }">
@@ -396,7 +396,7 @@
 }
 
 .category-label {
-  font-size: 4vh;
+  font-size: 2vw;
   font-weight: bold;
   color: black; /* สีข้อความ */
 }
@@ -432,7 +432,7 @@
 
 .filter-title {
   font-weight: bold;
-  font-size: 3vh;
+  font-size: 1.5vw;
 }
 
 .filter-options {
@@ -442,7 +442,7 @@
 }
 
 .filter-button {
-  font-size: 3vh;
+  font-size: 1.5vw;
   width: auto; /* ขนาดกล่อง */
   height: auto;
   display: flex;
@@ -466,7 +466,7 @@
 }
 
 .price-box {
-  font-size: 3vh;
+  font-size: 1.5vw;
   width: 6vw; /* ขนาดกล่อง */
   height: 7vh;
   padding: 1vw;
@@ -491,13 +491,13 @@
 
 .price-box-label{
   text-align: center;
-  font-size: 3vh;
+  font-size: 1.5vw;
 }
 
 .range-label{
   width: 10vw;
   text-align: center;
-  font-size: 3vh;
+  font-size: 1.5vw;
 }
 
 .star-container {

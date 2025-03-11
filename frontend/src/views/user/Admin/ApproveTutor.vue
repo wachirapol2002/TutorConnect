@@ -1,10 +1,10 @@
 <template>
   <div id="app">
       <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
-        <div class="fw-bold text-center" style="font-size: 5vh;">ติวเตอร์ที่รอยืนยัน</div>
+        <div class="fw-bold text-center" style="font-size: 2.5vw;">ติวเตอร์ที่รอยืนยัน</div>
       </div>
       <div v-if="tutors.length == 0" class="text-center my-5">
-        <div class="" style="font-size: 5vh;">ไม่มีติวเตอร์ที่รอยืนยัน</div>
+        <div class="" style="font-size: 2.5vw;">ไม่มีติวเตอร์ที่รอยืนยัน</div>
       </div>
       
       <div v-for="(tutor, index) in tutors" :key="index" class="container-fluid rounded-4 border border-dark p-1 py-2 mb-5" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 80vw;">
@@ -25,7 +25,7 @@
                   </section>
               </div>
               <div class="col-9" :style="{ backgroundColor: '' }">
-                <section class="container mt-4" style="font-size: 3vh;">
+                <section class="container mt-4" style="font-size: 1.5vw;">
                   <!-- ชื่อผู้ใช้งาน -->
                   <div class="row my-2">
                     <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
@@ -37,8 +37,12 @@
                       <div class="mx-2"> {{ tutor.displayname }}</div>
                     </div>
                     <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
-                      <label class="form-label fw-bold" for="date">วันที่ยื่นเอกสาร</label>
-                      <div class="mx-2">{{ formatTimestamp(tutor.status_timestamp) }}</div>
+                      <div class="mx-2">
+                        <div class="fw-bold">
+                          วันที่ยื่นเอกสาร
+                        </div>  
+                        {{ formatTimestamp(tutor.status_timestamp) }}
+                      </div>
                     </div>
                   </div>
 
@@ -88,7 +92,7 @@
                     </div>
                     <!-- ปุ่มติดต่อ -->
                     <div class="form-group col-4 d-flex align-items-center justify-content-start" :style="{ backgroundColor: '' }">
-                      <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="chat(tutor.account_id)">
+                      <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat(tutor.account_id)">
                           ส่งข้อความ
                       </div>
                     </div>
@@ -128,7 +132,7 @@
           <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยืนยันสิทธิ์การสอนหรือไม่</div>
           <div class="d-flex align-items-center justify-content-center mt-3">
             <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ย้อนกลับ
+              ปิด
             </div>
             <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-success text-white fw-bold" @click="Accept(this.select_tutor_id, select_index)">
               ยืนยัน
@@ -156,7 +160,7 @@
 
           <div class="d-flex align-items-center justify-content-center mt-3">
             <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ย้อนกลับ
+              ปิด
             </div>
             <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unAccept(this.select_tutor_id, select_index)">
               ยืนยัน

@@ -2,7 +2,7 @@
     <div id="app">
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
         
-          <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศหาติวเตอร์</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ประกาศหาติวเตอร์</div>
        
         </div>
         <div class="container-fluid rounded-4  border border-dark p-0 py-4 d-flex flex-column justify-content-center align-items-center" :style="{ backgroundColor: 'white' }" style="width: 80vw;">
@@ -197,7 +197,7 @@
 
 
         <div :class="center" class="my-4" :style="{ backgroundColor: '' }" style="height: 10vh;">
-          <div class="fw-bold text-center" style="font-size: 5vh;">ประกาศที่เคยลง</div>
+          <div class="fw-bold text-center" style="font-size: 2.5vw;">ประกาศที่เคยลง</div>
         </div>
 
 
