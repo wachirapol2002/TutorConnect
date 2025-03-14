@@ -116,7 +116,6 @@
 </template>
   
   <script>
-  import dayjs from 'dayjs';
   import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
@@ -226,7 +225,9 @@
           });   
     },
     formatTimestamp(timestamp) {
-        return dayjs(timestamp).format('DD-MM-YYYY');
+      if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString('th-TH');
     },
     Accept(study_id, index) {
       const data = {

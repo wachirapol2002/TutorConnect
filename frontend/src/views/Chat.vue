@@ -367,7 +367,7 @@
       formatTimestamp(timestamp) {
         if(!timestamp) return " ";
         const date = new Date(timestamp);
-        return date.toLocaleString(); // แปลงเป็นวันที่และเวลาในรูปแบบที่อ่านง่าย
+        return date.toLocaleString('th-TH');
       },
       truncateText(text, maxLength) {
         if (!text) return " ";

@@ -247,7 +247,6 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
 import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 import {
@@ -338,7 +337,9 @@ export default {
       return text.replace(/\n/g, "<br>");
   },
   formatTimestamp(timestamp) {
-    return dayjs(timestamp).format('DD-MM-YYYY HH:mm:ss');
+    if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString('th-TH');
   },
   openFacebookInNewTab() {
     window.open(this.tutor.facebook_link, '_blank');

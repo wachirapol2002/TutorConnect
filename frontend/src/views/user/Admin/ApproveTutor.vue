@@ -178,7 +178,6 @@
 </template>
   
 <script>
-import dayjs from 'dayjs';
 import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 
@@ -292,7 +291,9 @@ export default {
       this.reason = "";
     },
   formatTimestamp(timestamp) {
-    return dayjs(timestamp).format('DD-MM-YYYY');
+    if(!timestamp) return " ";
+      const date = new Date(timestamp);
+      return date.toLocaleString('th-TH');
   },
   chat(account_id){
       this.$router.push({ name: 'ChatPage'});
