@@ -37,8 +37,12 @@
                       <div class="mx-2"> {{ student.username }}</div>
                     </div>
                     <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
-                      <label class="form-label fw-bold" for="date">วันที่สมัคร</label>
-                      <div class="mx-2">{{ formatTimestamp(student.register_timestamp) }}</div>
+                      <div class="">
+                        <div class="fw-bold">
+                          วันที่สมัคร
+                        </div>  
+                        {{ formatTimestamp(student.register_timestamp) }}
+                      </div>
                     </div>
                   </div>
                   <!-- ระดับบัญชี -->
@@ -103,7 +107,6 @@
 </template>
   
 <script>
-import dayjs from 'dayjs';
 import axios from "axios";
 import useVuelidate from "@vuelidate/core";
 import {
@@ -213,7 +216,9 @@ export default {
         });   
   },
   formatTimestamp(timestamp) {
-    return dayjs(timestamp).format('DD-MM-YYYY');
+    if(!timestamp) return " ";
+    const date = new Date(timestamp);
+    return date.toLocaleString('th-TH');
   },
   chat(receiver_id){
       this.$router.push({ name: 'ChatPage'});

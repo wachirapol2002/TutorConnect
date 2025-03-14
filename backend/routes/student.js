@@ -107,6 +107,21 @@ router.post('/student/subject/register', async (req, res, next) => {
                 `UPDATE subjects SET register_count = register_count + 1 WHERE subject_id = ?`,
                 [subject_id]
             );
+
+            const [student] = await conn.query(`SELECT username FROM accounts WHERE account_id = ?;`,[account_id])
+            const [subject] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject_id])
+
+            const username = student[0].username
+            const subjectName = subject[0].subject_name
+
+            const [tutors] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+            const tutor_ac_id = tutors[0].account_id
+
+            await conn.query(
+                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+                [tutor_ac_id, "สมัครเรียน", "ผู้ใช้งาน "+username+" สมัครเรียนวิชา "+subjectName+" ของคุณ"]
+            )
         }
         conn.commit()
         res.status(201).send()
@@ -152,6 +167,21 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
                 `UPDATE subjects SET register_count = register_count - 1 WHERE subject_id = ?`,
                 [subject_id]
             );
+            
+            const [student] = await conn.query(`SELECT username FROM accounts WHERE account_id = ?;`,[account_id])
+            const [subject] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject_id])
+
+            const username = student[0].username
+            const subjectName = subject[0].subject_name
+
+            const [tutors] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+            const tutor_ac_id = tutors[0].account_id
+
+            await conn.query(
+                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+                [tutor_ac_id, "ยกเลิกการสมัครเรียน", "ผู้ใช้งาน "+username+" ทำการยกเลิกการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
+            )
             
         } else {
             // หากไม่มีข้อมูล
@@ -284,7 +314,7 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
         }
       });
 
-      // ให้คะแนนรีวิววิชา
+      // ดูคะแนนรีวิววิชา
       router.post("/student/subject/rating/view", async function (req, res, next) {
         const Schema = Joi.object({
             study_id: Joi.any().required(),

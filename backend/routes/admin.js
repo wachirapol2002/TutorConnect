@@ -66,6 +66,7 @@ router.post("/tutorlist/info", async function (req, res, next) {
     FROM tutors
     JOIN accounts ON tutors.account_id = accounts.account_id
     JOIN verifications ON tutors.tutor_id = verifications.tutor_id
+    WHERE tutors.profile_status != 'สมัครติวเตอร์' and accounts.permission = "ติวเตอร์"
     ORDER BY accounts.account_id
     `
     try {      
@@ -195,6 +196,124 @@ router.post("/admin/verify/unaccept", async function (req, res, next) {
     } finally {
         conn.release()
     }
+  });
+
+    // ระงับติวเตอร์
+    router.post("/admin/tutor/ban", async function (req, res, next) {
+        const Schema = Joi.object({
+            tutor_id: Joi.any().required(),
+            message: Joi.required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const tutor_id = req.body.tutor_id
+        const message = req.body.message
+        try {
+            await conn.query(
+                `UPDATE tutors SET profile_status = 'ระงับชั่วคราว' WHERE tutor_id = ?;`,
+                [tutor_id]
+            )
+            await conn.query(
+                `UPDATE verifications SET status = 'ระงับชั่วคราว' WHERE tutor_id = ?;`,
+                [tutor_id]
+            )
+
+            const [accounts] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+            const account_id = accounts[0].account_id
+
+            await conn.query(
+                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+                [account_id, "ระงับการสอน", 'ผู้ดูแลระงับการสอนของคุณชั่วคราว โปรดติดต่อผู้ดูแล '+message]
+            )
+            conn.commit()
+
+            res.status(200).json({ message: "ระงับการสอนแล้ว" });
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+    });
+
+     // ปลดระงับติวเตอร์
+     router.post("/admin/tutor/unban", async function (req, res, next) {
+        const Schema = Joi.object({
+            tutor_id: Joi.any().required(),
+        })
+        try {
+            await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+        const conn = await pool.getConnection()
+        await conn.beginTransaction()
+        const tutor_id = req.body.tutor_id
+        try {
+            await conn.query(
+                `UPDATE tutors SET profile_status = 'พร้อมสอน' WHERE tutor_id = ?;`,
+                [tutor_id]
+            )
+            await conn.query(
+                `UPDATE verifications SET status = 'พร้อมสอน' WHERE tutor_id = ?;`,
+                [tutor_id]
+            )
+
+            const [accounts] = await conn.query(`SELECT tutors.account_id FROM tutors WHERE tutors.tutor_id = ?;`,[tutor_id])
+
+            const account_id = accounts[0].account_id
+
+            await conn.query(
+                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+                [account_id, "ปลดระงับการสอน", "ผู้ดูแลได้ให้สิทธิ์อนุญาติการสอนคุณอีกครั้ง"]
+            )
+            conn.commit()
+
+            res.status(200).json({ message: "ปลดการระงับแล้ว" });
+        } catch (err) {
+            conn.rollback()
+            res.status(400).json(err.toString());
+        } finally {
+            conn.release()
+        }
+    });
+
+  //   ดึงข้อมูลนักเรียนทั้งหมด
+router.post("/studentlist/info", async function (req, res, next) {
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    let sql = `
+    SELECT 
+        account_id,
+        portrait_path,
+        username,
+        firstname,
+        lastname,
+        gender,
+        email,
+        phone,
+        report_count
+    FROM accounts
+    WHERE permission = "นักเรียน"
+    ORDER BY account_id;
+    `
+    try {      
+        const [students] = await conn.query(sql)
+        conn.commit()
+        res.status(200).json({'students': students})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+    
   });
 
 

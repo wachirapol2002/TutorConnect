@@ -148,7 +148,6 @@
 </template>
   
   <script>
-  import dayjs from 'dayjs';
   import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
@@ -243,7 +242,9 @@
         return text.replace(/\n/g, "<br>");
       },
       formatTimestamp(timestamp) {
-      return dayjs(timestamp).format('DD-MM-YYYY');
+        if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString('th-TH');
       },
       handleFileUpload(event) {
       const file = event.target.files[0]; // ไฟล์ที่ผู้ใช้อัปโหลด

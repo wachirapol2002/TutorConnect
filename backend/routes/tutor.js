@@ -674,13 +674,17 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
             `UPDATE studys SET status = 'อนุมัติคำขอ', approve_timestamp = NOW()  WHERE study_id = ?;`,
             [study_id]
         )
-        const subject_id = await conn.query(
-            `SELECT subject_id FROM studys WHERE study_id = ?;`, 
+        const subject = await conn.query(
+            `SELECT subject_id, tutor_id FROM studys WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
             `UPDATE subjects SET student_count = student_count + 1 WHERE subject_id = ?;`,
-            [subject_id[0][0].subject_id]
+            [subject[0][0].subject_id]
+        )
+        await conn.query(
+            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
+            [subject[0][0].tutor_id, subject[0][0].tutor_id]
         )
         conn.commit()
         res.status(200).json({ message: "ยอมรับคำขอแล้ว" });
@@ -708,13 +712,17 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const study_id = req.body.study_id
     console.log(study_id)
     try {
-        const subject_id = await conn.query(
-            `SELECT subject_id FROM studys WHERE study_id = ?;`, 
+        const subject = await conn.query(
+            `SELECT subject_id, tutor_id FROM studys WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
             `UPDATE subjects SET register_count = register_count - 1 WHERE subject_id = ?;`,
-            [subject_id[0][0].subject_id]
+            [subject[0][0].subject_id]
+        )
+        await conn.query(
+            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
+            [subject[0][0].tutor_id, subject[0][0].tutor_id]
         )
         await conn.query(
             `DELETE FROM studys WHERE study_id = ?`,

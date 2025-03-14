@@ -45,16 +45,21 @@
           <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='นักเรียน'">
             <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">    
               <div class="bell ms-2 me-3" :class="center" style="text-decoration: none; color: #ffcc00;">
-                <font-awesome-icon icon="bell" class="" style="font-size: 2rem; cursor: pointer;" />
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
                   <div class="px-3" :style="{fontSize: '1.5vw'}">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
+                    <span >&#9660;</span>
                   </div>
                 </div>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <router-link to="/notification" class="dropdown-item">
+                      ข้อความแจ้งเตือน <font-awesome-icon icon="bell" class="" style="font-size: 1rem; cursor: pointer;" /> 
+                    </router-link>
+                  </li>
                   <li>
                     <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ส่วนตัว</router-link>
                   </li>
@@ -75,7 +80,7 @@
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
                 <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
                   ข้อความ
-                  <div class="num-box ms-1 px-2" :class="center"
+                  <div v-if="unread_messages != 0" class="num-box ms-1 px-2" :class="center"
                     style="width: auto; height: auto;"
                     :style="{fontSize: '1.25vw'}"
                   >
@@ -89,16 +94,21 @@
           <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์'">
             <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">    
               <div class="bell ms-2 me-3" :class="center" style="text-decoration: none; color: #ffcc00;">
-                <font-awesome-icon icon="bell" class="" style="font-size: 2rem; cursor: pointer;" />
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
                   <div class="px-3" :style="{fontSize: '1.5vw'}">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
+                    <span >&#9660;</span>
                   </div>
                 </div>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <router-link to="/notification" class="dropdown-item">
+                      ข้อความแจ้งเตือน <font-awesome-icon icon="bell" class="" style="font-size: 1rem; cursor: pointer;" /> 
+                    </router-link>
+                  </li>
                   <li>
                     <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ส่วนตัว</router-link>
                   </li>
@@ -126,11 +136,11 @@
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
                   <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
                     ข้อความ
-                    <div class="num-box ms-1 px-2" :class="center"
-                      style="width: auto; height: auto;"
-                      :style="{fontSize: '1.25vw'}"
+                    <div v-if="unread_messages != 0" class="num-box ms-1 px-2" :class="center"
+                    style="width: auto; height: auto;"
+                    :style="{fontSize: '1.25vw'}"
                     >
-                      {{ unread_messages }}
+                    {{ unread_messages }}
                     </div>
                   </div>
               </router-link>
@@ -140,25 +150,27 @@
                     <div class="px-3" :style="{fontSize: '1.5vw'}">ยืนยันตัวตน</div>
                 </router-link>
               </template>
-
-
-
             </div>
           </template>
           <!-- ผู้ดูแลระบบ -->
           <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ผู้ดูแลระบบ'">
             <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">    
               <div class="bell ms-2 me-3" :class="center" style="text-decoration: none; color: #ffcc00;">
-                <font-awesome-icon icon="bell" class="" style="font-size: 2rem; cursor: pointer;" />
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
                   <div class="px-3" :style="{fontSize: '1.5vw'}">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
+                    <span >&#9660;</span>
                   </div>
                 </div>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <li>
+                    <router-link to="/notification" class="dropdown-item">
+                      ข้อความแจ้งเตือน <font-awesome-icon icon="bell" class="" style="font-size: 1rem; cursor: pointer;" /> 
+                    </router-link>
+                  </li>
                   <li>
                     <router-link to="/student/profile" class="dropdown-item">ตั้งค่าโปรไฟล์ส่วนตัว</router-link>
                   </li>
@@ -172,40 +184,23 @@
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
                   <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
-                    จัดการผู้สอน
-                    <div class="num-box ms-1 px-2" :class="center"
-                      style="width: auto; height: auto;"
-                      :style="{fontSize: '1.25vw'}"
-                    >
-                      {{ unverify_count }}
-                    </div>
+                    จัดการบัญชี <span >&#9660;</span>
                 </div>
                 </div>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                   <li>
-                    <router-link to="/admin/verify" class="dropdown-item">ยืนยันตัวตนผู้สอน</router-link>
+                    <router-link to="/admin/verify" class="dropdown-item">
+                      ยืนยันตัวตนผู้สอน {{ unverify_count }}
+                    </router-link>
                   </li>
                   <li>
                     <router-link to="/admin/tutorlist" class="dropdown-item">บัญชีผู้สอนทั้งหมด</router-link>
                   </li>
+                  <li>
+                    <router-link to="/admin/studentlist" class="dropdown-item">บัญชีผู้เรียนทั้งหมด</router-link>
+                  </li>
                 </ul>
               </div>
-
-
-
-              <!-- <router-link class="router-link" to="/admin/verify" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
-                    ยืนยันตัวตนผู้สอน
-                    <div class="num-box ms-1 px-2" :class="center"
-                      style="width: auto; height: auto;"
-                      :style="{fontSize: '1.25vw'}"
-                    >
-                      {{ unverify_count }}
-                    </div>
-                </div>
-              </router-link> -->
-
-
 
 
               <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
@@ -217,7 +212,7 @@
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
                 <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
                   ข้อความ
-                  <div class="num-box ms-1 px-2" :class="center"
+                  <div v-if="unread_messages != 0" class="num-box ms-1 px-2" :class="center"
                     style="width: auto; height: auto;"
                     :style="{fontSize: '1.25vw'}"
                   >
@@ -243,31 +238,6 @@
           </template>
           
 
-<!-- 
-          <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">
-            <router-link to="/login" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">เข้าสู่ระบบ</div>
-            </router-link>
-            <router-link to="/student/register" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">สมัครสมาชิก</div>
-            </router-link>
-            <router-link to="/" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">หาติวเตอร์</div>
-            </router-link>
-            <router-link to="/tutor/studentlist" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">นักเรียนที่เคยสอน</div>
-            </router-link>
-            <router-link to="/tutor/enroll" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">ผู้สมัครเรียน</div>
-            </router-link>
-            <router-link to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
-              <div class="px-3" :style="{fontSize: '1.5vw'}">หางาน</div>
-            </router-link>
-          </div> -->
-
-
-
-          
 
               
 
@@ -305,7 +275,7 @@ export default {
     };
   },
   mounted() {
-    this.unread_messages = this.$cookies.get("unread_messages") || 0;
+    // this.unread_messages = this.$cookies.get("unread_messages") || 0;
     // ตรวจสอบค่าจาก cookies ทุกๆ 3 วินาที
     this.startInterval();
   },
@@ -343,22 +313,22 @@ export default {
         };
         axios.post("http://localhost:3000/chat/unread/count", data)
         .then((res) => {
-          this.$cookies.set("unread_messages", res.data.unread.unread_count);
+          // this.$cookies.set("unread_messages", res.data.unread.unread_count);
+          this.unread_messages = res.data.unread.unread_count
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
         });   
       }
-      const newCount = this.$cookies.get("unread_messages");
-      if (newCount !== this.unread_messages) {
-        this.unread_messages = newCount;
-      }
+      // const newCount = this.$cookies.get("unread_messages");
+      // if (newCount !== this.unread_messages) {
+      //   this.unread_messages = newCount;
+      // }
     },
     verifyCount() {
       if(this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ผู้ดูแลระบบ'){
         axios.post("http://localhost:3000/tutorlist/unverify/count")
         .then((res) => {
-          console.log(res.data.count)
           this.unverify_count = res.data.count
         })  
         .catch((err) => {

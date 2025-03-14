@@ -40,6 +40,7 @@ router.post('/user/login', async (req, res, next) => {
             throw new Error('"ชื่อผู้ใช้" หรือ "รหัสผ่าน" ไม่ถูกต้อง')
         }
         let tutor_id = null;
+        let tutor_status = null;
         if (account.permission === 'ติวเตอร์'){
             const [tutors] = await conn.query(
                 'SELECT tutor_id, profile_status FROM tutors WHERE account_id = ?',
@@ -466,7 +467,7 @@ router.post('/report', async (req, res, next) => {
         INSERT INTO notifications (account_id, type, message)
             VALUES (?, ?, ?);
         `
-        await conn.query(sqlNotification, [account_id, "ถูกรายงานโดยผู้ใช้งานอื่น", message])
+        await conn.query(sqlNotification, [account_id, "รายงานโดยผู้ใช้งานอื่น", message])
 
         let sqlUpdateCount = `UPDATE accounts SET report_count = report_count + 1 WHERE account_id = ?;`
 
@@ -483,6 +484,43 @@ router.post('/report', async (req, res, next) => {
     }
 })
 
+//รายงาน
+router.post('/notification', async (req, res, next) => {
+    const Schema = Joi.object({
+        account_id: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+  
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const account_id = req.body.account_id
+    console.log(account_id)
+
+    try {
+        let sql = `
+        SELECT *
+        FROM notifications
+        WHERE account_id = ?
+        ORDER BY timestamp DESC;
+        `
+        await conn.query(sql,[account_id])
+
+        // Check if username is correct
+        const [notifications] = await conn.query(sql,[account_id])
+
+        conn.commit()
+        res.status(200).json({'notifications': notifications})
+    } catch (error) {
+        conn.rollback()
+        res.status(403).json({ message: error.message })
+    } finally {
+        conn.release()
+    }
+})
 
 
 

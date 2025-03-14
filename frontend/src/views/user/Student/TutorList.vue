@@ -10,11 +10,13 @@
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
                           <!-- แสดงภาพตัวอย่าง -->
-                          <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                            <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                          />
-                          </div>
+                          <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
+                            <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                              <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                              style="width: 100%; height: 100%; object-fit: cover;"
+                            />
+                            </div>
+                          </router-link>
                           
                         </div>
                       </div>
@@ -33,8 +35,12 @@
                         </div>
                       </div>
                       <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
-                        <label class="form-label fw-bold" for="date">วันที่เริ่มเรียน</label>
-                        <div class="mx-2">{{formatTimestamp(tutor.first_approve_timestamp)}}</div>
+                        <div class="">
+                          <div class="fw-bold">
+                            วันที่เริ่มเรียน
+                          </div>  
+                          {{ formatTimestamp(tutor.first_approve_timestamp) }}
+                        </div>
                       </div>
                     </div>
 
@@ -95,7 +101,6 @@
 </template>
   
   <script>
-  import dayjs from 'dayjs';
   import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
@@ -174,7 +179,9 @@
       return tutor.category_list.split(', ');
     },
     formatTimestamp(timestamp) {
-      return dayjs(timestamp).format('DD-MM-YYYY');
+      if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString('th-TH');
     },
     formatText(text) {
         return text.replace(/\n/g, "<br>");

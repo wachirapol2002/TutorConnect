@@ -166,25 +166,6 @@
 
                 <!-- หัวข้อการสอนและราคา -->
                 <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">หัวข้อการสอนและราคา</div>
-                <!-- <div class="information mt-2">
-                  <ul v-if="subjects.length" >
-                    <li v-for="(subject, index) in subjects" 
-                      :key="subject.subject_id"
-                      class="d-flex justify-content-start align-items-center my-2"
-                    >
-                      <div class="col-1 text-center" :class="center">
-                        <button type="button" @click="enrollSubject(subject.subject_id)" class="button btn btn-success btn-sm fw-bold text-light">สมัครเรียน</button>
-                      </div>
-                      <div class="col-10">
-                        {{ subject.subject_name + " " + subject.degree_level}}
-                        <strong>{{ subject.price }} บาท/ชั่วโมง</strong>
-                      </div>
-                      <div class="col-1 text-center" :class="center">
-                        <button type="button" @click="SubjectDescribe(index)" class="button btn btn-warning btn-sm fw-bold text-dark">รายละเอียดเพิ่มเติม</button>
-                      </div>
-                    </li>
-                  </ul>
-                </div> -->
 
                 <div class="information mt-2">
                   <ul v-if="unStudySubjects.length" class="m-0 p-0">
@@ -411,7 +392,6 @@
 </template>
   
   <script>
-  import dayjs from 'dayjs';
   import axios from "axios";
   import useVuelidate from "@vuelidate/core";
   import {
@@ -511,7 +491,9 @@
         return text.replace(/\n/g, "<br>");
     },
     formatTimestamp(timestamp) {
-      return dayjs(timestamp).format('DD-MM-YYYY HH:mm:ss');
+      if(!timestamp) return " ";
+        const date = new Date(timestamp);
+        return date.toLocaleString('th-TH');
     },
     openFacebookInNewTab() {
       window.open(this.tutor.facebook_link, '_blank');

@@ -5,8 +5,8 @@
         type="text"
         v-model="searchQuery"
         class="form-control"
-        placeholder="ค้นหา (ID, Username, TutorName, Firstname, Lastname, Email)"
-        @input="searchTutors"
+        placeholder="ค้นหา (ID, Username, Firstname, Lastname, Email)"
+        @input="searchStudents"
       />
     </div>
     
@@ -24,11 +24,6 @@
                 Username
                 <span v-if="sortColumn === 'username' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'username' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('displayname')" class="">
-                TutorName
-                <span v-if="sortColumn === 'displayname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'displayname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('firstname')" class="">
                 Firstname
@@ -50,37 +45,22 @@
                 <span v-if="sortColumn === 'phone' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'phone' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Identity</th>
-              <th scope="col" class="text-center">Selfie</th>
-              <th scope="col" @click="sortTable('rating_score')" class="text-center">
-                Rating
-                <span v-if="sortColumn === 'rating_score' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'rating_score' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('teaching_count')" class="text-center">
-                Student_Count
-                <span v-if="sortColumn === 'teaching_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'teaching_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
               <th scope="col" @click="sortTable('report_count')" class="text-center">
                 Report
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Status</th>
-              
-             
               <th scope="col" class="text-center">Profile</th>
               <th scope="col" class="text-center">Contact</th>
               <th scope="col" class="text-center">Manage</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(tutor, index) in currentTutors" :key="index">
-              <th scope="row" class="text-center">{{ tutor.account_id || '-'  }}</th>
+            <tr v-for="(student, index) in currentStudents" :key="index">
+              <th scope="row" class="text-center">{{ student.account_id }}</th>
               <td class="text-center">
                 <img
-                        :src="tutor && tutor.portrait_path ? 'http://localhost:3000' + tutor.portrait_path : require('@/assets/user.png')"
+                        :src="student && student.portrait_path ? 'http://localhost:3000' + student.portrait_path : require('@/assets/user.png')"
                         alt="User"
                         class="rounded-circle me-3 profile-img"
                         :style="{ 
@@ -92,72 +72,35 @@
                         }"
                 />
               </td>
-              <td>{{ tutor.username || '-'  }}</td>
-              <td>{{ tutor.displayname || '-' }}</td>
-              <td>{{ tutor.firstname || '-'  }}</td>
-              <td>{{ tutor.lastname || '-'  }}</td>
-              <td>{{ tutor.email || '-'  }}</td>
-              <td>{{ tutor.phone || '-'  }}</td>
-
+              <td>{{ student.username }}</td>
+              <td>{{ student.firstname }}</td>
+              <td>{{ student.lastname }}</td>
+              <td>{{ student.email }}</td>
+              <td>{{ student.phone }}</td>
+              <td class="text-center">{{ student.report_count }}</td>
               <td>
-                <img :src="(tutor.document_path ? 'http://localhost:3000' + tutor.document_path :require('@/assets/IDcard.png'))" alt="เอกสารยืนยัน" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: cover;"
-                />
-                
-              </td>
-              <td>
-                <img :src="(tutor.selfie_path ? 'http://localhost:3000' + tutor.selfie_path : require('@/assets/selfie.png'))" alt="ภาพถ่ายใบหน้า" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: contain;"
-                />
-              </td>
-              <td class="text-center">{{ tutor.rating_score || '-' }}</td>
-              <td class="text-center">{{ tutor.teaching_count}}</td>
-              <td class="text-center">{{ tutor.report_count}}</td>
-
-              <!-- <td class="text-center">{{ tutor.profile_status }}</td> -->
-
-              <td class="text-center">
-    <span 
-        class="badge font-bold p-2 rounded-lg"
-        :class="{'bg-success text-white': tutor.profile_status === 'พร้อมสอน',
-                'bg-warning text-dark': tutor.profile_status === 'รอตรวจสอบ', 
-                'bg-danger text-white': tutor.profile_status === 'ระงับชั่วคราว'}">
-        {{ tutor.profile_status }}
-    </span>
-</td>
-              
-
-
-              <td>
-                <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
+                <router-link :to="'/student/profile/?id='+ student.student_id" style="text-decoration: none;">
                   <div class="button bg-light text-dark">
                     โปรไฟล์
                   </div>
                 </router-link>
               </td>
               <td>
-                <div class="button bg-dark text-light" @click="chat(tutor.account_id)">
+                <div class="button bg-dark text-light" @click="chat(student.account_id)">
                   ข้อความ
                 </div>
               </td>
-              <template v-if="tutor.profile_status == 'พร้อมสอน'">
+              <template v-if="student.profile_status == 'พร้อมสอน'">
                 <td>
-                <div class="button bg-danger text-light" @click="btnBan(tutor.tutor_id)">
-                  ระงับการสอน
+                <div class="button bg-danger text-light">
+                  ลบสิทธิ์
                 </div>
               </td>
               </template>
-              <template v-if="tutor.profile_status == 'ระงับชั่วคราว'">
+              <template v-if="student.profile_status !== 'พร้อมสอน'">
                 <td>
-                <div class="button bg-warning text-dark" @click="btnUnBan(tutor.tutor_id)">
-                  ปลดระงับ
-                </div>
-              </td>
-              </template>
-              <template v-if="tutor.profile_status == 'รอตรวจสอบ'">
-                <td>
-                <div class="button bg-success text-light"  @click="btnApprove(tutor.tutor_id)">
-                  อนุญาติการสอน
+                <div class="button bg-warning text-dark">
+                  แก้ไข
                 </div>
               </td>
               </template>
@@ -170,73 +113,10 @@
 
       <div class="d-flex justify-content-center my-3">
       
-        <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="btn btn-dark">ย้อนกลับ</button>
-        <span class="mx-3">หน้า {{ currentPage }} / {{ totalPages }}</span>
-        <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="btn btn-dark">หน้าถัดไป</button>
-      </div>
-
-
-
-      <!-- อนุมัติ -->
-      <div v-if="showApprove" class="popup-overlay" style="width: 100%;">
-        <div class="popup" style="width: 50%;">
-          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยืนยันสิทธิ์การสอนหรือไม่</div>
-          <div class="d-flex align-items-center justify-content-center mt-3">
-            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ปิด
-            </div>
-            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-success text-white fw-bold" @click="Approve(this.select_tutor_id)">
-              ยืนยัน
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ปลดระงับ -->
-      <div v-if="showUnBan" class="popup-overlay" style="width: 100%;">
-        <div class="popup" style="width: 50%;">
-          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการปลดระงับการสอนหรือไม่</div>
-          <div class="d-flex align-items-center justify-content-center mt-3">
-            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ปิด
-            </div>
-            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="unBan(this.select_tutor_id)">
-              ยืนยัน
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- ระงับ -->
-      <div v-if="showBan" class="popup-overlay" style="width: 100%;">
-        <div class="popup" style="width: 50%;">
-          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการระงับสิทธิ์สอนหรือไม่</div>
-
-
-          <div class="mb-3 text-center">
-            <label for="reason" class="form-label" style="font-size: 1vw;">ระบุเหตุผล แจ้งเตือนไปยังผู้สอน</label>
-            <textarea v-model="reason" id="reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
-          </div>
-          <template v-if="v$.reason.$error">
-            <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
-              กรุณาระบุเหตุผลของการถูกระงับ
-            </p>
-          </template>
-
-          <div class="d-flex align-items-center justify-content-center mt-3">
-            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
-              ปิด
-            </div>
-            <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me-5 bg-danger text-white fw-bold" @click="Ban(this.select_tutor_id)">
-              ยืนยัน
-            </div>
-          </div>
-        </div>
-      </div>
-
-
+      <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="btn btn-dark">ย้อนกลับ</button>
+      <span class="mx-3">หน้า {{ currentPage }} / {{ totalPages }}</span>
+      <button :disabled="currentPage === totalPages" @click="changePage(currentPage + 1)" class="btn btn-dark">หน้าถัดไป</button>
+  </div>
 
  
 
@@ -257,14 +137,14 @@ import {
 } from "@vuelidate/validators";
 
 export default {
-  name: "TutorInfoListPage",
+  name: "StudentInfoListPage",
   setup() {
     const v$ = useVuelidate();
     return { v$ };
   },
   data() {
     return {
-      tutors: [],
+      students: [],
       searchQuery: '', // คำค้นหาจากผู้ใช้
       sortColumn: '',  // คอลัมน์ที่ใช้สำหรับการเรียงลำดับ
       sortOrder: 'asc',  // ทิศทางการเรียงลำดับ (asc หรือ desc)
@@ -274,6 +154,7 @@ export default {
       imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
       previousRoutes: [],
       mainColor: "#BC2C2C",
+      select_tutor_id: "",
       select_index: "",
       username: "",
       password: "",
@@ -282,12 +163,10 @@ export default {
       phone: "",
       firstname: "",
       lastname: "",
-      
-      select_tutor_id: "",
+ 
       reason: "",
-      showApprove: false,
-      showBan: false,
-      showUnBan: false,
+      showlicense: false,
+      showUnlicense: false,
       error: "",
       center: {
         "d-flex": true,
@@ -305,15 +184,15 @@ export default {
       },
   },
   mounted() {
-    this.getTutors()
+    this.getStudents()
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.filteredTutors.length / this.itemsPerPage); // คำนวณจำนวนหน้า
+      return Math.ceil(this.filteredStudents.length / this.itemsPerPage); // คำนวณจำนวนหน้า
     },
-    filteredTutors() {
+    filteredStudents() {
       // ฟังก์ชันในการกรองข้อมูลตามคำค้นหา
-      return this.tutors.filter(tutor => {
+      return this.students.filter(tutor => {
         const query = this.searchQuery.toLowerCase();
         return (
           (tutor.account_id && tutor.account_id.toString().includes(query)) ||
@@ -326,10 +205,10 @@ export default {
         
       });
     },
-    currentTutors() {
+    currentStudents() {
       const start = (this.currentPage - 1) * this.itemsPerPage; // เริ่มต้นแถวในหน้า
       const end = start + this.itemsPerPage; // จบแถวในหน้า
-      return this.filteredTutors.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
+      return this.filteredStudents.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
     },
   },
 
@@ -339,7 +218,7 @@ export default {
         this.currentPage = page;
       }
     },
-    searchTutors() {
+    searchStudents() {
       this.currentPage = 1; // รีเซ็ตหน้าหลังจากค้นหาใหม่
     },
     sortTable(column) {
@@ -351,10 +230,10 @@ export default {
       this.sortColumn = column;
       this.sortOrder = 'asc';
     }
-    this.sortTutors();
+    this.sortStudents();
   },
-  sortTutors() {
-    this.tutors.sort((a, b) => {
+  sortStudents() {
+    this.students.sort((a, b) => {
       let comparison = 0;
       if (a[this.sortColumn] < b[this.sortColumn]) {
         comparison = -1;
@@ -364,54 +243,40 @@ export default {
       return this.sortOrder === 'asc' ? comparison : -comparison;
     });
   },
-    getTutors() {
-      axios.post("http://localhost:3000/tutorlist/info")
+    getStudents() {
+      axios.post("http://localhost:3000/studentlist/info")
         .then((res) => {
-            this.tutors = res.data.tutors
+            this.students = res.data.students
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
         });   
   },
-  Approve(tutor_id) {
+  Accept(tutor_id, index) {
       const data = {
           tutor_id: tutor_id
         };
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
           alert(response.data.message); 
-          this.getTutors()
+          this.tutors.splice(index, 1);
           this.closePopup()
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
         });   
     },
-    unBan(tutor_id) {
-      const data = {
-          tutor_id: tutor_id
-        };
-      axios.post("http://localhost:3000/admin/tutor/unban", data)
-        .then((response) => {
-          alert(response.data.message);
-          this.getTutors()
-          this.closePopup()
-        })  
-        .catch((err) => {
-          alert(err.response.data.details.message);
-        });   
-    },
-    Ban(tutor_id) {
+    unAccept(tutor_id, index) {
       this.v$.$touch();
       if (!this.v$.$invalid) {
         const data = {
             tutor_id: tutor_id,
             message: this.reason
           };
-          axios.post("http://localhost:3000/admin/tutor/ban", data)
+          axios.post("http://localhost:3000/admin/verify/unaccept", data)
           .then((response) => {
-            alert(response.data.message);
-            this.getTutors()
+            alert(response.data.message); 
+            this.tutors.splice(index, 1);
             this.closePopup()
           })  
           .catch((err) => {
@@ -419,25 +284,21 @@ export default {
           });
       }
     },
-    btnApprove(tutor_id) {
+    showAccept(tutor_id, index) {
       this.select_tutor_id = tutor_id
-      this.showApprove = true;
+      this.select_index = index
+      this.showlicense = true;
       this.reason = "";
     },
-    btnBan(tutor_id) {
+    showUnAccept(tutor_id, index) {
       this.select_tutor_id = tutor_id
-      this.showBan = true;
-      this.reason = "";
-    },
-    btnUnBan(tutor_id) {
-      this.select_tutor_id = tutor_id
-      this.showUnBan = true;
+      this.select_index = index
+      this.showUnlicense = true;
       this.reason = "";
     },
     closePopup() {
-      this.showBan = false;
-      this.showUnBan = false;
-      this.showApprove = false;
+      this.showlicense = false;
+      this.showUnlicense = false;
       this.select_tutor_id = ""
       this.select_index = ""
       this.reason = "";

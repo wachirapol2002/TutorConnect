@@ -1,167 +1,25 @@
 <template>
   <div id="app">
-    <div class="mb-3">
-      <input
-        type="text"
-        v-model="searchQuery"
-        class="form-control"
-        placeholder="ค้นหา (ID, Username, TutorName, Firstname, Lastname, Email)"
-        @input="searchTutors"
-      />
-    </div>
-    
+
       <div class="container-fluid rounded-4 border border-dark p-0 py-0 mb-1" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 100vw; min-height: 75vh;">
         <table class="table table-hover">
           <thead class="thead-dark">
             <tr>
-              <th scope="col" @click="sortTable('account_id')" class="text-center">
-                ID
-                <span v-if="sortColumn === 'account_id' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'account_id' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" class="text-center">Picture</th>
-              <th scope="col" @click="sortTable('username')" class="">
-                Username
-                <span v-if="sortColumn === 'username' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'username' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('displayname')" class="">
-                TutorName
-                <span v-if="sortColumn === 'displayname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'displayname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('firstname')" class="">
-                Firstname
-                <span v-if="sortColumn === 'firstname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'firstname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('lastname')" class="">
-                Lastname
-                <span v-if="sortColumn === 'lastname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'lastname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('email')" class="">
-                Email
-                <span v-if="sortColumn === 'email' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'email' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('phone')" class="">
-                Phone
-                <span v-if="sortColumn === 'phone' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'phone' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" class="text-center">Identity</th>
-              <th scope="col" class="text-center">Selfie</th>
-              <th scope="col" @click="sortTable('rating_score')" class="text-center">
-                Rating
-                <span v-if="sortColumn === 'rating_score' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'rating_score' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('teaching_count')" class="text-center">
-                Student_Count
-                <span v-if="sortColumn === 'teaching_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'teaching_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('report_count')" class="text-center">
-                Report
-                <span v-if="sortColumn === 'report_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'report_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" class="text-center">Status</th>
-              
-             
-              <th scope="col" class="text-center">Profile</th>
-              <th scope="col" class="text-center">Contact</th>
-              <th scope="col" class="text-center">Manage</th>
+              <th scope="col" class="text-center" style="width: 5vw">#</th>
+              <th scope="col" class="" style="width: 15vw">type</th>
+              <th scope="col" class="" style="width: 70vw">message</th>
+              <th scope="col" class="" style="width: 10vw">timestamp</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(tutor, index) in currentTutors" :key="index">
-              <th scope="row" class="text-center">{{ tutor.account_id || '-'  }}</th>
-              <td class="text-center">
-                <img
-                        :src="tutor && tutor.portrait_path ? 'http://localhost:3000' + tutor.portrait_path : require('@/assets/user.png')"
-                        alt="User"
-                        class="rounded-circle me-3 profile-img"
-                        :style="{ 
-                          width: '70px', 
-                          height: '70px', 
-                          objectFit: 'cover', 
-                          maxWidth: '70px', 
-                          maxHeight: '70px' 
-                        }"
-                />
-              </td>
-              <td>{{ tutor.username || '-'  }}</td>
-              <td>{{ tutor.displayname || '-' }}</td>
-              <td>{{ tutor.firstname || '-'  }}</td>
-              <td>{{ tutor.lastname || '-'  }}</td>
-              <td>{{ tutor.email || '-'  }}</td>
-              <td>{{ tutor.phone || '-'  }}</td>
-
-              <td>
-                <img :src="(tutor.document_path ? 'http://localhost:3000' + tutor.document_path :require('@/assets/IDcard.png'))" alt="เอกสารยืนยัน" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: cover;"
-                />
-                
-              </td>
-              <td>
-                <img :src="(tutor.selfie_path ? 'http://localhost:3000' + tutor.selfie_path : require('@/assets/selfie.png'))" alt="ภาพถ่ายใบหน้า" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: contain;"
-                />
-              </td>
-              <td class="text-center">{{ tutor.rating_score || '-' }}</td>
-              <td class="text-center">{{ tutor.teaching_count}}</td>
-              <td class="text-center">{{ tutor.report_count}}</td>
-
-              <!-- <td class="text-center">{{ tutor.profile_status }}</td> -->
-
-              <td class="text-center">
-    <span 
-        class="badge font-bold p-2 rounded-lg"
-        :class="{'bg-success text-white': tutor.profile_status === 'พร้อมสอน',
-                'bg-warning text-dark': tutor.profile_status === 'รอตรวจสอบ', 
-                'bg-danger text-white': tutor.profile_status === 'ระงับชั่วคราว'}">
-        {{ tutor.profile_status }}
-    </span>
-</td>
-              
-
-
-              <td>
-                <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
-                  <div class="button bg-light text-dark">
-                    โปรไฟล์
-                  </div>
-                </router-link>
-              </td>
-              <td>
-                <div class="button bg-dark text-light" @click="chat(tutor.account_id)">
-                  ข้อความ
-                </div>
-              </td>
-              <template v-if="tutor.profile_status == 'พร้อมสอน'">
-                <td>
-                <div class="button bg-danger text-light" @click="btnBan(tutor.tutor_id)">
-                  ระงับการสอน
-                </div>
-              </td>
-              </template>
-              <template v-if="tutor.profile_status == 'ระงับชั่วคราว'">
-                <td>
-                <div class="button bg-warning text-dark" @click="btnUnBan(tutor.tutor_id)">
-                  ปลดระงับ
-                </div>
-              </td>
-              </template>
-              <template v-if="tutor.profile_status == 'รอตรวจสอบ'">
-                <td>
-                <div class="button bg-success text-light"  @click="btnApprove(tutor.tutor_id)">
-                  อนุญาติการสอน
-                </div>
-              </td>
-              </template>
+            <tr v-for="(notification, index) in notifications" :key="index">
+              <th scope="row" class="text-center">{{index + 1}}</th>
+              <td class="">{{ notification.type || '-'  }}</td>
+              <td class="">{{ notification.message || '-'  }}</td>
+              <td class="">{{ formatTimestamp(notification.timestamp)}}</td>
             </tr>
+  
+ 
           </tbody>
         </table>
 
@@ -237,14 +95,6 @@
       </div>
 
 
-
- 
-
-
-
-
-      
-
   </div>
 </template>
   
@@ -257,13 +107,14 @@ import {
 } from "@vuelidate/validators";
 
 export default {
-  name: "TutorInfoListPage",
+  name: "NotificationPage",
   setup() {
     const v$ = useVuelidate();
     return { v$ };
   },
   data() {
     return {
+      notifications: [],
       tutors: [],
       searchQuery: '', // คำค้นหาจากผู้ใช้
       sortColumn: '',  // คอลัมน์ที่ใช้สำหรับการเรียงลำดับ
@@ -305,7 +156,7 @@ export default {
       },
   },
   mounted() {
-    this.getTutors()
+    this.getNotifications()
   },
   computed: {
     totalPages() {
@@ -364,10 +215,15 @@ export default {
       return this.sortOrder === 'asc' ? comparison : -comparison;
     });
   },
-    getTutors() {
-      axios.post("http://localhost:3000/tutorlist/info")
+  getNotifications() {
+      const data = {
+          account_id: this.$cookies.get("account").account_id,
+        };
+        
+      axios.post("http://localhost:3000/notification", data)
         .then((res) => {
-            this.tutors = res.data.tutors
+            this.notifications = res.data.notifications
+            console.log(res.data.notifications)
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
@@ -443,10 +299,10 @@ export default {
       this.reason = "";
     },
   formatTimestamp(timestamp) {
-    if(!timestamp) return " ";
+      if(!timestamp) return " ";
       const date = new Date(timestamp);
       return date.toLocaleString('th-TH');
-  },
+    },
   chat(account_id){
       this.$router.push({ name: 'ChatPage'});
       this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
