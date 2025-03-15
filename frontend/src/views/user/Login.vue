@@ -4,11 +4,9 @@
         <img
           :src="require('@/assets/logo.png')" class="my-3"
           style="max-height:10vh; width: auto; border-radius: 0%"
-          
         />
-        <!-- <br /> -->
-        <!-- TutorConnect -->
          
+
       </div>
       <div
         class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
@@ -170,6 +168,8 @@
                   }else if(profile_status === 'รอตรวจสอบ'){
                     this.$router.push({ path: "/tutor/wait" });
                   }else if(profile_status === 'พร้อมสอน'){
+                    this.$router.push({ path: "/teacher/profile" });
+                  }else if(profile_status === 'ระงับชั่วคราว'){
                     this.$router.push({ path: "/teacher/profile" });
                   }
                 })

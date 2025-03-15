@@ -132,12 +132,22 @@
               <!-- สถานที่สอน -->
               <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">สถานที่สอน</div>
               <div class="information mt-2">
-                <ul>
-                    <li>ออนไลน์</li>
+                <ul v-if="places.length" class="m-1 border-2 mb-4">
+                  <li
+                    v-for="(place) in places"
+                    :key="place.location_id"
+                    class="d-flex justify-content-between align-items-center my-2"
+                  >
+                  <div class="col-12">
+                    - {{ place.place_name + (place.address !== 'ไม่ระบุ' ? ' ' + place.address : '') }}
+                  </div>
+                  </li>
                 </ul>
               </div>
               
 
+              <!-- หัวข้อการสอนและราคา -->
+              <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">หัวข้อการสอนและราคา</div>
 
               <div class="information mt-2">
                 <ul v-if="unStudySubjects.length" class="m-0 p-0">
@@ -376,10 +386,10 @@ export default {
         })
         .then((res) => {
           this.comments = res.data.comments;
-          return axios.post("http://localhost:3000/student/getRating", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
+          return axios.post("http://localhost:3000/tutor/place", { tutor_id: this.tutor_id });
         })
         .then((res) => {
-          this.currentRating = res.data.score;
+          this.places = res.data.places;
         })
         .catch((err) => {
           alert(err.response.data.details.message);
@@ -559,13 +569,19 @@ export default {
 img {
   object-fit: cover;
 }
-.button{
-transition: transform 0.2s ease;
-
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .btn{
 transition: transform 0.2s ease;

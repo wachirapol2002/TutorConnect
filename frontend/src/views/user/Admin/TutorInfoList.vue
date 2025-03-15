@@ -30,7 +30,7 @@
                 <span v-if="sortColumn === 'displayname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'displayname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" @click="sortTable('firstname')" class="">
+              <!-- <th scope="col" @click="sortTable('firstname')" class="">
                 Firstname
                 <span v-if="sortColumn === 'firstname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'firstname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
@@ -39,7 +39,7 @@
                 Lastname
                 <span v-if="sortColumn === 'lastname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'lastname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
+              </th> -->
               <th scope="col" @click="sortTable('email')" class="">
                 Email
                 <span v-if="sortColumn === 'email' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
@@ -58,7 +58,7 @@
                 <span v-if="sortColumn === 'rating_score' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('teaching_count')" class="text-center">
-                Student_Count
+                Student
                 <span v-if="sortColumn === 'teaching_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'teaching_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
@@ -94,8 +94,8 @@
               </td>
               <td>{{ tutor.username || '-'  }}</td>
               <td>{{ tutor.displayname || '-' }}</td>
-              <td>{{ tutor.firstname || '-'  }}</td>
-              <td>{{ tutor.lastname || '-'  }}</td>
+              <!-- <td>{{ tutor.firstname || '-'  }}</td>
+              <td>{{ tutor.lastname || '-'  }}</td> -->
               <td>{{ tutor.email || '-'  }}</td>
               <td>{{ tutor.phone || '-'  }}</td>
 
@@ -114,17 +114,15 @@
               <td class="text-center">{{ tutor.teaching_count}}</td>
               <td class="text-center">{{ tutor.report_count}}</td>
 
-              <!-- <td class="text-center">{{ tutor.profile_status }}</td> -->
-
               <td class="text-center">
-    <span 
-        class="badge font-bold p-2 rounded-lg"
-        :class="{'bg-success text-white': tutor.profile_status === 'พร้อมสอน',
-                'bg-warning text-dark': tutor.profile_status === 'รอตรวจสอบ', 
-                'bg-danger text-white': tutor.profile_status === 'ระงับชั่วคราว'}">
-        {{ tutor.profile_status }}
-    </span>
-</td>
+                <span 
+                    class="badge font-bold p-2 rounded-lg"
+                    :class="{'bg-success text-white': tutor.profile_status === 'พร้อมสอน',
+                            'bg-warning text-dark': tutor.profile_status === 'รอตรวจสอบ', 
+                            'bg-danger text-white': tutor.profile_status === 'ระงับชั่วคราว'}">
+                    {{ tutor.profile_status }}
+                </span>
+              </td>
               
 
 
@@ -379,9 +377,9 @@ export default {
         };
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
+          this.closePopup()
           alert(response.data.message); 
           this.getTutors()
-          this.closePopup()
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
@@ -393,9 +391,9 @@ export default {
         };
       axios.post("http://localhost:3000/admin/tutor/unban", data)
         .then((response) => {
+          this.closePopup()
           alert(response.data.message);
           this.getTutors()
-          this.closePopup()
         })  
         .catch((err) => {
           alert(err.response.data.details.message);
@@ -410,9 +408,9 @@ export default {
           };
           axios.post("http://localhost:3000/admin/tutor/ban", data)
           .then((response) => {
+            this.closePopup()
             alert(response.data.message);
             this.getTutors()
-            this.closePopup()
           })  
           .catch((err) => {
             alert(err.response.data.details.message);

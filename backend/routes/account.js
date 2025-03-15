@@ -467,7 +467,7 @@ router.post('/report', async (req, res, next) => {
         INSERT INTO notifications (account_id, type, message)
             VALUES (?, ?, ?);
         `
-        await conn.query(sqlNotification, [account_id, "รายงานโดยผู้ใช้งานอื่น", message])
+        await conn.query(sqlNotification, [account_id, "ถูกรายงานโดยผู้ใช้งานอื่น", message])
 
         let sqlUpdateCount = `UPDATE accounts SET report_count = report_count + 1 WHERE account_id = ?;`
 

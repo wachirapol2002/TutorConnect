@@ -2,24 +2,37 @@
   <div id="app">
 
       <div class="container-fluid rounded-4 border border-dark p-0 py-0 mb-1" :style="{ backgroundColor: 'white' , lineHeight: '1.2'  }" style="width: 100vw; min-height: 75vh;">
-        <table class="table table-hover">
+        <table class="table  table-striped">
           <thead class="thead-dark">
             <tr>
               <th scope="col" class="text-center" style="width: 5vw">#</th>
-              <th scope="col" class="" style="width: 15vw">type</th>
-              <th scope="col" class="" style="width: 70vw">message</th>
-              <th scope="col" class="" style="width: 10vw">timestamp</th>
+              <th scope="col" class="" style="width: 15vw">Type</th>
+              <th scope="col" class="" style="width: 70vw">Message</th>
+              <th scope="col" class="" style="width: 10vw">Timestamp</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(notification, index) in notifications" :key="index">
-              <th scope="row" class="text-center">{{index + 1}}</th>
-              <td class="">{{ notification.type || '-'  }}</td>
+            <tr v-for="(notification, index) in currentNotifications" :key="index">
+              <th scope="row" class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+
+
+              <td class="">
+                <span 
+                    class="badge font-bold p-2 rounded-lg"
+                    :class="{'bg-info text-white': notification.type === 'สมัครเรียน',
+                            'bg-secondary text-white': (notification.type === 'ยกเลิกการสมัครเรียน'),
+                            'bg-success text-white': (notification.type === 'ได้รับสิทธิ์เป็นผู้สอน'|| notification.type === 'ปลดระงับการสอน'|| notification.type === 'ตอบรับการสอน'),
+                            'bg-warning text-dark': (notification.type === 'ถูกรายงานโดยผู้ใช้งานอื่น'),
+                            'bg-danger text-white': (notification.type === 'ระงับการสอน' || notification.type === 'ปฏิเสธการสมัครเรียน'),
+                            'bg-dark text-white': (notification.type === 'ถูกปฏิเสธสิทธิ์เป็นผู้สอน')}">
+                    {{ notification.type }}
+                </span>
+              </td>
+
+
               <td class="">{{ notification.message || '-'  }}</td>
               <td class="">{{ formatTimestamp(notification.timestamp)}}</td>
             </tr>
-  
- 
           </tbody>
         </table>
 
@@ -120,7 +133,7 @@ export default {
       sortColumn: '',  // คอลัมน์ที่ใช้สำหรับการเรียงลำดับ
       sortOrder: 'asc',  // ทิศทางการเรียงลำดับ (asc หรือ desc)
       currentPage: 1, // หน้าปัจจุบัน
-      itemsPerPage: 7, // จำนวนแถวต่อหน้า
+      itemsPerPage: 15, // จำนวนแถวต่อหน้า
 
       imageUrl: require('@/assets/user.png'), // เก็บ URL ภาพที่อัปโหลด
       previousRoutes: [],
@@ -160,27 +173,13 @@ export default {
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.filteredTutors.length / this.itemsPerPage); // คำนวณจำนวนหน้า
+      return Math.ceil(this.notifications.length / this.itemsPerPage); // คำนวณจำนวนหน้า
     },
-    filteredTutors() {
-      // ฟังก์ชันในการกรองข้อมูลตามคำค้นหา
-      return this.tutors.filter(tutor => {
-        const query = this.searchQuery.toLowerCase();
-        return (
-          (tutor.account_id && tutor.account_id.toString().includes(query)) ||
-          (tutor.username && tutor.username.toLowerCase().includes(query)) ||
-          (tutor.displayname && tutor.displayname.toLowerCase().includes(query)) ||
-          (tutor.firstname && tutor.firstname.toLowerCase().includes(query)) ||
-          (tutor.lastname && tutor.lastname.toLowerCase().includes(query)) ||
-          (tutor.email && tutor.email.toLowerCase().includes(query))
-        );
-        
-      });
-    },
-    currentTutors() {
+
+    currentNotifications() {
       const start = (this.currentPage - 1) * this.itemsPerPage; // เริ่มต้นแถวในหน้า
       const end = start + this.itemsPerPage; // จบแถวในหน้า
-      return this.filteredTutors.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
+      return this.notifications.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
     },
   },
 
@@ -190,31 +189,7 @@ export default {
         this.currentPage = page;
       }
     },
-    searchTutors() {
-      this.currentPage = 1; // รีเซ็ตหน้าหลังจากค้นหาใหม่
-    },
-    sortTable(column) {
-    if (this.sortColumn === column) {
-      // ถ้าเป็นคอลัมน์เดิมที่คลิกแล้วให้สลับทิศทาง
-      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-    } else {
-      // ถ้าเป็นคอลัมน์ใหม่ให้ตั้งค่าเริ่มต้นที่ 'asc'
-      this.sortColumn = column;
-      this.sortOrder = 'asc';
-    }
-    this.sortTutors();
-  },
-  sortTutors() {
-    this.tutors.sort((a, b) => {
-      let comparison = 0;
-      if (a[this.sortColumn] < b[this.sortColumn]) {
-        comparison = -1;
-      } else if (a[this.sortColumn] > b[this.sortColumn]) {
-        comparison = 1;
-      }
-      return this.sortOrder === 'asc' ? comparison : -comparison;
-    });
-  },
+
   getNotifications() {
       const data = {
           account_id: this.$cookies.get("account").account_id,

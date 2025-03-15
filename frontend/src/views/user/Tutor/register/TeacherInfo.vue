@@ -3,14 +3,6 @@
     <div class="fw-bold text-center my-4">
       <div class="my-2" :class="center" :style="{fontSize: '2vw',}">ข้อมูลผู้สอน</div>
       <div class="step-container">
-        <!-- <div
-          v-for="step in totalSteps"
-          :key="step"
-          class="step"
-          :class="{ active: step === currentStep }"
-        >
-          {{ step }}
-        </div> -->
         <router-link to="/tutor/verify" :class="center" style="text-decoration: none;">
           <div class="step actived"> 1 </div>
         </router-link>
@@ -395,13 +387,19 @@ export default {
 </script>
 
 <style>
-.button{
-  transition: transform 0.2s ease;
-  
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .form-label{
   font-size: 1.5vw;

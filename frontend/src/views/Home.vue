@@ -353,13 +353,19 @@
   </script>
 
 <style>
-.button{
-  transition: transform 0.2s ease;
-  
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .btn{
   transition: transform 0.2s ease;

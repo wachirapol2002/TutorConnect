@@ -504,9 +504,101 @@ router.post("/tutor/graduate/remove", async function (req, res, next) {
     }
   });
 
+    // ดูสถานที่
+router.post("/tutor/place", async function (req, res, next) {
+    const Schema = Joi.object({
+        tutor_id: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const tutor_id = req.body.tutor_id
+    let sql = `SELECT *
+            FROM locations
+            WHERE tutor_id=?`
+    try {
+
+        const [places] = await conn.query(
+            sql, [tutor_id]
+        )
+        conn.commit()
+        res.status(200).json({'places': places})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+  });
 
 
-// ดูวิชาที่่สอน
+
+// เพิ่มสถานที่
+router.post("/tutor/place/add", async function (req, res, next) {
+    const Schema = Joi.object({
+        tutor_id: Joi.any().required(),
+        placeName: Joi.any().required(),
+        address: Joi.any().required(),
+        position: Joi.any().required(),
+    })
+    try {
+        await Schema.validateAsync({ ...req.body }, { abortEarly: false })
+    } catch (err) {
+        return res.status(400).send(err)
+    }
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const tutor_id = req.body.tutor_id
+    const place_name = req.body.placeName
+    const address = req.body.address
+    const coordinates = req.body.position
+
+    try {
+        await conn.query(
+            'INSERT INTO locations(tutor_id, place_name, address, coordinates) VALUES (?, ?, ?, ?)',
+            [tutor_id, place_name, address, coordinates]
+        )
+        
+        const [places] = await conn.query(
+            'SELECT * FROM locations WHERE tutor_id=?', 
+            [tutor_id]
+        )
+        conn.commit()
+        res.status(200).json({'places': places})
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+  });
+
+  // ลบสถานที่
+router.post("/tutor/place/remove", async function (req, res, next) {
+    const conn = await pool.getConnection()
+    await conn.beginTransaction()
+    const location_id = req.body.location_id
+    try {
+        await conn.query(
+            'DELETE FROM locations WHERE location_id = ?;',
+            [location_id]
+        )  
+        conn.commit()
+        res.status(201).send()
+    } catch (err) {
+        conn.rollback()
+        res.status(400).json(err.toString());
+    } finally {
+        conn.release()
+    }
+  });
+
+
+  // ดูวิชาที่่สอน
 router.post("/tutor/subject", async function (req, res, next) {
     const Schema = Joi.object({
         tutor_id: Joi.any().required(),
@@ -537,7 +629,6 @@ router.post("/tutor/subject", async function (req, res, next) {
         conn.release()
     }
   });
-
 
 
 // เพิ่มวิชา
@@ -675,7 +766,7 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
             [study_id]
         )
         const subject = await conn.query(
-            `SELECT subject_id, tutor_id FROM studys WHERE study_id = ?;`, 
+            `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
@@ -686,6 +777,17 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
             `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
             [subject[0][0].tutor_id, subject[0][0].tutor_id]
         )
+        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[subject[0][0].tutor_id])
+        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject[0][0].subject_id])
+
+        const tutorName = tutor[0].displayname
+        const subjectName = subjectInfo[0].subject_name
+
+        await conn.query(
+            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+            [subject[0][0].account_id, "ตอบรับการสอน", "ผู้สอน "+tutorName+" ทำการตอบรับการสอนวิชา "+subjectName+" ของคุณ"]
+            )
+        
         conn.commit()
         res.status(200).json({ message: "ยอมรับคำขอแล้ว" });
     } catch (err) {
@@ -710,10 +812,9 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const study_id = req.body.study_id
-    console.log(study_id)
     try {
         const subject = await conn.query(
-            `SELECT subject_id, tutor_id FROM studys WHERE study_id = ?;`, 
+            `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
@@ -724,10 +825,24 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
             `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
             [subject[0][0].tutor_id, subject[0][0].tutor_id]
         )
+
+        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[subject[0][0].tutor_id])
+        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject[0][0].subject_id])
+
+        const tutorName = tutor[0].displayname
+        const subjectName = subjectInfo[0].subject_name
+
+        await conn.query(
+            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
+            [subject[0][0].account_id, "ปฏิเสธการสอน", "ผู้สอน "+tutorName+" ทำการปฏิเสธการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
+            )
+
+
         await conn.query(
             `DELETE FROM studys WHERE study_id = ?`,
             [study_id]
         )
+
         conn.commit()
         res.status(200).json({ message: "ปฏิเสธคำขอแล้ว" });
     } catch (err) {

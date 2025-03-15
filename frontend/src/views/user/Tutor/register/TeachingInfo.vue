@@ -3,14 +3,6 @@
     <div class="fw-bold text-center my-4">
       <div class="my-2" :class="center" :style="{fontSize: '2vw',}">ข้อมูลการสอน</div>
       <div class="step-container">
-        <!-- <div
-          v-for="step in totalSteps"
-          :key="step"
-          class="step"
-          :class="{ active: step === currentStep }"
-        >
-          {{ step }}
-        </div> -->
         <router-link to="/tutor/verify" :class="center" style="text-decoration: none;">
           <div class="step actived"> 1 </div>
         </router-link>
@@ -37,25 +29,25 @@
          <div id="map" style="height: 60vh; width: 100%;"></div>
          <input id="placeInput" type="text" placeholder="ค้นหาสถานที่" class="form-control information" />
         <div class="row my-4">
-          <!-- พิกัดสถานที่ -->
-            <div class="form-group col-6 mx-0">
-              <input
-                v-model="placePosition"
-                type="text"
-                placeholder="คลิกบนแผนที่เพื่อเลือก (ออนไลน์ไม่ต้องเลือก)"
-                class="form-control information"
-                readonly
-              />
-            </div>
-            <!--ชื่อสถานที่ -->
-            <div class="form-group col-3 mx-0 px-0">
+          <!--ชื่อสถานที่ -->
+          <div class="form-group col-3 mx-0">
               <input
                 v-model="placeName"
                 type="text"
-                placeholder="ระบุชื่อสถานที่"
+                placeholder="ระบุชื่อสถานที่*"
                 class="form-control information"
               />
             </div>
+          <!-- พิกัดสถานที่ -->
+            <div class="form-group col-6 mx-0 px-0">
+              <input
+                v-model="placeAddress"
+                type="text"
+                placeholder="ระบุที่อยู่"
+                class="form-control information"
+              />
+            </div>
+   
             <!-- ปุ่มเพิ่มสถานที่ -->
             <div class="form-group col-3 mx-0">
               <button type="button" @click="addPlace" class="btn btn-secondary information">เพิ่มสถานที</button>
@@ -66,16 +58,13 @@
           <ul v-if="places.length" class="m-1 border-bottom border-2 mb-4">
             <li
               v-for="(place, index) in places"
-              :key="index"
+              :key="place.location_id"
               class="d-flex justify-content-between align-items-center my-2"
             >
-              <div class="col-5">
-                - {{ place.name }}
+              <div class="col-11">
+                - {{ place.place_name + (place.address !== 'ไม่ระบุ' ? ' ' + place.address : '') }}
               </div>
-              <div class="col-6">
-                {{ place.position }}
-              </div>
-              <button type="button" @click="removePlace(index)" class="btn btn-danger btn-sm">ลบ</button>
+              <button type="button" @click="removePlace(place.location_id, index)" class="btn btn-danger btn-sm">ลบ</button>
             </li>
           </ul>
         </div>
@@ -96,11 +85,10 @@
           <div class="form-group col-2 mx-0 pe-1">
             <label class="form-label" for="subject">ราคา/ชั่วโมง</label>
           </div>
-          
         </div>
+
         <div class="row my-2 mt-0">
-          <!-- <label class="form-label" for="subject">วิชาที่ต้องการสอน</label> -->
-          <!-- เลือกหมวดวิชา -->
+            <!-- เลือกหมวดวิชา -->
             <div class="form-group col-3 mx-0 pe-1">
               <select v-model="selectedCategory" class="form-control information">
                 <option value="" disabled>เลือกหมวดวิชา*</option>
@@ -233,8 +221,8 @@
                      {{ index + 1 }}. หมวด {{ subject.category }} | {{ subject.subject_name }} {{ subject.degree_level }} {{ subject.price }} บาท/ชั่วโมง
                 </span>
                 <div>
-                  <button type="button" @click="SubjectDescribe(subject.subject_id, index)" class="btn btn-warning btn-sm information mx-2">รายละเอียดวิชา</button>
-                  <button type="button" @click="removeSubject(subject.subject_id, index)" class="text-light btn btn-danger btn-sm information mx-2">ลบ</button>
+                  <button type="button" @click="SubjectDescribe(subject.subject_id, index)" class="btn btn-secondary btn-sm fw-bold text-light mx-2">รายละเอียดวิชา</button>
+                  <button type="button" @click="removeSubject(subject.subject_id, index)" class="text-light btn btn-danger btn-sm mx-2">ลบ</button>
                 </div>
                 
               </li>
@@ -282,11 +270,11 @@ export default {
       line: this.$cookies.get("tutor") ? this.$cookies.get("tutor").line_id : "",
       introduce: this.$cookies.get("tutor") ? this.$cookies.get("tutor").introduce_message : "",
       describe: this.$cookies.get("tutor") ? this.$cookies.get("tutor").description : "",
-
       map: null,       // เก็บอ็อบเจกต์แผนที่
       marker: null,    // เก็บตำแหน่ง Marker
       placeName: "", 
-      placePosition: "", 
+      placeAddress: "",
+      placePosition: "",
       place: "",       // เก็บค่าพิกัดที่เลือก
       places: [],
       categories: ["ภาษา", "วิชาการ", "ดนตรี", "กีฬา", "คอมพิวเตอร์", "ทักษะชีวิต", "พัฒนาวิชาชีพ"], // หมวดวิชาที่มีให้เลือก
@@ -338,75 +326,69 @@ export default {
     document.head.appendChild(script);
   },
   setupGoogleMap() {
-  // สร้างแผนที่
-  console.log("Google Maps API Loaded:", window.google);
+    console.log("Google Maps API Loaded:", window.google);
   if (!window.google) {
-      this.initGoogleMap();
-      return;
+    this.initGoogleMap();
+    return;
   }
 
   const defaultLocation = { lat: 13.736717, lng: 100.523186 };
   this.map = new google.maps.Map(document.getElementById("map"), {
-      center: defaultLocation,
-      zoom: 13,
+    center: defaultLocation,
+    zoom: 13,
   });
+
+  // สร้าง Marker เริ่มต้น + เพิ่ม draggable: true ให้ลากได้
+  this.marker = new google.maps.Marker({
+    position: defaultLocation,
+    map: this.map,
+    draggable: true,
+  });
+
+  // ✨ Event: ลาก marker แล้วอัปเดตพิกัดใหม่
+  google.maps.event.addListener(this.marker, "dragend", (event) => {
+    const { lat, lng } = event.latLng.toJSON();
+    this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+    console.log("พิกัดใหม่:", this.placePosition);
+  });
+
   // สร้าง Autocomplete
-  const input = document.getElementById('placeInput');
+  const input = document.getElementById("placeInput");
   const autocomplete = new google.maps.places.Autocomplete(input);
-  autocomplete.bindTo('bounds', this.map);
+  autocomplete.bindTo("bounds", this.map);
+
+  // ค้นหาสถานที่ผ่าน Autocomplete
   autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        console.log(place)
-        if (!place.geometry || !place.geometry.location) {
-          alert("ไม่สามารถค้นหาตำแหน่งนี้ได้ กรุณาลองใหม่อีกครั้ง");
-          return;
-          
-        }
-        if (place.geometry) {
-          const location = place.geometry.location;
-          const { lat, lng } = place.geometry.location.toJSON();
-          this.placeName = place.name || "";
-          this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
-          if (place.geometry.viewport) {
-          this.map.fitBounds(place.geometry.viewport);
-        } else {
-            if (!this.marker) {
-            // ถ้า marker ยังไม่ได้ถูกสร้าง
-            this.marker = new google.maps.Marker({
-                position: location,
-                map: this.map,
-                draggable: true
-            });
-            } else {
-                // ถ้า marker ถูกสร้างแล้ว
-                this.marker.setPosition(location);
-            }
-          this.setCenter(place.geometry.location);
-          this.setZoom(15); // ซูมใกล้ตำแหน่ง
-        }
-        } else {
-          alert("ไม่สามารถดึงข้อมูลสถานที่ได้");
-        }
-      });
-      // คลิกบนแผนที่เพื่อเพิ่ม Marker
-      this.map.addListener("click", (event) => {
-        const { lat, lng } = event.latLng.toJSON();
-        this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+    const place = autocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) {
+      alert("ไม่สามารถค้นหาตำแหน่งนี้ได้ กรุณาลองใหม่อีกครั้ง");
+      return;
+    }
 
-        if (!this.marker) {
-          this.marker = new google.maps.Marker({
-            position: event.latLng,
-            map: this.map,
-            draggable: true
-          });
-        } else {
-          this.marker.setPosition(event.latLng);
-        }
+    const location = place.geometry.location;
+    const { lat, lng } = location.toJSON();
+    this.placeName = place.name || "";
+    this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+    this.placeAddress = place.formatted_address || "ไม่พบที่อยู่";
 
-        this.map.setCenter(event.latLng);
-      });
+    // ย้าย Marker ไปตำแหน่งใหม่
+    this.marker.setPosition(location);
 
+    // ขยับแผนที่ไปตำแหน่งใหม่
+    this.map.setCenter(location);
+    this.map.setZoom(15);
+  });
+
+  // คลิกบนแผนที่เพื่อเพิ่ม/ย้าย Marker
+  this.map.addListener("click", (event) => {
+    const { lat, lng } = event.latLng.toJSON();
+    this.placePosition = `Latitude: ${lat.toFixed(5)}, Longitude: ${lng.toFixed(5)}`;
+
+    this.marker.setPosition(event.latLng);
+    this.map.setCenter(event.latLng);
+  });
 },
+
     teacherInfo() {
         const data = {
             account_id: this.$cookies.get("account").account_id,
@@ -419,99 +401,107 @@ export default {
               this.line = res.data.tutor.line_id
               this.introduce = res.data.tutor.introduce_message
               this.describe = res.data.tutor.description
-              return axios.post("http://localhost:3000/tutor/subject", { tutor_id: this.tutor_id });
-          })  
+              return axios.post("http://localhost:3000/tutor/place", { tutor_id: this.tutor_id });
+            })  
           .then((res) => {
-              this.subjects = res.data.subjects;
-          })
-          .catch((err) => {
-            alert(err.response.data.details.message);
-          });   
-    },
+            this.places = res.data.places;
+              return axios.post("http://localhost:3000/tutor/subject", { tutor_id: this.tutor_id });
+            })  
+          .then((res) => {
+            this.subjects = res.data.subjects;
+            })
+            .catch((err) => {
+              alert(err.response.data.details.message);
+            });   
+      },
     addPlace() {
       if (this.placeName) {
-        // เพิ่มวิชาใหม่เข้าไปใน Array
+        this.marker.setPosition({ lat: 13.736717, lng: 100.523186 });
+        this.map.setCenter({ lat: 13.736717, lng: 100.523186 });
+        let data = {}
         if (this.placePosition == "") {
-          this.places.push({
-            position: "สอนออนไลน์",
-            name: this.placeName,
-          });
-        }else{
-          this.places.push({
-          position: this.placePosition,
-          name: this.placeName,
-        });
-        }
-        // เคลียร์ฟิลด์หลังจากเพิ่มข้อมูล
-        this.placePosition = "";
-        this.placeName = "";
-      } else {
-        alert("กรุณาระบุสถานที่สอนก่อน");
-      }
-    },
-    removePlace(index) {
-      this.places.splice(index, 1); // ลบข้อมูลที่ตำแหน่ง index
-    },
-    addSubject() {
-      this.v$.$touch();
-      if (this.subjectName && !this.v$.$invalid){
-        const data = {
+          data = {
             tutor_id: this.tutor_id,
-            selectedCategory: this.selectedCategory, // หมวดวิชาที่เลือก
-            subjectName: this.subjectName, // ชื่อวิชาที่กรอก
-            subjectDegree: this.subjectDegree,
-            subjectPrice: this.subjectPrice,
-            subjectDescribe: this.subjectDescribe,
-            subjectPlace: this.subjectPlace,
+            placeName: this.placeName,
+            address: this.placeAddress ? this.placeAddress : "ไม่ระบุ",
+            position: "สอนออนไลน์"
           };
+        }else{
+          data = {
+            tutor_id: this.tutor_id,
+            placeName: this.placeName,
+            address: this.placeAddress ? this.placeAddress : "ไม่ระบุ",
+            position: this.placePosition,
+          };
+        }
         axios
-          .post("http://localhost:3000/tutor/subject/add", data)
+          .post("http://localhost:3000/tutor/place/add", data)
           .then((res) => {
-            this.subjects = res.data.subjects
-            this.selectedCategory = ''
-            this.subjectName = ''
-            this.subjectDegree = ''
-            this.subjectPrice = ''
-            this.subjectDescribe = ''
-            this.subjectPlace = null
+            this.places = res.data.places
+            this.placePosition = "";
+            this.placeAddress = "";
+            this.placeName = "";
+            document.getElementById("placeInput").value = "";
           })
           .catch((err) => {
             alert(err);
             console.log(err)
           });
-    }else{
-      alert("กรุณากรอกชื่อวิชาก่อน");
-    }
-    },
-    
-    addAcademy() {
-      if (this.school_name){
-        const data = {
-            tutor_id: this.tutor_id,
-            status: this.status,
-            degree: this.degree,
-            school_name: this.school_name,
-            honor: this.honor,
-            grade: this.grade,
-          };
-          axios
-            .post("http://localhost:3000/tutor/graduate/add", data)
-            .then((res) => {
-              this.academys = res.data.graduates
-              this.status = ''
-              this.degree = ''
-              this.school_name = ''
-              this.honor = ''
-              this.grade = ''
-            })
-            .catch((err) => {
-              alert(err.response.data.details.message);
-              console.log(err)
-            });
-      }else{
-        alert("กรุณากรอกชื่อสถานศึกษาก่อน");
+
+      } else {
+        alert("กรุณาระบุสถานที่สอนก่อน");
       }
     },
+    removePlace(location_id, index) {
+      if (confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
+        const data = {
+            location_id: location_id,
+          };
+        axios
+          .post("http://localhost:3000/tutor/place/remove", data)
+          .then(() => {
+            this.places.splice(index, 1); // ลบข้อมูลจากหน้าจอ
+          })
+          .catch((err) => {
+            alert("เกิดข้อผิดพลาดในการลบข้อมูล");
+            console.error(err);
+          });
+      }
+    },
+    addSubject() {
+      this.v$.$touch();
+      if(!this.v$.$invalid){
+          if (this.subjectName){
+            const data = {
+                tutor_id: this.tutor_id,
+                selectedCategory: this.selectedCategory, // หมวดวิชาที่เลือก
+                subjectName: this.subjectName, // ชื่อวิชาที่กรอก
+                subjectDegree: this.subjectDegree,
+                subjectPrice: this.subjectPrice,
+                subjectDescribe: this.subjectDescribe,
+                subjectPlace: this.subjectPlace,
+              };
+            axios
+              .post("http://localhost:3000/tutor/subject/add", data)
+              .then((res) => {
+                this.subjects = res.data.subjects
+                this.selectedCategory = ''
+                this.subjectName = ''
+                this.subjectDegree = ''
+                this.subjectPrice = ''
+                this.subjectDescribe = ''
+                this.subjectPlace = null
+              })
+              .catch((err) => {
+                alert(err);
+                console.log(err)
+              });
+        }else{
+          alert("กรุณากรอกชื่อวิชาก่อน");
+        }
+      }
+    },
+  
     removeSubject(subject_id, index) {
       if (confirm("คุณต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
         const data = {
@@ -572,13 +562,19 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-.button{
-  transition: transform 0.2s ease;
-  
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .btn{
   transition: transform 0.2s ease;
@@ -592,7 +588,7 @@ export default {
   font-size: 1.5vw;
 }
 .information{
-  font-size: 1.2vw;
+  font-size: 1vw;
 }
 .popup-overlay {
   position: fixed;

@@ -14,7 +14,14 @@
           <div class="col-4 d-flex justify-content-start align-items-center" :style="{backgroundColor: ''}">
             <router-link to="/" :class="center" style="text-decoration: none; color: white;">
               <div class="mx-2" :class="center">
-                <img :src="require('./assets/logo.png')" style="max-height:7.5vh; width: auto;">
+                <img :src="require('./assets/logo.png')"
+                class="rounded-circle me-1 profile-img"
+                :style="{ 
+                          objectFit: 'cover', 
+                          width: auto, 
+                          maxHeight: '7.5vh' 
+                }"
+                >
               </div>
             </router-link>
             <div>TutorConnect</div>
@@ -35,8 +42,7 @@
                   <div class="px-3" :style="{fontSize: '1.5vw'}">บัญชี: ผู้ดูแลระบบ</div>
               </template>
             </template>
-            
-            
+           
           </div>
           
 
@@ -132,7 +138,7 @@
                   <div class="px-3" :style="{fontSize: '1.5vw'}">หางาน</div>
                 </router-link>
               </template>
-    
+
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
                   <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
                     ข้อความ
@@ -145,11 +151,13 @@
                   </div>
               </router-link>
 
-              <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์' && this.$cookies.get('account').tutor_status!='พร้อมสอน'">
-                <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
+              <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์' && (this.$cookies.get('account').tutor_status=='สมัครติวเตอร์' || this.$cookies.get('account').tutor_status=='รอตรวจสอบ')">
+                <router-link class="router-link" to="/tutor/verify" :class="center" style="text-decoration: none; color: white;">
                     <div class="px-3" :style="{fontSize: '1.5vw'}">ยืนยันตัวตน</div>
                 </router-link>
               </template>
+
+  
             </div>
           </template>
           <!-- ผู้ดูแลระบบ -->

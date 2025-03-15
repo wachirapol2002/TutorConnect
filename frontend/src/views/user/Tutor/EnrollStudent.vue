@@ -20,7 +20,7 @@
                       <div class="content">
                         <div class="file d-flex flex-column justify-content-center align-items-end">
                           <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                            <img :src="'http://localhost:3000' + student.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                            <img :src="student && student.portrait_path ? 'http://localhost:3000' + student.portrait_path : require('@/assets/user.png')" alt="โปรไฟล์" 
                               style="width: 100%; height: 100%; object-fit: cover;"
                             />
                           </div>
@@ -284,21 +284,19 @@
   img {
       object-fit: cover;
   }
-  .button{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 3px solid #D9D9D9; /* กรอบ */
-    width: auto; /* ขนาดกล่อง */
-    height: auto;
-    text-align: center;
-    transition: transform 0.2s ease;;
-    color: white;
-    
-  }
-  .button:hover{
-    transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-    cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
-  }
+  .button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
+}
+.button:hover {
+  transform: scale(1.05);
+}
   
   </style>

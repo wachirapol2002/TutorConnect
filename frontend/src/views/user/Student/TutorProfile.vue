@@ -58,11 +58,11 @@
                           ส่งข้อความ
                       </div>
                       <div class="d-flex flex-row">
-                        <div v-if="this.$route.query.id != this.$cookies.get('account').account_id" class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="report()">
+                        <div v-if="(this.$cookies.get('account')) && this.$route.query.id != this.$cookies.get('account').account_id" class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="report()">
                             รายงาน
                         </div>
-                        <div v-if="this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me- bg-danger text-white fw-bold" :style="{}" @click="unlicense()">
-                            ลบสิทธิ์การสอน
+                        <div v-if="(this.$cookies.get('account')) && this.$cookies.get('account').permission=='ผู้ดูแลระบบ'" class="button rounded-3 me- bg-danger text-white fw-bold" :style="{}" @click="unlicense()">
+                            ระงับการสอน
                         </div>
                       </div>
                     </div>
@@ -102,7 +102,7 @@
         <!-- ลบสิทธิ์การสอน -->
       <div v-if="showUnlicense" class="popup-overlay" style="width: 100%;">
         <div class="popup" style="width: 50%;">
-          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการยกเลิกสิทธิ์การสอนหรือไม่</div>
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการระงับสิทธิ์สอนหรือไม่</div>
 
           <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
           <div class="mb-3 text-center">
@@ -111,7 +111,7 @@
           </div>
           <template v-if="v$.reason.$error">
             <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
-              กรุณากรอกเหตุผลของการยกเลิกสิทธิ์
+              กรุณาระบุเหตุผลของการถูกระงับ
             </p>
           </template>
 
@@ -158,8 +158,16 @@
                 <!-- สถานที่สอน -->
                 <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">สถานที่สอน</div>
                 <div class="information mt-2">
-                  <ul>
-                      <li>ออนไลน์</li>
+                  <ul v-if="places.length" class="m-1 border-2 mb-4">
+                    <li
+                      v-for="(place) in places"
+                      :key="place.location_id"
+                      class="d-flex justify-content-between align-items-center my-2"
+                    >
+                    <div class="col-12">
+                      - {{ place.place_name + (place.address !== 'ไม่ระบุ' ? ' ' + place.address : '') }}
+                    </div>
+                    </li>
                   </ul>
                 </div>
                 
@@ -327,14 +335,6 @@
 
         <template v-if="this.study==true">
  
-          <!-- <div class="mt-4">
-              <div class="fw-bold" style="font-size: 1.5rem;">ให้คะแนนผู้สอน</div>
-              <div id="rating" class="d-flex align-items-center">
-       
-                  <span v-for="n in 5" :key="n" @click="setRating(n)" :class="{'text-warning': n <= currentRating}" 
-                      class="me-2 fs-3" style="cursor: pointer;">★</span>
-              </div>
-          </div> -->
           <!-- แสดงความคิดเห็น -->
           <div class="mt-4">
               <div class="fw-bold" style="font-size: 1.5rem;">แสดงความคิดเห็น</div>
@@ -407,7 +407,7 @@
     data() {
       return {
         tutor_id: this.$route.query.id,
-        account_id: this.$cookies.get('account').account_id,
+        account_id: this.$cookies.get('account')?.account_id || "",
         study: false,
         currentRating: 0, // ดาวที่ถูกให้คะแนน
         currentSubjectRating: 0,
@@ -527,16 +527,16 @@
             return axios.post("http://localhost:3000/tutor/comment", { tutor_id: this.tutor.tutor_id });
           })
           .then((res) => {
-            this.comments = res.data.comments;
-            return axios.post("http://localhost:3000/student/getRating", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
+          this.comments = res.data.comments;
+          return axios.post("http://localhost:3000/tutor/place", { tutor_id: this.tutor_id });
           })
           .then((res) => {
-            this.currentRating = res.data.score;
+            this.places = res.data.places;
           })
           .catch((err) => {
             alert(err.response.data.details.message);
           });   
-    },
+      },
     checkStudy(){
       const data = {
             tutor_id: this.$route.query.id,
@@ -658,7 +658,6 @@
       }
     },
     chat(){
-      console.log(this.tutor.account_id)
       this.$router.push({ name: 'ChatPage'});
       this.$cookies.set("sender_id", this.$cookies.get('account').account_id);
       this.$cookies.set("receiver_id", this.tutor.account_id);
@@ -671,7 +670,6 @@
       },
     addAcademy() {
         if (this.academy) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
           this.academys.push({
             name: this.academy,
           });
@@ -686,7 +684,6 @@
       },
       addPlace() {
         if (this.placeName) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
           if (this.placePosition == "") {
             this.places.push({
               position: "สอนออนไลน์",
@@ -710,7 +707,6 @@
       },
       addSubject() {
         if (this.selectedCategory && this.subjectName) {
-          // เพิ่มวิชาใหม่เข้าไปใน Array
           this.subjects.push({
             category: this.selectedCategory,
             name: this.subjectName,
@@ -799,16 +795,16 @@
             tutor_id: this.$route.query.id,
             message: this.reason
           };
-        axios.post("http://localhost:3000/admin/verify/unaccept", data)
-              .then(() => {
-                alert("ลบสิทธิ์การสอนแล้ว");
-                this.closePopup()
-                this.reason = ""
-                this.$router.push({ path: "/" });
-              })
-              .catch((err) => {
-                alert(err.response.data.message);
-              });
+          axios.post("http://localhost:3000/admin/tutor/ban", data)
+          .then(() => {
+            alert("ระงับการสอนแล้ว");
+            this.closePopup()
+            this.reason = ""
+            this.$router.push({ path: "/" });
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });
       }
     },
     submitReport(){
@@ -867,13 +863,19 @@
 img {
     object-fit: cover;
 }
-.button{
-  transition: transform 0.2s ease;
-  
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .btn{
   transition: transform 0.2s ease;

@@ -1,6 +1,10 @@
 <template>
   <div id="app">
     <div class="fw-bold text-center my-4">
+      <img
+          :src="require('@/assets/logo.png')" class="my-3"
+          style="max-height:10vh; width: auto; border-radius: 0%"
+        />
       <div class="my-2 text-danger" :class="center" :style="{fontSize: '2vw',}">*จำเป็นต้องส่งเอกสารยืนยันตัวตน</div>
       
     </div>
@@ -8,11 +12,14 @@
       class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"
       style="width: 50vw;"
     >
+    
       <div :class="center" :style="{fontSize: '2vw',}">สมัครสอน</div>
+
       <!-- form -->
       <form name="Register">
         <!-- file -->
         <section class="container">
+          
           <div class="content">
             <div class="file d-flex flex-column" :class="center">
               <!-- แสดงภาพตัวอย่าง -->
@@ -334,20 +341,20 @@ export default {
       previousRoutes: [],
       mainColor: "#BC2C2C",
       file: null,
-      username: "",
-      password: "",
-      confirmPassword: "",
+      // username: "",
+      // password: "",
+      // confirmPassword: "",
       email: "",
       phone: "",
       firstname: "",
       lastname: "",
-      // username: "tutor",
+      username: "Tutor",
       // firstname: "Wachirapol",
       // lastname: "Klinkasorn",
       // email: "wachirapol2545@gmail.com",
       // phone: "0909209945",
-      // password: "Kami28062545",
-      // confirmPassword: "Kami28062545",
+      password: "Kami28062545",
+      confirmPassword: "Kami28062545",
       
       gender: null,
       showpassword: false,

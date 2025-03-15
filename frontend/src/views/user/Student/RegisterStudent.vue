@@ -6,9 +6,6 @@
           style="max-height:10vh; width: auto; border-radius: 0%"
           
         />
-        <!-- <br /> -->
-        <!-- TutorConnect -->
-         
       </div>
       <div
         class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}"

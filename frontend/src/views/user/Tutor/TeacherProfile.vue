@@ -2,6 +2,7 @@
     <div id="app">
         <div class="container-fluid rounded-4  border border-dark my-5 p-3 py-4" :style="{ backgroundColor: 'white' }" style="width: 80vw;">
             <!-- ส่วนข้อมูลของผู้สอน -->
+             
             <div class="d-flex justify-content-start align-items-center" :style="{ backgroundColor: '' }">
                 <div :class="center" class="m-0 p-0" style="width: 25vw;" :style="{ backgroundColor: '' }">
                 <!-- รูปโปรไฟล์ -->
@@ -19,6 +20,7 @@
                             <span v-for="empty in (5 - Math.floor(this.rating_score))" :key="empty" class="text-secondary" :style="{ fontSize: '2vw' }">★</span>
                             <small class="ms-1" :style="{ fontSize: '2vw' }">{{ this.rating_score}}/5</small>
                         </div>
+                  
                     </div>
                     <!-- วิชาที่สอน -->
                     <div class="d-flex align-items-center">
@@ -56,27 +58,28 @@
 
                     
                     <div class="d-flex align-items-center mt-3">
-                      
+                      <div class="button rounded-3 me-5 bg-dark text-white fw-bold" :style="{}" @click="edit()">
+                          แก้ไขข้อมูล
+                      </div>
 
                       <template v-if="profile_status === 'รอตรวจสอบ'">
-                        <div class="button rounded-3 me-5 bg-dark text-white fw-bold" :style="{}" @click="back()">
-                          ย้อนกลับ
-                        </div>
                         <div class="h5 text-danger">
                           กำลังรอผู้ดูแลตรวจสอบข้อมูลของคุณ
                         </div>
                       </template>
-                      <div v-if="profile_status === 'พร้อมสอน'" class="button rounded-3 me-5 bg-dark text-white fw-bold" :style="{}" @click="edit()">
-                          แก้ไขข้อมูล
-                      </div>
+               
                     </div>
                     
                 
                 </div>
             </div>
         </div>
+        
 
         <div class="container-fluid rounded-4 px-5 py-4 border border-dark" :style="{backgroundColor: 'white'}" style="width: 80vw;">
+          <div v-if="profile_status === 'ระงับชั่วคราว'" class="badge font-bold mx-3 rounded-lg bg-danger" :style="{ fontSize: '2vw' }" :class="center">
+            การสอนของคุณถูกระงับ กรุณาติดต่อผู้ดูแล
+          </div>
             <div :class="center" :style="{fontSize: '2vw',}">ข้อมูลการสอน</div>
             <!-- รายละเอียดข้อมูลการสอน -->
             <div>
@@ -104,36 +107,25 @@
                 </div>
                 
 
-                <!-- สถานที่สอน -->
-                <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">สถานที่สอน</div>
-                <div class="information mt-2">
-                  <ul>
-                      <li>ออนไลน์</li>
-                  </ul>
-                </div>
+              <!-- สถานที่สอน -->
+              <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">สถานที่สอน</div>
+              <div class="information mt-2">
+                <ul v-if="places.length" class="m-1 border-2 mb-4">
+                  <li
+                    v-for="(place) in places"
+                    :key="place.location_id"
+                    class="d-flex justify-content-between align-items-center my-2"
+                  >
+                  <div class="col-12">
+                    - {{ place.place_name + (place.address !== 'ไม่ระบุ' ? ' ' + place.address : '') }}
+                  </div>
+                  </li>
+                </ul>
+              </div>
                 
 
                 <!-- หัวข้อการสอนและราคา -->
                 <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">หัวข้อการสอนและราคา</div>
-                <!-- <div class="information mt-2">
-                  <ul v-if="subjects.length" >
-                    <li v-for="(subject, index) in subjects" 
-                      :key="subject.subject_id"
-                      class="d-flex justify-content-start align-items-center my-2"
-                    >
-                      <div class="col-1 text-center" :class="center">
-                        <button type="button" @click="enrollSubject(subject.subject_id)" class="button btn btn-success btn-sm fw-bold text-light">สมัครเรียน</button>
-                      </div>
-                      <div class="col-10">
-                        {{ subject.subject_name + " " + subject.degree_level}}
-                        <strong>{{ subject.price }} บาท/ชั่วโมง</strong>
-                      </div>
-                      <div class="col-1 text-center" :class="center">
-                        <button type="button" @click="SubjectDescribe(index)" class="button btn btn-warning btn-sm fw-bold text-dark">รายละเอียดเพิ่มเติม</button>
-                      </div>
-                    </li>
-                  </ul>
-                </div> -->
 
                 <div class="information mt-2">
                   <ul v-if="unStudySubjects.length" class="m-0 p-0">
@@ -146,7 +138,6 @@
                         <button 
                           v-if="!subject.status" 
                           type="button" 
-                          @click="enrollSubject(subject.subject_id)" 
                           class="button btn btn-success btn-sm fw-bold text-light w-100"
                         >
                           สมัครเรียน
@@ -155,7 +146,6 @@
                         <button 
                           v-else-if="subject.status === 'รออนุมัติ'" 
                           type="button" 
-                          @click="cancelEnroll(subject.subject_id, subject.study_id)" 
                           class="button btn btn-danger btn-sm fw-bold text-light w-100"
                         >
                           ยกเลิกสมัคร
@@ -401,11 +391,11 @@
             return axios.post("http://localhost:3000/tutor/comment", { tutor_id: this.tutor.tutor_id });
           })
           .then((res) => {
-            this.comments = res.data.comments;
-            return axios.post("http://localhost:3000/student/getRating", { tutor_id: this.tutor.tutor_id, account_id: this.account_id});
+          this.comments = res.data.comments;
+          return axios.post("http://localhost:3000/tutor/place", { tutor_id: this.tutor_id });
           })
           .then((res) => {
-            this.currentRating = res.data.score;
+            this.places = res.data.places;
           })
           .catch((err) => {
             alert(err.response.data.details.message);
@@ -571,6 +561,7 @@
     back() {
       this.$router.push({ path: "/tutor/teaching/info" });
     },
+    
     },
     watch: {
       $route(to, from) {
@@ -585,13 +576,19 @@
 img {
     object-fit: cover;
 }
-.button{
-  transition: transform 0.2s ease;
-  
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #D9D9D9; /* กรอบ */
+  width: auto; /* ขนาดกล่อง */
+  height: auto;
+  text-align: center;
+  transition: transform 0.2s;
+  color: white;
 }
-.button:hover{
-  transform: scale(1.1); /* ขยายเล็กน้อยเมื่อ hover */
-  cursor: pointer; /* แสดงให้รู้ว่าเป็นปุ่ม */
+.button:hover {
+  transform: scale(1.05);
 }
 .btn{
   transition: transform 0.2s ease;
