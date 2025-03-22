@@ -107,9 +107,19 @@ const routes = [
         component: () => import('../views/user/Admin/TutorInfoList.vue')
     },
     {
+        path: '/admin/tutorpersonal',
+        name: 'TutorPersonalPage',
+        component: () => import('../views/user/Admin/TutorPersonal.vue')
+    },
+    {
         path: '/admin/studentlist',
         name: 'StudentInfoListPage',
         component: () => import('../views/user/Admin/StudentInfoList.vue')
+    },
+    {
+        path: '/admin/reportlist',
+        name: 'ReportListPage',
+        component: () => import('../views/user/Admin/ReportList.vue')
     },
     {
         path: '/notification',

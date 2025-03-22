@@ -108,7 +108,7 @@ router.post('/student/subject/register', async (req, res, next) => {
                 [subject_id]
             );
 
-            const [student] = await conn.query(`SELECT username FROM accounts WHERE account_id = ?;`,[account_id])
+            const [student] = await conn.query(`SELECT username, account_id FROM accounts WHERE account_id = ?;`,[account_id])
             const [subject] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject_id])
 
             const username = student[0].username
@@ -119,8 +119,8 @@ router.post('/student/subject/register', async (req, res, next) => {
             const tutor_ac_id = tutors[0].account_id
 
             await conn.query(
-                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
-                [tutor_ac_id, "สมัครเรียน", "ผู้ใช้งาน "+username+" สมัครเรียนวิชา "+subjectName+" ของคุณ"]
+                'INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);',
+                [student[0].account_id, tutor_ac_id, "สมัครเรียน", "ผู้ใช้งาน "+username+" สมัครเรียนวิชา "+subjectName+" ของคุณ"]
             )
         }
         conn.commit()
@@ -168,7 +168,7 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
                 [subject_id]
             );
             
-            const [student] = await conn.query(`SELECT username FROM accounts WHERE account_id = ?;`,[account_id])
+            const [student] = await conn.query(`SELECT username, account_id FROM accounts WHERE account_id = ?;`,[account_id])
             const [subject] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject_id])
 
             const username = student[0].username
@@ -179,8 +179,8 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
             const tutor_ac_id = tutors[0].account_id
 
             await conn.query(
-                'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
-                [tutor_ac_id, "ยกเลิกการสมัครเรียน", "ผู้ใช้งาน "+username+" ทำการยกเลิกการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
+                'INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);',
+                [student[0].account_id, tutor_ac_id, "ยกเลิกการสมัครเรียน", "ผู้ใช้งาน "+username+" ทำการยกเลิกการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
             )
             
         } else {

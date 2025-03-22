@@ -37,7 +37,7 @@
                       <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
                         <div class="">
                           <div class="fw-bold">
-                            วันที่เริ่มเรียน
+                            วันที่เริ่มเรียนครั้งแรก
                           </div>  
                           {{ formatTimestamp(tutor.first_approve_timestamp) }}
                         </div>

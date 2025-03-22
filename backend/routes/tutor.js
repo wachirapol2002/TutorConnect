@@ -652,7 +652,7 @@ router.post("/tutor/subject/add", async function (req, res, next) {
     console.log(req.body.subjectDegree)
     const tutor_id = req.body.tutor_id
     const category = req.body.selectedCategory
-    const subject_name = req.body.subjectName
+    const subject_name = req.body.subjectName.replace(/,/g, "");
     const description = req.body.subjectDescribe
     const degree_level = req.body.subjectDegree
     const price = req.body.subjectPrice
@@ -750,6 +750,7 @@ router.post("/tutor/student/register", async function (req, res, next) {
 router.post("/tutor/enroll/accept", async function (req, res, next) {
     const Schema = Joi.object({
         study_id: Joi.any().required(),
+        sender_id: Joi.any().required(),
     })
     try {
         await Schema.validateAsync({ ...req.body }, { abortEarly: false })
@@ -759,33 +760,54 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const study_id = req.body.study_id
+    const sender_id = req.body.sender_id
     console.log(study_id)
     try {
         await conn.query(
-            `UPDATE studys SET status = 'อนุมัติคำขอ', approve_timestamp = NOW()  WHERE study_id = ?;`,
+            `UPDATE studys SET status = 'อนุมัติคำขอ', approve_timestamp = NOW() WHERE study_id = ?;`,
             [study_id]
         )
-        const subject = await conn.query(
+        const studys = await conn.query(
             `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
             `UPDATE subjects SET student_count = student_count + 1 WHERE subject_id = ?;`,
-            [subject[0][0].subject_id]
+            [studys[0][0].subject_id]
         )
         await conn.query(
             `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
-            [subject[0][0].tutor_id, subject[0][0].tutor_id]
+            [studys[0][0].tutor_id, studys[0][0].tutor_id]
         )
-        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[subject[0][0].tutor_id])
-        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[subject[0][0].subject_id])
+
+        await conn.query(
+            `INSERT INTO revisits (tutor_id, account_id, revisit_count)
+            VALUES (?, ?, (SELECT GREATEST(COUNT(*) - 1, 0) FROM studys WHERE tutor_id = ? AND account_id = ? AND status = 'อนุมัติคำขอ'))
+            ON DUPLICATE KEY UPDATE revisit_count = VALUES(revisit_count);`,
+            [studys[0][0].tutor_id, studys[0][0].account_id, studys[0][0].tutor_id, studys[0][0].account_id]
+        );
+
+        await conn.query(
+            `UPDATE tutors 
+             SET revisit_score = (
+                 SELECT (SUM(CASE WHEN revisit_count > 0 THEN 1 ELSE 0 END) * 100 / COUNT(*)) AS revisit_rate
+                FROM revisits
+                WHERE tutor_id = ?
+             ) 
+             WHERE tutor_id = ?;`,
+            [studys[0][0].tutor_id, studys[0][0].tutor_id]
+        );
+
+
+        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[studys[0][0].tutor_id])
+        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[studys[0][0].subject_id])
 
         const tutorName = tutor[0].displayname
         const subjectName = subjectInfo[0].subject_name
 
         await conn.query(
-            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
-            [subject[0][0].account_id, "ตอบรับการสอน", "ผู้สอน "+tutorName+" ทำการตอบรับการสอนวิชา "+subjectName+" ของคุณ"]
+            'INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);',
+            [sender_id, studys[0][0].account_id, "ตอบรับการสอน", "ผู้สอน "+tutorName+" ทำการตอบรับการสอนวิชา "+subjectName+" ของคุณ"]
             )
         
         conn.commit()
@@ -803,6 +825,7 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
 router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const Schema = Joi.object({
         study_id: Joi.any().required(),
+        sender_id: Joi.any().required(),
     })
     try {
         await Schema.validateAsync({ ...req.body }, { abortEarly: false })
@@ -812,6 +835,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const study_id = req.body.study_id
+    const sender_id = req.body.sender_id
     try {
         const subject = await conn.query(
             `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
@@ -833,10 +857,9 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
         const subjectName = subjectInfo[0].subject_name
 
         await conn.query(
-            'INSERT INTO notifications(account_id, type, message) VALUES (?, ?, ?)',
-            [subject[0][0].account_id, "ปฏิเสธการสอน", "ผู้สอน "+tutorName+" ทำการปฏิเสธการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
+            'INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);',
+            [sender_id, subject[0][0].account_id, "ปฏิเสธการสอน", "ผู้สอน "+tutorName+" ทำการปฏิเสธการสมัครเรียนวิชา "+subjectName+" ของคุณ"]
             )
-
 
         await conn.query(
             `DELETE FROM studys WHERE study_id = ?`,

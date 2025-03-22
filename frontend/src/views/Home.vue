@@ -286,16 +286,29 @@
       }
     },
       filterCategory(category) {
-      this.selectedCategory = category;
-      this.selectedSubjects = []
+      if(this.selectedCategory === category){
+        this.selectedCategory = ""
+        this.selectedSubjects = []
         axios.get("http://localhost:3000/category/subject", {params: {category: this.selectedCategory}})
-          .then((res) => {
-              this.subCategories = res.data
-              console.log(this.subCategories)
+          .then(() => {
+              this.subCategories = {}
           })  
           .catch((err) => {
             alert(err.response.data.details.message);
           });   
+
+      }else{
+        this.selectedCategory = category;
+        this.selectedSubjects = []
+        axios.get("http://localhost:3000/category/subject", {params: {category: this.selectedCategory}})
+          .then((res) => {
+              this.subCategories = res.data
+          })  
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+      }
+      
     },
     filterSubject(subject) {
       // this.selectedSubject = subject

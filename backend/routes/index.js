@@ -26,10 +26,12 @@ router.get("/category/subject", async function (req, res, next) {
     let sql = `
     SELECT subject_name, SUM(student_count) AS total_students
     FROM subjects
+    JOIN tutors ON subjects.tutor_id = tutors.tutor_id
+    WHERE tutors.profile_status = "พร้อมสอน"
     `
     let cond = []
     if (category.length > 0) {
-      sql += ' WHERE category = ?';
+      sql += ' and category = ?';
       cond = [category]
     }
     sql += 'GROUP BY subject_name ORDER BY total_students DESC'

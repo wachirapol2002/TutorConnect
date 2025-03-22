@@ -231,7 +231,8 @@
     },
     Accept(study_id, index) {
       const data = {
-          study_id: study_id
+          study_id: study_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/tutor/enroll/accept", data)
         .then((response) => {
@@ -244,7 +245,8 @@
     },
     unAccept(study_id, index) {
       const data = {
-          study_id: study_id
+          study_id: study_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/tutor/enroll/unaccept", data)
         .then((response) => {

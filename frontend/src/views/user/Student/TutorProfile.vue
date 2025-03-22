@@ -54,7 +54,7 @@
                     </div>
                     <!-- ปุ่มส่งข้อความ -->
                     <div class="d-flex align-items-center justify-content-between mt-3">
-                      <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat()">
+                      <div v-if="(this.$cookies.get('account')) && this.$route.query.id != this.$cookies.get('account').account_id" class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat()">
                           ส่งข้อความ
                       </div>
                       <div class="d-flex flex-row">
@@ -341,6 +341,7 @@
               <div class="d-flex align-items-center mt-2">
                 <textarea
                       class="form-control me-2"
+                      style="font-size: 1.2vw;"
                       v-model="commentInput"
                       placeholder="แสดงความคิดเห็น..."
                       @keydown="handleKeydown"
@@ -665,7 +666,7 @@
     handleKeydown(event) {
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault(); // ป้องกันการสร้างบรรทัดใหม่
-          this.sendMessage(); // เรียกฟังก์ชันส่งข้อความ
+          this.submitComment(); // เรียกฟังก์ชันส่งข้อความ
         }
       },
     addAcademy() {
@@ -719,6 +720,7 @@
         }
       },
       enrollSubject(subject_id) {
+        if((this.$cookies.get('account')) && this.$route.query.id != this.$cookies.get('account').account_id){
         const data = {
             tutor_id: this.tutor_id,
             account_id: this.account_id,
@@ -736,6 +738,12 @@
             .catch((err) => {
               alert(err.response.data.message);
             });
+          }
+        else{
+          if(!this.$cookies.get('account')){
+            alert("กรุณาเข้าสู่ระบบก่อน")
+          }
+        }
       },
       cancelEnroll(subject_id, study_id) {
         const data = {
@@ -793,6 +801,7 @@
       if (!this.v$.$invalid) {
         const data = {
             tutor_id: this.$route.query.id,
+            sender_id: this.$cookies.get("account").account_id,
             message: this.reason
           };
           axios.post("http://localhost:3000/admin/tutor/ban", data)

@@ -5,7 +5,7 @@
         type="text"
         v-model="searchQuery"
         class="form-control"
-        placeholder="ค้นหา (ID, Username, TutorName, Firstname, Lastname, Email)"
+        placeholder="ค้นหา (ID, ชื่อผู้ใช้, ชื่อติวเตอร์)"
         @input="searchTutors"
       />
     </div>
@@ -19,60 +19,49 @@
                 <span v-if="sortColumn === 'account_id' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'account_id' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Picture</th>
+              <th scope="col" class="text-center">ภาพโปรไฟล์</th>
               <th scope="col" @click="sortTable('username')" class="">
-                Username
+                ชื่อผู้ใช้
                 <span v-if="sortColumn === 'username' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'username' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('displayname')" class="">
-                TutorName
+                ชื่อติวเตอร์
                 <span v-if="sortColumn === 'displayname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'displayname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <!-- <th scope="col" @click="sortTable('firstname')" class="">
-                Firstname
-                <span v-if="sortColumn === 'firstname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'firstname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('lastname')" class="">
-                Lastname
-                <span v-if="sortColumn === 'lastname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'lastname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th> -->
-              <th scope="col" @click="sortTable('email')" class="">
-                Email
-                <span v-if="sortColumn === 'email' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'email' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" @click="sortTable('phone')" class="">
-                Phone
-                <span v-if="sortColumn === 'phone' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
-                <span v-if="sortColumn === 'phone' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
-              </th>
-              <th scope="col" class="text-center">Identity</th>
-              <th scope="col" class="text-center">Selfie</th>
+
               <th scope="col" @click="sortTable('rating_score')" class="text-center">
-                Rating
+                คะแนน
                 <span v-if="sortColumn === 'rating_score' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'rating_score' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
+
+
+              <th scope="col" @click="sortTable('revisit_score')" class="text-center">
+                อัตราเรียนซ้ำ
+                <span v-if="sortColumn === 'revisit_score' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
+                <span v-if="sortColumn === 'revisit_score' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
+              </th>
+
               <th scope="col" @click="sortTable('teaching_count')" class="text-center">
-                Student
+                จำนวนที่สอน
                 <span v-if="sortColumn === 'teaching_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'teaching_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
+  
               <th scope="col" @click="sortTable('report_count')" class="text-center">
-                Report
+                โดนรายงาน
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Status</th>
-              
-             
-              <th scope="col" class="text-center">Profile</th>
-              <th scope="col" class="text-center">Contact</th>
-              <th scope="col" class="text-center">Manage</th>
+          
+              <th scope="col" class="text-center">สาเหตุ</th>
+              <th scope="col" class="text-center">สถานะ</th>
+              <th scope="col" class="text-center">โปรไฟล์ผู้สอน</th>
+              <th scope="col" class="text-center">ข้อมูลส่วนตัว</th>
+              <th scope="col" class="text-center">ติดต่อ</th>
+              <th scope="col" class="text-center">สิทธิ์การสอน</th>
             </tr>
           </thead>
           <tbody>
@@ -94,26 +83,18 @@
               </td>
               <td>{{ tutor.username || '-'  }}</td>
               <td>{{ tutor.displayname || '-' }}</td>
-              <!-- <td>{{ tutor.firstname || '-'  }}</td>
-              <td>{{ tutor.lastname || '-'  }}</td> -->
-              <td>{{ tutor.email || '-'  }}</td>
-              <td>{{ tutor.phone || '-'  }}</td>
-
-              <td>
-                <img :src="(tutor.document_path ? 'http://localhost:3000' + tutor.document_path :require('@/assets/IDcard.png'))" alt="เอกสารยืนยัน" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: cover;"
-                />
-                
-              </td>
-              <td>
-                <img :src="(tutor.selfie_path ? 'http://localhost:3000' + tutor.selfie_path : require('@/assets/selfie.png'))" alt="ภาพถ่ายใบหน้า" 
-                            style="max-width: 14vh; max-height: 7.25vh; width: auto; height: auto; object-fit: contain;"
-                />
-              </td>
+    
               <td class="text-center">{{ tutor.rating_score || '-' }}</td>
+              <td class="text-center">{{ tutor.revisit_score+"%" || '-' }}</td>
               <td class="text-center">{{ tutor.teaching_count}}</td>
               <td class="text-center">{{ tutor.report_count}}</td>
-
+              <td>
+                <router-link :to="'/admin/reportlist/?id='+ tutor.account_id" style="text-decoration: none;">
+                  <div class="button bg-warning text-dark" style="border: 3px solid wheat;">
+                    ผู้รายงาน
+                  </div>
+                </router-link>
+              </td>
               <td class="text-center">
                 <span 
                     class="badge font-bold p-2 rounded-lg"
@@ -124,18 +105,23 @@
                 </span>
               </td>
               
-
-
               <td>
                 <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
                   <div class="button bg-light text-dark">
-                    โปรไฟล์
+                    ดูโปรไฟล์
+                  </div>
+                </router-link>
+              </td>
+              <td>
+                <router-link :to="'/admin/tutorpersonal/?id='+ tutor.account_id" style="text-decoration: none;">
+                  <div class="button bg-light text-dark">
+                    ดูข้อมูล
                   </div>
                 </router-link>
               </td>
               <td>
                 <div class="button bg-dark text-light" @click="chat(tutor.account_id)">
-                  ข้อความ
+                  ส่งข้อความ
                 </div>
               </td>
               <template v-if="tutor.profile_status == 'พร้อมสอน'">
@@ -373,7 +359,8 @@ export default {
   },
   Approve(tutor_id) {
       const data = {
-          tutor_id: tutor_id
+          tutor_id: tutor_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
@@ -387,7 +374,8 @@ export default {
     },
     unBan(tutor_id) {
       const data = {
-          tutor_id: tutor_id
+          tutor_id: tutor_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/admin/tutor/unban", data)
         .then((response) => {
@@ -404,6 +392,7 @@ export default {
       if (!this.v$.$invalid) {
         const data = {
             tutor_id: tutor_id,
+            sender_id: this.$cookies.get("account").account_id,
             message: this.reason
           };
           axios.post("http://localhost:3000/admin/tutor/ban", data)

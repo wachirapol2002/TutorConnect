@@ -463,11 +463,14 @@ router.post('/report', async (req, res, next) => {
         `
         await conn.query(sqlReport, [account_id, reporter_id , message])
 
-        let sqlNotification = `
-        INSERT INTO notifications (account_id, type, message)
-            VALUES (?, ?, ?);
-        `
-        await conn.query(sqlNotification, [account_id, "ถูกรายงานโดยผู้ใช้งานอื่น", message])
+        let sqlNotification = `INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);`
+        // const reporter = await conn.query(
+        //     `SELECT username, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
+        //     [study_id]
+        // )
+        // const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[subject[0][0].tutor_id])
+
+        await conn.query(sqlNotification, [reporter_id, account_id, "ถูกรายงานโดยผู้ใช้งานอื่น", "ถูกรายงานข้อหา "+'"'+message+'"'])
 
         let sqlUpdateCount = `UPDATE accounts SET report_count = report_count + 1 WHERE account_id = ?;`
 
@@ -484,7 +487,7 @@ router.post('/report', async (req, res, next) => {
     }
 })
 
-//รายงาน
+//ดึงแจ้งเตือน
 router.post('/notification', async (req, res, next) => {
     const Schema = Joi.object({
         account_id: Joi.any().required(),
@@ -502,10 +505,13 @@ router.post('/notification', async (req, res, next) => {
 
     try {
         let sql = `
-        SELECT *
+        SELECT 
+            notifications.*, 
+            accounts.username AS senderUsername
         FROM notifications
-        WHERE account_id = ?
-        ORDER BY timestamp DESC;
+        LEFT JOIN accounts ON notifications.sender_id = accounts.account_id
+        WHERE notifications.account_id = ?
+        ORDER BY notifications.timestamp DESC;
         `
         await conn.query(sql,[account_id])
 

@@ -755,12 +755,6 @@
     chat(){
       this.$router.push({ path: "/chat" });
     },
-    handleKeydown(event) {
-        if (event.key === "Enter" && !event.shiftKey) {
-          event.preventDefault(); // ป้องกันการสร้างบรรทัดใหม่
-          this.sendMessage(); // เรียกฟังก์ชันส่งข้อความ
-        }
-      },
       addPlace() {
       if (this.placeName) {
         this.marker.setPosition({ lat: 13.736717, lng: 100.523186 });
@@ -819,6 +813,10 @@
       this.v$.$touch();
       if(!this.v$.$invalid){
           if (this.subjectName){
+            if (this.subjectName.includes(",")) {
+              alert("ห้ามใช้เครื่องหมาย , ในชื่อวิชา");
+              return;
+            }
             const data = {
                 tutor_id: this.tutor_id,
                 selectedCategory: this.selectedCategory, // หมวดวิชาที่เลือก

@@ -16,7 +16,7 @@
                     <div class="content">
                       <div class="file d-flex flex-column justify-content-center align-items-end">
                         <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                          <img :src="'http://localhost:3000' + this.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                          <img :src="this.portrait_path ? 'http://localhost:3000' + this.portrait_path : require('@/assets/user.png')" alt="โปรไฟล์" 
                             style="width: 100%; height: 100%; object-fit: cover;"
                           />
                         </div>
@@ -79,12 +79,42 @@
                         <div class="button rounded-3 me-5 bg-dark text-light fw-bold" :style="{}" @click="chat(this.student_id)">
                           ส่งข้อความ
                         </div>
+                        <div v-if="(this.$cookies.get('account')) && this.$route.query.id != this.$cookies.get('account').account_id" class="button rounded-3 me-5 bg-warning text-dark fw-bold" :style="{}" @click="report()">
+                            รายงาน
+                        </div>
                       </div>
                     </div>
                   </section>
                 </div>
             </div>
         </div>
+
+      <!-- รายงาน -->
+      <div v-if="showReport" class="popup-overlay" style="width: 100%;">
+        <div class="popup" style="width: 50%;">
+          <div class="mb-2 text-center" style="font-size: 2vw;">ต้องการรายงานนักเรียนหรือไม่</div>
+
+          <!-- ช่องใส่เหตุผล/คอมเมนต์ -->
+          <div class="mb-3 text-center">
+            <label for="reason" class="form-label" style="font-size: 1vw;">ระบุเหตุผล เพื่อให้แจ้งเตือนนักเรียน</label>
+            <textarea v-model="reason" id="reason" class="form-control" style="font-size: 1vw;" rows="3" placeholder="กรอกเหตุผลที่นี่..."></textarea>
+          </div>
+          <template v-if="v$.reason.$error">
+            <p class="text-danger m-0 p-0" style="font-size: 1em;" v-if="v$.reason.required.$invalid">
+              กรุณากรอกเหตุผลของการรายงาน
+            </p>
+          </template>
+
+          <div class="d-flex align-items-center justify-content-center mt-3">
+            <div class="button rounded-3 me-5 bg-dark text-light fw-bold" @click="closePopup">
+              ปิด
+            </div>
+            <div class="button rounded-3 me-5 bg-warning text-dark fw-bold" @click="submitReport">
+              ยืนยัน
+            </div>
+          </div>
+        </div>
+      </div>
 
         
 
@@ -96,24 +126,7 @@
   import useVuelidate from "@vuelidate/core";
   import {
     required,
-    email,
-    minLength,
-    maxLength,
-    sameAs,
-    helpers,
   } from "@vuelidate/validators";
-
-
-    function phone(value) {
-    return !helpers.req(value) || !!value.match(/0[0-9]{9}/);
-  }
-
-  function complexPassword(value) {
-    if (value.match(/[a-z]/) && value.match(/[A-Z]/) && value.match(/[0-9]/)) {
-      return true;
-    }
-    return false;
-  }
 
   export default {
     name: "StudentInfoPage",
@@ -135,6 +148,8 @@
         lastname: "",
         gender: "",
         error: "",
+        showReport: false,
+        reason: "",
         center: {
           "d-flex": true,
           "justify-content-center": true,
@@ -146,33 +161,9 @@
       };
     },
     validations: {
-      username: {
-        required: required,
-        minLength: minLength(5),
-        maxLength: maxLength(20),
-      },
-      firstname: {
-        required: required,
-      },
-      lastname: {
-        required: required,
-      },
-      email: {
-        required: required,
-        email: email,
-      },
-      phone: {
-        required: required,
-        phone: phone,
-      },
-      password: {
-        required: required,
-        minLength: minLength(8),
-        complex: complexPassword,
-      },
-      confirmPassword: {
-        sameAs: sameAs("password"),
-      },
+      reason: {
+      required: required,
+    },
     },
     mounted() {
       this.initInfo()
@@ -196,6 +187,32 @@
           .catch((err) => {
             alert(err.response.data.details.message);
           });   
+    },
+    report(){
+      this.showReport = true; // เปิด popup
+    },
+    submitReport(){
+      this.v$.$touch();
+      if (!this.v$.$invalid) {
+        const data = {
+            account_id: this.$route.query.id,
+            reporter_id: this.$cookies.get('account').account_id,
+            message: this.reason
+          };
+        axios.post("http://localhost:3000/report", data)
+              .then((res) => {
+                alert(res.data.message); 
+                this.closePopup()
+                this.reason = ""
+              })
+              .catch((err) => {
+                alert(err.response.data.message);
+              });
+      }
+    },
+    closePopup() {
+      this.showReport = false;
+      this.reason = "";
     },
 
       chat(receiver_id){

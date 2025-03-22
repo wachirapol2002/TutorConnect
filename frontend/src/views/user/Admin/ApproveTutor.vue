@@ -241,7 +241,8 @@ export default {
   },
   Accept(tutor_id, index) {
       const data = {
-          tutor_id: tutor_id
+          tutor_id: tutor_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
@@ -258,6 +259,7 @@ export default {
       if (!this.v$.$invalid) {
         const data = {
             tutor_id: tutor_id,
+            sender_id: this.$cookies.get("account").account_id,
             message: this.reason
           };
           axios.post("http://localhost:3000/admin/verify/unaccept", data)

@@ -6,33 +6,19 @@
           <thead class="thead-dark">
             <tr>
               <th scope="col" class="text-center" style="width: 5vw">#</th>
-              <th scope="col" class="" style="width: 75vw">ข้อความ</th>
-              <!-- <th scope="col" class="" style="width: 10vw">ผู้ส่ง</th> -->
-              <th scope="col" class="" style="width: 10vw">ประเภท</th>
+              <th scope="col" class="" style="width: 10vw">ผู้รายงาน</th>
+              <th scope="col" class="" style="width: 65vw">ข้อหา</th>
+              
+              <th scope="col" class="" style="width: 10vw">ผู้โดยรายงาน</th>
               <th scope="col" class="" style="width: 10vw">Timestamp</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(notification, index) in currentNotifications" :key="index">
+            <tr v-for="(notification, index) in currentReports" :key="index">
               <th scope="row" class="text-center">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
+              <td class="">{{ notification.reporter_username || '-'  }}</td>
               <td class="">{{ notification.message || '-'  }}</td>
-              <!-- <td class="">{{ notification.senderUsername || '-' }}</td> -->
-            
-              <td class="">
-                <span 
-                    class="badge font-bold p-2 rounded-lg"
-                    :class="{'bg-info text-white': notification.type === 'สมัครเรียน',
-                            'bg-secondary text-white': (notification.type === 'ยกเลิกการสมัครเรียน'),
-                            'bg-success text-white': (notification.type === 'ได้รับสิทธิ์เป็นผู้สอน'|| notification.type === 'ปลดระงับการสอน'|| notification.type === 'ตอบรับการสอน'),
-                            'bg-warning text-dark': (notification.type === 'ถูกรายงานโดยผู้ใช้งานอื่น'),
-                            'bg-danger text-white': (notification.type === 'ระงับการสอน' || notification.type === 'ปฏิเสธการสอน'),
-                            'bg-dark text-white': (notification.type === 'ถูกปฏิเสธสิทธิ์เป็นผู้สอน')}">
-                    {{ notification.type }}
-                </span>
-              </td>
-
-
-              
+              <td class="">{{ notification.reported_username || '-' }}</td>
               <td class="">{{ formatTimestamp(notification.timestamp)}}</td>
             </tr>
           </tbody>
@@ -122,14 +108,15 @@ import {
 } from "@vuelidate/validators";
 
 export default {
-  name: "NotificationPage",
+  name: "ReportList",
   setup() {
     const v$ = useVuelidate();
     return { v$ };
   },
   data() {
     return {
-      notifications: [],
+      report_account_id: this.$route.query.id,
+      reports: [],
       tutors: [],
       searchQuery: '', // คำค้นหาจากผู้ใช้
       sortColumn: '',  // คอลัมน์ที่ใช้สำหรับการเรียงลำดับ
@@ -171,17 +158,17 @@ export default {
       },
   },
   mounted() {
-    this.getNotifications()
+    this.getReports()
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.notifications.length / this.itemsPerPage); // คำนวณจำนวนหน้า
+      return Math.ceil(this.reports.length / this.itemsPerPage); // คำนวณจำนวนหน้า
     },
 
-    currentNotifications() {
+    currentReports() {
       const start = (this.currentPage - 1) * this.itemsPerPage; // เริ่มต้นแถวในหน้า
       const end = start + this.itemsPerPage; // จบแถวในหน้า
-      return this.notifications.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
+      return this.reports.slice(start, end); // ดึงข้อมูลที่ต้องการแสดง
     },
   },
 
@@ -192,15 +179,14 @@ export default {
       }
     },
 
-  getNotifications() {
+  getReports() {
       const data = {
-          account_id: this.$cookies.get("account").account_id,
+          account_id: this.$route.query.id,
         };
         
-      axios.post("http://localhost:3000/notification", data)
+      axios.post("http://localhost:3000/reportlist", data)
         .then((res) => {
-            this.notifications = res.data.notifications
-            console.log(res.data.notifications)
+            this.reports = res.data.reports
         })  
         .catch((err) => {
           alert(err.response.data.details.message);

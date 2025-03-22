@@ -5,7 +5,7 @@
         type="text"
         v-model="searchQuery"
         class="form-control"
-        placeholder="ค้นหา (ID, Username, Firstname, Lastname, Email)"
+        placeholder="ค้นหา (ID, ชื่อผู้ใช้, ชื่อจริง, นามสกุล, อีเมล)"
         @input="searchStudents"
       />
     </div>
@@ -19,40 +19,41 @@
                 <span v-if="sortColumn === 'account_id' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'account_id' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Picture</th>
+              <th scope="col" class="text-center">ภาพโปรไฟล์</th>
               <th scope="col" @click="sortTable('username')" class="">
-                Username
+                ชื่อผู้ใช้
                 <span v-if="sortColumn === 'username' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'username' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('firstname')" class="">
-                Firstname
+                ชื่อจริง
                 <span v-if="sortColumn === 'firstname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'firstname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('lastname')" class="">
-                Lastname
+                นามสกุล
                 <span v-if="sortColumn === 'lastname' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'lastname' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('email')" class="">
-                Email
+                อีเมล
                 <span v-if="sortColumn === 'email' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'email' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('phone')" class="">
-                Phone
+                หมายเลขโทรศัพท์
                 <span v-if="sortColumn === 'phone' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'phone' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
               <th scope="col" @click="sortTable('report_count')" class="text-center">
-                Report
+                โดนรายงาน
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'asc'" class="ms-2">&#9650;</span>
                 <span v-if="sortColumn === 'report_count' && sortOrder === 'desc'" class="ms-2">&#9660;</span>
               </th>
-              <th scope="col" class="text-center">Profile</th>
-              <th scope="col" class="text-center">Contact</th>
-              <th scope="col" class="text-center">Manage</th>
+              <th scope="col" class="text-center">สาเหตุ</th>
+              <th scope="col" class="text-center">โปรไฟล์</th>
+              <th scope="col" class="text-center">ติดต่อ</th>
+              <!-- <th scope="col" class="text-center">Manage</th> -->
             </tr>
           </thead>
           <tbody>
@@ -79,31 +80,30 @@
               <td>{{ student.phone }}</td>
               <td class="text-center">{{ student.report_count }}</td>
               <td>
-                <router-link :to="'/student/profile/?id='+ student.student_id" style="text-decoration: none;">
+                <router-link :to="'/admin/reportlist/?id='+ student.account_id" style="text-decoration: none;">
+                  <div class="button bg-warning text-dark">
+                    ผู้รายงาน
+                  </div>
+                </router-link>
+              </td>
+              <td>
+                <router-link :to="'/tutor/studentinfo/?id='+ student.account_id" style="text-decoration: none;">
                   <div class="button bg-light text-dark">
-                    โปรไฟล์
+                    ดูโปรไฟล์
                   </div>
                 </router-link>
               </td>
               <td>
                 <div class="button bg-dark text-light" @click="chat(student.account_id)">
-                  ข้อความ
+                  ส่งข้อความ
                 </div>
               </td>
-              <template v-if="student.profile_status == 'พร้อมสอน'">
-                <td>
-                <div class="button bg-danger text-light">
-                  ลบสิทธิ์
-                </div>
-              </td>
-              </template>
-              <template v-if="student.profile_status !== 'พร้อมสอน'">
-                <td>
-                <div class="button bg-warning text-dark">
-                  แก้ไข
-                </div>
-              </td>
-              </template>
+              <!-- <td>
+              <div class="button bg-warning text-dark">
+                แก้ไข
+              </div>
+            </td> -->
+
             </tr>
           </tbody>
         </table>
@@ -254,7 +254,8 @@ export default {
   },
   Accept(tutor_id, index) {
       const data = {
-          tutor_id: tutor_id
+          tutor_id: tutor_id,
+          sender_id: this.$cookies.get("account").account_id,
         };
       axios.post("http://localhost:3000/admin/verify/accept", data)
         .then((response) => {
@@ -271,6 +272,7 @@ export default {
       if (!this.v$.$invalid) {
         const data = {
             tutor_id: tutor_id,
+            sender_id: this.$cookies.get("account").account_id,
             message: this.reason
           };
           axios.post("http://localhost:3000/admin/verify/unaccept", data)
