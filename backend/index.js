@@ -44,6 +44,14 @@ app.use(tutorRouter.router)
 app.use(adminRouter.router)
 
 
+
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  }
+});
+
 io.on("connection", (socket) => {
   console.log(`🔥 User connected: ${socket.id}`);
 
