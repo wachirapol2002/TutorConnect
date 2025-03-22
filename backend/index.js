@@ -6,23 +6,21 @@ const dotenv = require('dotenv');
 const http = require('http');
 const socketIo = require('socket.io');
 
-dotenv.config();  // ใช้ dotenv เพื่อโหลดไฟล์ .env
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
-// socket.io เชื่อมต่อกับเซิร์ฟเวอร์
 const io = socketIo(server, {
   cors: {
-    origin: "*",  // อนุญาตให้ทุกโดเมน
+    origin: "*",
     methods: ["GET", "POST"],
   }
 });
 
-// ใช้ middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }))
 app.use(cors());
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
@@ -53,7 +51,7 @@ io.on("connection", (socket) => {
 
   // เมื่อมีการเข้าห้องแชท
   socket.on("joinRoom", ({ user1, user2 }) => {
-    const roomID = [user1, user2].sort().join("_"); // สร้าง ID ห้องจากผู้ใช้ทั้งสอง
+    const roomID = [user1, user2].sort().join("_"); // สร้าง ID ห้องจากผู้ใช้
     socket.join(roomID);
     console.log(`📢 ${user1} joined room: ${roomID}`);
 
@@ -74,6 +72,8 @@ io.on("connection", (socket) => {
     console.log(`❌ User disconnected: ${socket.id}`);
   });
 });
+
+
 
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
