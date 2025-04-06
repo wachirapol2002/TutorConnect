@@ -70,6 +70,7 @@
             </div>
           </div>
 
+          
           <div class="form-group" :class="center">
             <label :style="{fontSize: '1.5vw', color: 'black',}">ยังไม่มีบัญชี</label>
             
@@ -77,8 +78,20 @@
               <div class="register mx-2" :style="{fontSize: '1.5vw', color: 'black', fontWeight: 500}">สมัครสมาชิก</div>
             </router-link>
           </div>
+          <div class="form-group mt-2" :class="center">
+            <router-link to="/student/policy" style="text-decoration: none">
+              <label class="form-label mx-2">นโยบายการใช้งานสำหรับนักเรียน</label>
+            </router-link>
+            <router-link to="" style="text-decoration: none">
+              <label class="form-label">/</label>
+            </router-link>
+            <router-link to="/tutor/policy" style="text-decoration: none">
+              <label class="form-label mx-2">นโยบายการใช้งานสำหรับผู้สอน</label>
+            </router-link>
+          </div>
+                 
 
-                    
+             
         </form>
       </div>
 

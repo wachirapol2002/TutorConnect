@@ -8,10 +8,10 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faUser, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faBell, faStar, faRepeat, faRedo, faChalkboardTeacher, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
-library.add(faUser, faBell);
+library.add(faUser, faBell, faStar, faRepeat, faRedo, faChalkboardTeacher, faBookOpen);
 
 const app = createApp(App)
 

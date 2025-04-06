@@ -415,12 +415,6 @@ export default {
   chat(){
     this.$router.push({ path: "/chat" });
   },
-  handleKeydown(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault(); // ป้องกันการสร้างบรรทัดใหม่
-        this.sendMessage(); // เรียกฟังก์ชันส่งข้อความ
-      }
-    },
   addAcademy() {
       if (this.academy) {
         // เพิ่มวิชาใหม่เข้าไปใน Array

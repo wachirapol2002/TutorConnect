@@ -24,7 +24,7 @@ const usernameValidator = async (value) => {
         [value]
     )
     if (rows.length > 0) {
-        const message = ''
+        const message = 'ชื่อผู้ใช้นี้ถูกใช้งาน'
         throw new Joi.ValidationError(message, { message })
     }
     return value
@@ -65,7 +65,7 @@ router.post('/student/register', async (req, res, next) => {
         res.status(201).send()
     } catch (err) {
         conn.rollback()
-        res.status(400).json(err.toString());
+        res.status(404).json(err.toString());
     } finally {
         conn.release()
     }

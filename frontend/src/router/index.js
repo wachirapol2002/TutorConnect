@@ -17,6 +17,16 @@ const routes = [
         component: () => import('../views/user/Student/RegisterStudent.vue')
     },
     {
+        path: '/student/policy',
+        name: 'StudentPolicyPage',
+        component: () => import('../views/user/StudentPolicy.vue')
+    },
+    {
+        path: '/tutor/policy',
+        name: 'TutorPolicyPage',
+        component: () => import('../views/user/TutorPolicy.vue')
+    },
+    {
         path: '/student/profile',
         name: 'StudentProfilePage',
         component: () => import('../views/user/Student/StudentProfile.vue')

@@ -2,7 +2,7 @@
   <div id="app">
     <div class="fw-bold text-center my-4">
       <img
-          :src="require('@/assets/logo.png')" class="my-3"
+          :src="require('@/assets/logo.png')" class="my-0"
           style="max-height:10vh; width: auto; border-radius: 0%"
         />
       <div class="my-2 text-danger" :class="center" :style="{fontSize: '2vw',}">*จำเป็นต้องส่งเอกสารยืนยันตัวตน</div>
@@ -281,6 +281,12 @@
           >
         </div>
 
+        <div class="row my-2">
+          <router-link to="/tutor/policy" style="text-decoration: none">
+            <label class="form-label">นโยบายการใช้งานสำหรับผู้สอน</label>
+          </router-link>
+        </div>
+
 
         <div class="form-group d-flex justify-content-center">
           <div class="button rounded-3 my-4 px4- mx-2 bg-dark text-light" :style="{backgroundColor: mainColor,}" @click="submit()">
@@ -467,12 +473,11 @@ export default {
               this.$router.push({ path: "/tutor/verify" });
               
             })
-            .catch((error) => {
-              console.error("Error during API request:", error);
-              this.error = error.response
-                ? error.response.data
-                : "An error occurred.";
+            .catch((err) => {
+              alert(err.response.data.details.message);
+              console.log(err)
             });
+            
         }
       },
 

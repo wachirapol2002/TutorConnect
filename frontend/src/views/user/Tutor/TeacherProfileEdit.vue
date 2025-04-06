@@ -31,7 +31,7 @@
                         <div class="ms-3">
                             <span v-for="star in Math.floor(this.rating_score)" :key="star" class="text-warning" :style="{ fontSize: '2vw' }">★</span>
                             <span v-for="empty in (5 - Math.floor(this.rating_score))" :key="empty" class="text-secondary" :style="{ fontSize: '2vw' }">★</span>
-                            <small class="ms-1" :style="{ fontSize: '2vw' }">{{ this.rating_score}}/5</small>
+                            <small class="ms-1" :style="{ fontSize: '2vw' }">{{ formatScore(this.rating_score)}}/5</small>
                         </div>
                     </div>
                     <!-- วิชาที่สอน -->
@@ -224,32 +224,50 @@
                 <!-- สถานทีสอน -->
                 <!-- Map -->
                 <div class="mt-3" :style="{fontWeight: '500', fontSize: '1.5vw',}">สถานที่สอน</div>
+                <div class="form-label mt-3" :style="{fontWeight: '500', fontSize: '1.2vw',}" for="onside">ออนไซต์</div>
                 <div id="map" style="height: 60vh; width: 100%;"></div>
                 <input id="placeInput" type="text" placeholder="ค้นหาสถานที่" class="form-control information" />
+                <!-- ออนไซต์ -->
                 <div class="row my-4">
                   <!--ชื่อสถานที่ -->
                   <div class="form-group col-3 mx-0">
-                      <input
-                        v-model="placeName"
-                        type="text"
-                        placeholder="ระบุชื่อสถานที่*"
-                        class="form-control information"
-                      />
-                    </div>
+                    <input
+                      v-model="placeName"
+                      type="text"
+                      placeholder="ระบุชื่อสถานที่*"
+                      class="form-control information"
+                    />
+                  </div>
                   <!-- พิกัดสถานที่ -->
-                    <div class="form-group col-6 mx-0 px-0">
-                      <input
-                        v-model="placeAddress"
-                        type="text"
-                        placeholder="ระบุที่อยู่"
-                        class="form-control information"
-                      />
-                    </div>
-          
-                    <!-- ปุ่มเพิ่มสถานที่ -->
-                    <div class="form-group col-3 mx-0">
-                      <button type="button" @click="addPlace" class="btn btn-secondary information">เพิ่มสถานที</button>
-                    </div>
+                  <div class="form-group col-6 mx-0 px-0">
+                    <input
+                      v-model="placeAddress"
+                      type="text"
+                      placeholder="ระบุที่อยู่"
+                      class="form-control information"
+                    />
+                  </div>
+                  <!-- ปุ่มเพิ่มสถานที่ -->
+                  <div class="form-group col-2 mx-0">
+                    <button type="button" @click="addPlace" class="btn btn-secondary information">เพิ่มสถานที</button>
+                  </div>
+                </div>
+                <!-- ออนไลน์ -->
+                <div class="form-label mt-3" :style="{fontWeight: '500', fontSize: '1.2vw',}" for="onside">ออนไลน์</div>
+                <div class="row my-4">
+                  <!--ชื่อสถานที่ -->
+                  <div class="form-group col-9 mx-0">
+                    <input
+                      v-model="appName"
+                      type="text"
+                      placeholder="ระบุชื่อโปรแกรม/เว็บไซต์*"
+                      class="form-control information"
+                    />
+                  </div>
+                  <!-- ปุ่มเพิ่มสถานที่ -->
+                  <div class="form-group col-2 mx-0">
+                    <button type="button" @click="addApp" class="btn btn-secondary information">เพิ่มโปรแกรม</button>
+                  </div>
                 </div>
                 <div class="row my-4">
                   <!-- แสดงรายการสถานที่ -->
@@ -544,6 +562,7 @@
         placeName: "", 
         placePosition: "",
         placeAddress: "",
+        appName: "",
         place: "",       // เก็บค่าพิกัดที่เลือก
         places: [],
         selectedCategory: "", // หมวดวิชาที่เลือก
@@ -608,10 +627,17 @@
     }
   },
     methods: {
+    formatScore(score) {
+      const validScore = parseFloat(score);
+      if (isNaN(validScore)) {
+        return '0';
+      }
+      return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
+    },
       initGoogleMap() {
         const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย API Key จริงของคุณ
         const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places&language=th`;
         script.async = true;
         script.defer = true;
         window.initMap = this.setupGoogleMap;
@@ -791,6 +817,29 @@
 
       } else {
         alert("กรุณาระบุสถานที่สอนก่อน");
+      }
+    },
+    addApp() {
+      if (this.appName) {
+        let data = {
+            tutor_id: this.tutor_id,
+            placeName: this.appName,
+            address: "ออนไลน์",
+            position: "สอนออนไลน์"
+        };
+        axios
+          .post("http://localhost:3000/tutor/place/add", data)
+          .then((res) => {
+            this.places = res.data.places
+            this.appName = "";
+          })
+          .catch((err) => {
+            alert(err);
+            console.log(err)
+          });
+
+      } else {
+        alert("กรุณาระบุโปรแกราม/เว็บไซต์ก่อน");
       }
     },
     removePlace(location_id, index) {

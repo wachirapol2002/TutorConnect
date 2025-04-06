@@ -24,7 +24,7 @@ const usernameValidator = async (value) => {
         [value]
     )
     if (rows.length > 0) {
-        const message = ''
+        const message = 'ชื่อผู้ใช้นี้ถูกใช้งาน'
         throw new Joi.ValidationError(message, { message })
     }
     return value
@@ -57,7 +57,7 @@ router.get("/tutor/teacher/info", async function (req, res, next) {
         cond = [search]
       }
       sql += ` GROUP BY tutors.tutor_id 
-      ORDER BY tutors.rating_score DESC, tutors.revisit_score DESC;`;
+      ORDER BY tutors.rating_score DESC, tutors.teaching_count DESC, tutors.revisit_score DESC;`;
       const [rows, fields] = await pool.query(sql, cond);
       const processedRows = rows.map(row => {
         const subjectNames = row.subject_names ? row.subject_names.split(',') : [];
@@ -517,9 +517,7 @@ router.post("/tutor/place", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const tutor_id = req.body.tutor_id
-    let sql = `SELECT *
-            FROM locations
-            WHERE tutor_id=?`
+    let sql = `SELECT * FROM locations WHERE tutor_id=? ORDER BY address = "ออนไลน์" ASC, timestamp ASC`
     try {
 
         const [places] = await conn.query(
@@ -564,7 +562,7 @@ router.post("/tutor/place/add", async function (req, res, next) {
         )
         
         const [places] = await conn.query(
-            'SELECT * FROM locations WHERE tutor_id=?', 
+            'SELECT * FROM locations WHERE tutor_id=? ORDER BY address = "ออนไลน์" ASC, timestamp ASC', 
             [tutor_id]
         )
         conn.commit()
@@ -736,7 +734,7 @@ router.post("/tutor/student/register", async function (req, res, next) {
     try {
         const [registerStudents] = await conn.query(sql, [tutor_id])
         conn.commit()
-        res.status(200).json({'registerStudents': registerStudents})
+        res.status(200).json({'registerStudents': registerStudents, registerCounts: registerStudents.length})
     } catch (err) {
         conn.rollback()
         res.status(400).json(err.toString());

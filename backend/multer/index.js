@@ -7,7 +7,7 @@ const path = require('path');
 var storage = multer.diskStorage({
   destination: function (req, file, callback) {
     if (file.fieldname === 'portrait') {
-      callback(null, './static/portraits');  // สำหรับภาพโปรไฟล์
+      callback(null, './static/portraits');
     } else if (file.fieldname == 'document') {
       callback(null, './static/document');
     } else if (file.fieldname == 'selfie') {

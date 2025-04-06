@@ -50,13 +50,11 @@ io.on("connection", (socket) => {
   console.log(`🔥 User connected: ${socket.id}`);
 
 
-
   // เมื่อมีการเข้าห้องแชท
   socket.on("joinRoom", ({ user1, user2 }) => {
     const roomID = [user1, user2].sort().join("_"); // สร้าง ID ห้องจากผู้ใช้
     socket.join(roomID);
     console.log(`📢 ${user1} joined room: ${roomID}`);
-
   });
 
   // รับข้อความและส่งต่อไปห้องที่กำหนด
@@ -65,7 +63,6 @@ io.on("connection", (socket) => {
     console.log(`📩 Message from ${sender} to ${receiver}: ${message}`);
     console.log(roomID)
     
-
     io.to(roomID).emit("receiveMessage", { sender, receiver, message });
   });
 
@@ -74,8 +71,6 @@ io.on("connection", (socket) => {
     console.log(`❌ User disconnected: ${socket.id}`);
   });
 });
-
-
 
 server.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

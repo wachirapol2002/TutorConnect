@@ -24,22 +24,22 @@
                 >
               </div>
             </router-link>
-            <div>TutorConnect</div>
+            <div class="me-4">TutorConnect</div>
 
             <template v-if="!this.$cookies.isKey('account')">
               <router-link class="router-link mx-3" to="/tutor/register" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">สมัครติวเตอร์</div>
+                <div class="px-3 head-text">สมัครติวเตอร์</div>
               </router-link>
             </template>
             <template v-if="this.$cookies.isKey('account')">
                 <template v-if="this.$cookies.get('account').permission =='นักเรียน'">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">บัญชี: นักเรียน</div>
+                  <div class="permission-box px-3 head-text" :style="{backgroundColor: '#141414'}">นักเรียน</div>
               </template>
               <template v-if="this.$cookies.get('account').permission =='ติวเตอร์'">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">บัญชี: ติวเตอร์</div>
+                  <div class="permission-box px-3 head-text" :style="{backgroundColor: '#141414'}">ติวเตอร์</div>
               </template>
               <template v-if="this.$cookies.get('account').permission =='ผู้ดูแลระบบ'">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">บัญชี: ผู้ดูแลระบบ</div>
+                  <div class="permission-box px-3 head-text" :style="{backgroundColor: '#141414'}">ผู้ดูแลระบบ</div>
               </template>
             </template>
            
@@ -54,7 +54,7 @@
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">
+                  <div class="px-3 head-text">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
                     <span >&#9660;</span>
@@ -75,13 +75,13 @@
                 </ul>
               </div>
               <router-link class="router-link" to="/student/tutorlist" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">ติวเตอร์ที่เคยเรียน</div>
+                <div class="px-3 head-text">ติวเตอร์ที่เคยเรียน</div>
               </router-link>
               <router-link class="router-link" to="/student/announce" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">ลงประกาศ</div>
+                <div class="px-3 head-text">ลงประกาศ</div>
               </router-link>
               <router-link class="router-link" to="/" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">หาติวเตอร์</div>
+                <div class="px-3 head-text">หาติวเตอร์</div>
               </router-link>
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
                 <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
@@ -103,7 +103,7 @@
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">
+                  <div class="px-3 head-text">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
                     <span >&#9660;</span>
@@ -129,18 +129,26 @@
 
               <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์' && this.$cookies.get('account').tutor_status=='พร้อมสอน'">
                 <router-link class="router-link" to="/tutor/studentlist" :class="center" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">นักเรียนที่เคยสอน</div>
+                  <div class="px-3 head-text">นักเรียนที่เคยสอน</div>
                 </router-link>
                 <router-link class="router-link" to="/tutor/enroll" :class="center" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">ผู้สมัครเรียน</div>
+                  <div class="px-3 head-text" :class="center">
+                    ผู้สมัครเรียน
+                    <div v-if="register_count != 0" class="num-box ms-1 px-2" :class="center"
+                    style="width: auto; height: auto;"
+                    :style="{fontSize: '1.25vw'}"
+                    >
+                    {{ register_count }}
+                    </div>
+                  </div>
                 </router-link>
                 <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">หางาน</div>
+                  <div class="px-3 head-text">หางาน</div>
                 </router-link>
               </template>
 
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
-                  <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
+                  <div class="px-3 head-text" :class="center">
                     ข้อความ
                     <div v-if="unread_messages != 0" class="num-box ms-1 px-2" :class="center"
                     style="width: auto; height: auto;"
@@ -153,7 +161,7 @@
 
               <template v-if="this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์' && (this.$cookies.get('account').tutor_status=='สมัครติวเตอร์' || this.$cookies.get('account').tutor_status=='รอตรวจสอบ')">
                 <router-link class="router-link" to="/tutor/verify" :class="center" style="text-decoration: none; color: white;">
-                    <div class="px-3" :style="{fontSize: '1.5vw'}">ยืนยันตัวตน</div>
+                    <div class="px-3 head-text">ยืนยันตัวตน</div>
                 </router-link>
               </template>
 
@@ -167,7 +175,7 @@
               </div>
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
-                  <div class="px-3" :style="{fontSize: '1.5vw'}">
+                  <div class="px-3 head-text">
                     <font-awesome-icon icon="user" class="me-1" style="font-size: 1.5rem; color: white;" />
                     {{ this.$cookies.get('account').username }}
                     <span >&#9660;</span>
@@ -191,7 +199,7 @@
 
               <div class="dropdown">
                 <div class="router-link" :class="center" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="text-decoration: none; color: white;">
-                  <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
+                  <div class="px-3 head-text" :class="center">
                     จัดการบัญชี <span >&#9660;</span>
                 </div>
                 </div>
@@ -212,13 +220,13 @@
 
 
               <router-link class="router-link" to="/tutor/announce" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">ดูประกาศ</div>
+                <div class="px-3 head-text">ดูประกาศ</div>
               </router-link>
               <router-link class="router-link" to="/" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">ผู้สอนในระบบ</div>
+                <div class="px-3 head-text">ผู้สอนในระบบ</div>
               </router-link>
               <router-link class="router-link" to="/chat" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :class="center" :style="{fontSize: '1.5vw'}">
+                <div class="px-3 head-text" :class="center">
                   ข้อความ
                   <div v-if="unread_messages != 0" class="num-box ms-1 px-2" :class="center"
                     style="width: auto; height: auto;"
@@ -234,13 +242,13 @@
           <template v-if="!this.$cookies.isKey('account')">
             <div class="col-8 d-flex flex-row-reverse justify-content-start align-items-center">
               <router-link class="router-link  me-3" to="/login" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">เข้าสู่ระบบ</div>
+                <div class="px-3 head-text">เข้าสู่ระบบ</div>
               </router-link>
               <router-link class="router-link" to="/student/register" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">สมัครสมาชิก</div>
+                <div class="px-3 head-text">สมัครสมาชิก</div>
               </router-link>
               <router-link class="router-link" to="/" :class="center" style="text-decoration: none; color: white;">
-                <div class="px-3" :style="{fontSize: '1.5vw'}">หาติวเตอร์</div>
+                <div class="px-3 head-text">หาติวเตอร์</div>
               </router-link>
             </div>
           </template>
@@ -275,6 +283,7 @@ export default {
       mainColor: "#BC2C2C",
       unread_messages: 0,
       unverify_count: 0,
+      register_count: 0,
       center:{
           'd-flex': true,
           'justify-content-center':true,
@@ -283,12 +292,10 @@ export default {
     };
   },
   mounted() {
-    // this.unread_messages = this.$cookies.get("unread_messages") || 0;
-    // ตรวจสอบค่าจาก cookies ทุกๆ 3 วินาที
     this.startInterval();
   },
   beforeUnmount() {
-    this.stopInterval(); // หยุด interval เมื่อ component ถูกทำลาย
+    this.stopInterval();
   },
   watch: {
     unread_messages(newValue, oldValue) {
@@ -299,13 +306,14 @@ export default {
     startInterval() {
       this.intervalID = setInterval(() => {
         this.unReadCount();
-        this.verifyCount()
+        this.studiesRegisterCount()
+        this.verifyCount();
       }, 3000);
     },
     stopInterval() {
       if (this.intervalID) {
         clearInterval(this.intervalID);
-        this.intervalID = null; // ตั้งค่าให้เป็น null เพื่อป้องกันการ clear ซ้ำ
+        this.intervalID = null;
       }
     },
 
@@ -328,10 +336,6 @@ export default {
           alert(err.response.data.details.message);
         });   
       }
-      // const newCount = this.$cookies.get("unread_messages");
-      // if (newCount !== this.unread_messages) {
-      //   this.unread_messages = newCount;
-      // }
     },
     verifyCount() {
       if(this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ผู้ดูแลระบบ'){
@@ -344,7 +348,26 @@ export default {
         });   
       }
     },
+    studiesRegisterCount() {
+      if(this.$cookies.isKey('account') && this.$cookies.get('account').permission=='ติวเตอร์'){
+        const data = {
+            account_id: this.$cookies.get("account").account_id,
+          };
+        axios.post("http://localhost:3000/tutor/teacher/info/byAccount", data)
+          .then((res) => {
+              this.tutor_id = res.data.tutor.tutor_id
+              return axios.post("http://localhost:3000/tutor/student/register", { tutor_id: this.tutor_id });
+          })  
+          .then((res) => {
+              this.register_count = res.data.registerCounts;
+          })
+          .catch((err) => {
+            alert(err.response.data.details.message);
+          });   
+      }
+    },
   },
+  
 };
 </script>
 <style>
@@ -357,6 +380,9 @@ export default {
 * {
   margin: 0;
   padding: 0;
+}
+.head-text{
+  font-size: clamp(10px, 1.5vw, 1.5vw);
 }
 .router-link{
   transition: transform 0.2s ease;
@@ -394,8 +420,10 @@ export default {
   align-items: center;
 }
 .profile-img {
-  width: 100%;   /* ทำให้รูปขยายเต็มขนาดของ div */
-  height: 100%;  /* ทำให้รูปเต็มขนาดของ div */
+  width: 3vw; /* ขนาดไอคอน */
+  height: 3vw;
+  min-width: 40px;
+  min-height: 40px;
   object-fit: cover; /* ป้องกันภาพบิดเบี้ยว และครอบรูปให้อยู่ในกรอบ */
 }
 .num-box {
@@ -403,5 +431,9 @@ export default {
   color: black;
   border-radius: 8px;
   border: 2px solid black;
+}
+.permission-box{
+  border-radius: 8px;
+  border: 2px solid gray ; /* กรอบ */
 }
 </style>

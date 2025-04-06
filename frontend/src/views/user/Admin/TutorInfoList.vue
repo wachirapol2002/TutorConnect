@@ -84,14 +84,14 @@
               <td>{{ tutor.username || '-'  }}</td>
               <td>{{ tutor.displayname || '-' }}</td>
     
-              <td class="text-center">{{ tutor.rating_score || '-' }}</td>
-              <td class="text-center">{{ tutor.revisit_score+"%" || '-' }}</td>
+              <td class="text-center">{{ formatScore(tutor.rating_score) || '-' }}</td>
+              <td class="text-center">{{ formatScore(tutor.revisit_score)+"%" || '-' }}</td>
               <td class="text-center">{{ tutor.teaching_count}}</td>
               <td class="text-center">{{ tutor.report_count}}</td>
               <td>
                 <router-link :to="'/admin/reportlist/?id='+ tutor.account_id" style="text-decoration: none;">
                   <div class="button bg-warning text-dark" style="border: 3px solid wheat;">
-                    ผู้รายงาน
+                    ข้อกล่าวหา
                   </div>
                 </router-link>
               </td>
@@ -318,6 +318,13 @@ export default {
   },
 
   methods: {
+    formatScore(score) {
+      const validScore = parseFloat(score);
+      if (isNaN(validScore)) {
+        return '0';
+      }
+      return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
+    },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;

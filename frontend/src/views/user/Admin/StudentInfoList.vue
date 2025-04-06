@@ -82,7 +82,7 @@
               <td>
                 <router-link :to="'/admin/reportlist/?id='+ student.account_id" style="text-decoration: none;">
                   <div class="button bg-warning text-dark">
-                    ผู้รายงาน
+                    ข้อกล่าวหา
                   </div>
                 </router-link>
               </td>
@@ -213,6 +213,13 @@ export default {
   },
 
   methods: {
+    formatScore(score) {
+      const validScore = parseFloat(score);
+      if (isNaN(validScore)) {
+        return '0';
+      }
+      return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
+    },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;

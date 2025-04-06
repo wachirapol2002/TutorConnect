@@ -26,11 +26,13 @@
         <!-- สถานทีสอน -->
          <!-- Map -->
          <label class="form-label" for="place">สถานที่สอน</label>
+         <div class="form-label mt-3" :style="{fontWeight: '500', fontSize: '1.2vw',}" for="onside">ออนไซต์</div>
          <div id="map" style="height: 60vh; width: 100%;"></div>
          <input id="placeInput" type="text" placeholder="ค้นหาสถานที่" class="form-control information" />
-        <div class="row my-4">
-          <!--ชื่อสถานที่ -->
-          <div class="form-group col-3 mx-0">
+          <!-- ออนไซต์ -->
+          <div class="row my-4">
+            <!--ชื่อสถานที่ -->
+            <div class="form-group col-3 mx-0">
               <input
                 v-model="placeName"
                 type="text"
@@ -38,7 +40,7 @@
                 class="form-control information"
               />
             </div>
-          <!-- พิกัดสถานที่ -->
+            <!-- พิกัดสถานที่ -->
             <div class="form-group col-6 mx-0 px-0">
               <input
                 v-model="placeAddress"
@@ -47,10 +49,26 @@
                 class="form-control information"
               />
             </div>
-   
             <!-- ปุ่มเพิ่มสถานที่ -->
-            <div class="form-group col-3 mx-0">
+            <div class="form-group col-2 mx-0">
               <button type="button" @click="addPlace" class="btn btn-secondary information">เพิ่มสถานที</button>
+            </div>
+          </div>
+          <!-- ออนไลน์ -->
+          <div class="form-label mt-3" :style="{fontWeight: '500', fontSize: '1.2vw',}" for="onside">ออนไลน์</div>
+          <div class="row my-4">
+            <!--ชื่อสถานที่ -->
+            <div class="form-group col-9 mx-0">
+              <input
+                v-model="appName"
+                type="text"
+                placeholder="ระบุชื่อโปรแกรม/เว็บไซต์*"
+                class="form-control information"
+              />
+            </div>
+            <!-- ปุ่มเพิ่มสถานที่ -->
+            <div class="form-group col-2 mx-0">
+              <button type="button" @click="addApp" class="btn btn-secondary information">เพิ่มโปรแกรม</button>
             </div>
         </div>
         <div class="row my-4">
@@ -272,7 +290,8 @@ export default {
       describe: this.$cookies.get("tutor") ? this.$cookies.get("tutor").description : "",
       map: null,       // เก็บอ็อบเจกต์แผนที่
       marker: null,    // เก็บตำแหน่ง Marker
-      placeName: "", 
+      placeName: "",
+      appName: "",
       placeAddress: "",
       placePosition: "",
       place: "",       // เก็บค่าพิกัดที่เลือก
@@ -319,7 +338,7 @@ export default {
     initGoogleMap() {
     const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย API Key จริงของคุณ
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places&language=th`;
     script.async = true;
     script.defer = true;
     window.initMap = this.setupGoogleMap;
@@ -450,6 +469,29 @@ export default {
 
       } else {
         alert("กรุณาระบุสถานที่สอนก่อน");
+      }
+    },
+    addApp() {
+      if (this.appName) {
+        let data = {
+            tutor_id: this.tutor_id,
+            placeName: this.appName,
+            address: "ออนไลน์",
+            position: "สอนออนไลน์"
+        };
+        axios
+          .post("http://localhost:3000/tutor/place/add", data)
+          .then((res) => {
+            this.places = res.data.places
+            this.appName = "";
+          })
+          .catch((err) => {
+            alert(err);
+            console.log(err)
+          });
+
+      } else {
+        alert("กรุณาระบุโปรแกราม/เว็บไซต์ก่อน");
       }
     },
     removePlace(location_id, index) {

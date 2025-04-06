@@ -3,55 +3,61 @@
 
 
       <!-- main categories -->
-        <div class="container-fluid p-5 d-flex flex-column my-categories" :style="{backgroundColor: '', height: '40vh', minWidth: '100vw' }">
+        <div class="container-fluid p-4 d-flex flex-column my-categories" :class="center" :style="{backgroundColor: '', height: '', minWidth: '100vw' }">
           <div class="row">
-            <div class="category rounded-4 px-2 mx-2" :style="{backgroundColor: Language}" @click="filterCategory('ภาษา')"
-            >
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2" :style="{backgroundColor: Language}" @click="filterCategory('ภาษา')">
               <img :src="require('@/assets/languages.png')" alt="ภาษา" class="category-icon m-2" />
               <span class="category-label m-1">ภาษา</span>
             </div>
-            <div class="category rounded-4 px-2 mx-2" :style="{backgroundColor: Education}" @click="filterCategory('วิชาการ')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2" :style="{backgroundColor: Education}" @click="filterCategory('วิชาการ')">
               <img :src="require('@/assets/education.png')" alt="วิชาการ" class="category-icon m-2" />
               <span class="category-label m-1">วิชาการ</span>
             </div>
-            <div class="category rounded-4 px-2 mx-2"  :style="{backgroundColor: Music}" @click="filterCategory('ดนตรี')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2"  :style="{backgroundColor: Music}" @click="filterCategory('ดนตรี')">
               <img :src="require('@/assets/musical.png')" alt="ดนตรี" class="category-icon m-2" />
               <span class="category-label m-1">ดนตรี</span>
             </div>
-            <div class="category rounded-4 px-2 mx-2"  :style="{backgroundColor: Sports}" @click="filterCategory('กีฬา')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2"  :style="{backgroundColor: Sports}" @click="filterCategory('กีฬา')">
               <img :src="require('@/assets/sports.png')" alt="กีฬา" class="category-icon m-2" />
               <span class="category-label m-1">กีฬา</span>
             </div>
-          </div>
-          <div class="row">
-            <div class="category rounded-4 px-2 mx-2"  :style="{backgroundColor: Computer}" @click="filterCategory('คอมพิวเตอร์')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2"  :style="{backgroundColor: Computer}" @click="filterCategory('คอมพิวเตอร์')">
               <img :src="require('@/assets/computer.png')" alt="คอมพิวเตอร์" class="category-icon m-2" />
               <span class="category-label m-1">คอมพิวเตอร์</span>
             </div>
-            <div class="category rounded-4 px-2 mx-2"  :style="{backgroundColor: LifeSkills}" @click="filterCategory('ทักษะชีวิต')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2"  :style="{backgroundColor: LifeSkills}" @click="filterCategory('ทักษะชีวิต')">
               <img :src="require('@/assets/life-skills.png')" alt="ทักษะชีวิต" class="category-icon m-2" />
               <span class="category-label m-1">ทักษะชีวิต</span>
             </div>
-            <div class="category rounded-4 px-2 mx-2"  :style="{backgroundColor: Development}" @click="filterCategory('พัฒนาวิชาชีพ')">
+            <div class="category rounded-4 px-2 py-2 mx-2 my-2"  :style="{backgroundColor: Development}" @click="filterCategory('พัฒนาวิชาชีพ')">
               <img :src="require('@/assets/development.png')" alt="พัฒนาวิชาชีพ" class="category-icon m-2" />
               <span class="category-label m-1">พัฒนาวิชาชีพ</span>
             </div>
           </div>
         </div>
 
-
-      <!-- subjects -->
-      <div class="container">
-        <div class="row">
-          <div 
-            class="col-12 col-sm-6 col-md-4 mb-3"
-            v-for="(subject, index) in subCategories" 
-            :key="index"
-          >
-            <div class="card shadow-sm" :class="{'bg-dark text-white': isSelected(subject)}">
-              <div class="card-body text-center">
-                <h5 class="card-title" 
-                @click="filterSubject(subject)">{{ subject }}</h5>
+      <div v-if="subCategories.length > 0">
+        <div class="container mb-3">
+          <input 
+            type="text" 
+            class="form-control card-text" 
+            placeholder="ค้นหาวิชา..." 
+            v-model="searchQuery"
+          />
+        </div> 
+        <!-- subjects -->
+        <div class="container">
+          <div class="row">
+            <div 
+              class="col-6 col-sm-6 col-md-4 mb-3"
+              v-for="(subject, index) in filteredSubjects" 
+              :key="index"
+            >
+              <div class="card shadow-sm" :class="{'bg-dark text-white': isSelected(subject)}">
+                <div class="card-body text-center">
+                  <div class="card-text" 
+                  @click="filterSubject(subject)">{{ subject }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -62,26 +68,26 @@
       <!-- filter -->
         <div :class=center class="flex-column mb-0" :style="{backgroundColor: '', height: 'auto', minWidth: '100vw' }">
           <div v-if="showfilter == false" class="filter rounded-4 px-2 my-4 button text-dark" :style="{backgroundColor: '#F8AE1E'}">
-                <div class="" :style="{fontWeight: 'bold', fontSize: '1.6vw',}" @click="morefilter()">เพิ่มฟิลเตอร์</div>
+                <div class="filter-text" :style="{fontWeight: 'bold',}" @click="morefilter()">เพิ่มฟิลเตอร์</div>
           </div>
           <div v-if="showfilter == true" class="filter rounded-4 px-2 my-4 button text-dark" :style="{backgroundColor: '#F8AE1E'}">
-                <div class="" :style="{fontWeight: 'bold', fontSize: '1.6vw',}" @click="hidefilter()">ซ่อนฟิลเตอร์</div>
+                <div class="filter-text" :style="{fontWeight: 'bold',}" @click="hidefilter()">ซ่อนฟิลเตอร์</div>
           </div>
             <!-- ฟิลเตอร์ -->
           <div v-if="showfilter == true" class="filter-container rounded-4 p-4 mb-5 shadow-lg" :style="{backgroundColor: 'white', height: 'auto', minWidth: '65vw' }">
             <!-- เพศผู้สอน -->
             <div class="filter-group mb-3 pb-3 border-bottom border-2" :style="{backgroundColor: '',}">
               <div class="filter-title mb-3">เพศผู้สอน</div>
-              <div class="filter-options d-flex justify-content-around" :style="{backgroundColor: ''}">
+              <div class="filter-options d-flex justify-content-center" :style="{backgroundColor: ''}">
                 <button
-                  class="filter-button rounded-4 mx-5 button text-dark"
+                  class="filter-button rounded-4 mx-5 px-3 button text-dark"
                   :class="{ selected: selectedGender.includes('ชาย') }"
                   @click="toggleGender('ชาย')"
                 >
                   ชาย
                 </button>
                 <button
-                  class="filter-button rounded-4 mx-5 button text-dark"
+                  class="filter-button rounded-4 mx-5 px-3 button text-dark"
                   :class="{ selected: selectedGender.includes('หญิง') }"
                   @click="toggleGender('หญิง')"
                 >
@@ -92,16 +98,16 @@
             <!-- สถานที่สอน -->
             <div class="filter-group mb-3 pb-3 border-bottom border-2">
               <div class="filter-title mb-3">สถานที่สอน</div>
-              <div class="filter-options d-flex justify-content-around" :style="{backgroundColor: ''}">
+              <div class="filter-options d-flex justify-content-center" :style="{backgroundColor: ''}">
                 <button
-                  class="filter-button rounded-4 mx-5 button text-dark"
+                  class="filter-button rounded-4 mx-5 px-3 button text-dark"
                   :class="{ selected: selectedPlace.includes('ออนไซต์') }"
                   @click="togglePlace('ออนไซต์')"
                 >
                   ออนไซต์
                 </button>
                 <button
-                  class="filter-button rounded-4 mx-5 button text-dark"
+                  class="filter-button rounded-4 mx-5 px-3 button text-dark"
                   :class="{ selected: selectedPlace.includes('ออนไลน์') }"
                   @click="togglePlace('ออนไลน์')"
                 >
@@ -147,7 +153,7 @@
         </div>
 
         <!-- Tutor -->
-        <div class="container py-4" style="background-color: #E5DBD9;">
+        <div v-if="tutors.length > 0" class="container py-4" style="background-color: #E5DBD9;">
           <div class="row justify-content-center g-3">
             <div class="col-md-4" v-for="(tutor, index) in filteredTutors" :key="index">
               <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">
@@ -166,10 +172,10 @@
                     
                     <!-- วิชา -->
                     <div class="mb-3">
-                      <span class="badge me-2 text-dark" 
+                      <span class="badge me-2 text-dark subject-text" 
                         v-for="(subject, index) in tutor.subject_names" 
                         :key="index" 
-                        :style="{backgroundColor: this.categoryColors[tutor.categories[index]]}"
+                        :style="{backgroundColor: this.categoryColors[tutor.categories?.[index]] ?? 'gray'}"
                       >
                         {{ subject }}
                       </span>
@@ -180,7 +186,11 @@
                     <div class="d-flex justify-content-center align-items-center gap-1">
                       <span v-for="star in Math.floor(tutor.rating_score)" :key="star" class="text-warning">★</span>
                       <span v-for="empty in (5 - Math.floor(tutor.rating_score))" :key="empty" class="text-secondary">★</span>
-                      <span class="ms-2 text-muted">{{ tutor.rating_score }}/5</span>
+                      <span class="ms-2 text-muted">{{ formatScore(tutor.rating_score) }}/5</span>
+                        <font-awesome-icon icon="chalkboard-teacher" class="text-primary mx-1" title="จำนวนครั้งที่สอน"/>
+                        <span>{{formatScore(tutor.teaching_count)}}</span>
+                        <font-awesome-icon icon="repeat" class="text-success mx-1" title="อัตราการกลับมาเรียนซ้ำ"/>
+                        <span>{{formatScore(tutor.revisit_score)}} %</span>
                     </div>
                   </div>
                 </div>
@@ -225,6 +235,7 @@
         Computer: "#C4B0E4",
         LifeSkills: "#B3D4E0",
         Development: "#F3BFC3",
+        searchQuery: "",
         subCategories: [
             // "คณิตศาสตร์",
             // "แคลคูลัส",
@@ -266,6 +277,13 @@
       },
       isSelected(subject) {
     return this.selectedSubjects.includes(subject);
+    },
+    formatScore(score) {
+      const validScore = parseFloat(score);
+      if (isNaN(validScore)) {
+        return '0';
+      }
+      return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
     },
       toggleGender(gender) {
       if (this.selectedGender.includes(gender)) {
@@ -331,6 +349,12 @@
     }
     },
     computed:{
+      filteredSubjects() {
+      const search = this.searchQuery.toLowerCase();
+      return this.subCategories.filter(subject =>
+        subject.toLowerCase().includes(search)
+      );
+    },
       filteredTutors() {
       return this.tutors.filter(tutor => 
         (!this.selectedCategory || tutor.categories.includes(this.selectedCategory)) && // หมวดหมู่
@@ -399,7 +423,7 @@
   border: 3px solid black; /* กรอบ */
   background-color: #f9f9f9; /* สีพื้นหลัง */
   width: auto; /* ขนาดกล่อง */
-  height: 12vh;
+  height: auto;
   text-align: center;
   transition: transform 0.2s;
 }
@@ -412,10 +436,12 @@
 .category-icon {
   width: 3vw; /* ขนาดไอคอน */
   height: 3vw;
+  min-width: 30px;
+  min-height: 30px;
 }
 
 .category-label {
-  font-size: 2vw;
+  font-size: clamp(16px, 2vw, 2vw);
   font-weight: bold;
   color: black; /* สีข้อความ */
 }
@@ -429,6 +455,9 @@
   width: auto; /* ขนาดกล่อง */
   height: 7vh;
   text-align: center;
+}
+.filter-text{
+  font-size: clamp(16px, 1.6vw, 25px);
 }
 
 .filter-container {
@@ -451,17 +480,16 @@
 
 .filter-title {
   font-weight: bold;
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 1.5vw);
 }
 
 .filter-options {
-  display: flex;
   width: 50%; /* ความกว้างของ filter-options ตาม container */
   height: 100%;
 }
 
 .filter-button {
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 1.5vw);
   width: auto; /* ขนาดกล่อง */
   height: auto;
   display: flex;
@@ -485,8 +513,9 @@
 }
 
 .price-box {
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 1.5vw);
   width: 6vw; /* ขนาดกล่อง */
+  min-width: 60px;
   height: 7vh;
   padding: 1vw;
   display: flex;
@@ -510,13 +539,13 @@
 
 .price-box-label{
   text-align: center;
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 1.5vw);
 }
 
 .range-label{
   width: 10vw;
   text-align: center;
-  font-size: 1.5vw;
+  font-size: clamp(16px, 1.5vw, 1.5vw);
 }
 
 .star-container {
@@ -536,6 +565,12 @@
 
 .card {
   transition: transform 0.2s;
+}
+.card-text{
+  font-size: clamp(16px, 1vw, 1vw);
+}
+.subject-text{
+  font-size: 12px;
 }
 .card:hover {
   transform: scale(1.05);

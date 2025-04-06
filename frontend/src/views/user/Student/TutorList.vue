@@ -31,7 +31,7 @@
                         <div class="ms-3">
                             <span v-for="star in Math.floor(tutor.rating_score)" :key="star" class="text-warning" :style="{ fontSize: '2vw' }">★</span>
                             <span v-for="empty in (5 - Math.floor(tutor.rating_score))" :key="empty" class="text-secondary" :style="{ fontSize: '2vw' }">★</span>
-                            <small class="ms-1" :style="{ fontSize: '2vw' }">{{ tutor.rating_score}}/5</small>
+                            <small class="ms-1" :style="{ fontSize: '2vw' }">{{ formatScore(tutor.rating_score)}}/5</small>
                         </div>
                       </div>
                       <div class="form-group col-4 d-flex" :style="{ backgroundColor: '' }">
@@ -160,6 +160,13 @@
       this.getTutors()
     },
     methods: {
+    formatScore(score) {
+      const validScore = parseFloat(score);
+      if (isNaN(validScore)) {
+        return '0';
+      }
+      return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
+    },
     getTutors() {
         const data = {
             account_id: this.$cookies.get("account").account_id,

@@ -2,7 +2,7 @@
     <div id="app">
       <div class="fw-bold text-center my-4">
         <img
-          :src="require('@/assets/logo.png')" class="my-3"
+          :src="require('@/assets/logo.png')" class="my-0"
           style="max-height:10vh; width: auto; border-radius: 0%"
           
         />
@@ -223,6 +223,11 @@
               for="showpass"
               >Show Password</label
             >
+          </div>
+          <div class="row my-2">
+            <router-link to="/student/policy" style="text-decoration: none">
+              <label class="form-label">นโยบายการใช้งานสำหรับนักเรียน</label>
+            </router-link>
           </div>
 
 
