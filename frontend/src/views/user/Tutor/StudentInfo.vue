@@ -166,6 +166,12 @@
     },
     },
     mounted() {
+      const account = this.$cookies.get('account');
+      const allowedRoles = ['ติวเตอร์', 'ผู้ดูแลระบบ'];
+      
+      if (!account || !allowedRoles.includes(account.permission)) {
+        window.location.href = '/';
+      }
       this.initInfo()
     },
     methods: {

@@ -12,7 +12,7 @@
                 <!-- วิชา -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">วิชาที่ต้องการเรียน</div>
+                    <div class="mx-2">วิชาที่ต้องการเรียน*</div>
                   </div>
                   <div class="form-group col-8">
 
@@ -31,7 +31,7 @@
                 <!--สถานที่  -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">กำหนดสถานที่</div>
+                    <div class="mx-2">กำหนดสถานที่*</div>
                   </div>
                   <div class="form-group col-8">
    
@@ -49,7 +49,7 @@
                 <!--อายุ  -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">ช่วงอายุของผู้เรียน</div>
+                    <div class="mx-2">ช่วงอายุของผู้เรียน*</div>
                   </div>
                   <div class="form-group col-8">
                     <input v-model="age" class="form-control" :style="{ fontSize: '1.2vw' }" list="agesList" required  placeholder="อายุของผู้เรียน"/>
@@ -123,7 +123,7 @@
                 <!--รูปแบบการเรียน -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">รูปแบบการเรียน</div>
+                    <div class="mx-2">รูปแบบการเรียน*</div>
                   </div>
                   <div class="form-group col-8">
                     <select v-model="learning" class="form-control" :style="{ fontSize: '1.2vw' }" required>
@@ -143,7 +143,7 @@
                 <!--เริ่มเรียนได้ -->
                 <div class="row my-3" :class="center">
                   <div class="form-group col-4">
-                    <div class="mx-2">วันที่เริ่มเรียนได้</div>
+                    <div class="mx-2">วันที่เริ่มเรียนได้*</div>
                   </div>
                   <div class="form-group col-8">
                     <input

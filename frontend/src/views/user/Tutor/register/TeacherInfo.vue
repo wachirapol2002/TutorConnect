@@ -263,6 +263,10 @@ export default {
     }
 },
   mounted() {
+    const account = this.$cookies.get('account');
+      if (!account) {
+        window.location.href = '/login';
+      }
     this.teacherInfo()
   },
   methods: {

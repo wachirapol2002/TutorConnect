@@ -15,11 +15,13 @@
                   <section class="container mt-4">
                     <div class="content">
                       <div class="file d-flex flex-column justify-content-center align-items-end">
-                        <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
-                          <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
-                            style="width: 100%; height: 100%; object-fit: cover;"
-                          />
-                        </div>
+                        <router-link :to="'/tutor/profile/?id='+ tutor.tutor_id" style="text-decoration: none;">      
+                          <div :class="center" style="height:10vw; width: 10vw; background-color: white; border: 1px solid black; overflow: hidden;">     
+                            <img :src="'http://localhost:3000' + tutor.portrait_path || require('@/assets/user.png')" alt="โปรไฟล์" 
+                              style="width: 100%; height: 100%; object-fit: cover;"
+                            />
+                          </div>
+                        </router-link>
                       </div>
                     </div>
                   </section>
@@ -227,6 +229,10 @@ export default {
       },
   },
   mounted() {
+    const account = this.$cookies.get('account');
+    if (!account || account.permission !== 'ผู้ดูแลระบบ') {
+      window.location.href = '/';
+    }
     this.getTutors()
   },
   methods: {

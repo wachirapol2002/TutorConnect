@@ -281,11 +281,22 @@
           >
         </div>
 
-        <div class="row my-2">
-          <router-link to="/tutor/policy" style="text-decoration: none">
-            <label class="form-label">นโยบายการใช้งานสำหรับผู้สอน</label>
-          </router-link>
-        </div>
+        <div class="form-group form-check mt-2 mb-0">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="check"
+              v-model="policy"
+            />
+            <router-link to="/tutor/policy" style="text-decoration: none">
+              <label class="form-label">ข้าพเจ้ายอมรับเงื่อนไขและนโยบายการใช้งานสำหรัผู้สอน</label>
+            </router-link>
+              <template v-if="v$.policy.$error">
+                <p class="text-danger m-0 p-0" v-if="v$.policy.check.$invalid ">
+                  กรุณาแสดงความยินยอมต่อเงื่อนไขและนโยบายการใช้งาน
+                </p>
+              </template>
+          </div>
 
 
         <div class="form-group d-flex justify-content-center">
@@ -332,6 +343,10 @@ if (value.match(/[a-z]/) && value.match(/[A-Z]/) && value.match(/[0-9]/)) {
 return false;
 }
 
+function mustBeTrue(value) {
+  return value === true;
+}
+
 
 export default {
   name: "RegisterTutorPage",
@@ -350,6 +365,7 @@ export default {
       username: "",
       password: "",
       confirmPassword: "",
+      policy: false,
       email: "",
       phone: "",
       firstname: "",
@@ -410,9 +426,16 @@ export default {
       confirmPassword: {
         sameAs: sameAs(this.password),
       },
+      policy: {
+          check: mustBeTrue,
+      },
     }
   },
   mounted() {
+    const account = this.$cookies.get('account');
+      if (account) {
+        window.location.href = '/';
+      }
   },
   methods: {
     handleFileUpload(event) {

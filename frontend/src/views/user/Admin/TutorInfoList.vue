@@ -289,6 +289,10 @@ export default {
       },
   },
   mounted() {
+    const account = this.$cookies.get('account');
+    if (!account || account.permission !== 'ผู้ดูแลระบบ') {
+      window.location.href = '/';
+    }
     this.getTutors()
   },
   computed: {

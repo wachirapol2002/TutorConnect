@@ -338,6 +338,12 @@
   
   },
     mounted() {
+      const account = this.$cookies.get('account');
+      const allowedRoles = ['ติวเตอร์'];
+      
+      if (!account || !allowedRoles.includes(account.permission)) {
+        window.location.href = '/';
+      }
       this.initInfo()
     },
     computed: {
