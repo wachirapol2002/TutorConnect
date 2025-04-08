@@ -233,7 +233,7 @@
                 <div class="row">
                     <!-- รูปโปรไฟล์ -->
                     <div class="col-1">
-                      <img :src="'http://localhost:3000' + comment.portrait_path || require('@/assets/user.png')" 
+                      <img :src="'http://localhost:3000' + comment.portrait_path || require('@/assets/user.png')" @click="goToProfile(comment.account_id)" style="cursor: pointer;"
                           alt="โปรไฟล์" class="comment-img profile-img">
                     </div>
                     <!-- ข้อความความคิดเห็น -->
@@ -355,6 +355,12 @@
     }
   },
     methods: {
+    goToProfile(account_id) {
+      const account = this.$cookies.get('account');
+      if (account && (account.permission === 'ติวเตอร์' || account.permission === 'ผู้ดูแลระบบ')) {
+        this.$router.push({ name: 'StudentInfoPage', query: { id: account_id } });
+      }
+    },
     formatScore(score) {
       const validScore = parseFloat(score);
       if (isNaN(validScore)) {

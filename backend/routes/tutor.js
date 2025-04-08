@@ -935,7 +935,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const conn = await pool.getConnection()
     await conn.beginTransaction()
     const tutor_id = req.body.tutor_id
-    let sql = `SELECT comments.*, accounts.portrait_path, accounts.firstname, accounts.lastname
+    let sql = `SELECT comments.*, accounts.portrait_path, accounts.account_id, accounts.firstname, accounts.lastname
             FROM comments
             JOIN accounts ON comments.account_id = accounts.account_id
             WHERE comments.tutor_id=? ORDER BY comments.timestamp DESC`

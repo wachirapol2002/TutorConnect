@@ -358,18 +358,17 @@
         <div class="mt-5">
             <div class="fw-bold" style="font-size: 1.5rem;">ความคิดเห็นผู้เรียน</div>
             <div v-for="(comment, index) in comments" :key="comment.comment_id" class="comment-card p-4 py-3 my-4">
-                <div class="row">
+                  <div class="row">
                     <!-- รูปโปรไฟล์ -->
-                    <div class="col-1">
-                      <img :src="'http://localhost:3000' + comment.portrait_path || require('@/assets/user.png')" 
-                          alt="โปรไฟล์" class="comment-img profile-img">
-                    </div>
+                      <div class="col-1">
+                        <img :src="'http://localhost:3000' + comment.portrait_path || require('@/assets/user.png')" @click="goToProfile(comment.account_id)" style="cursor: pointer;"
+                            alt="โปรไฟล์" class="comment-img profile-img">
+                      </div>
                     <!-- ข้อความความคิดเห็น -->
-      
-                      <div class="col-11">
-                        <div class="comment-content p-0">
-                          <div class="row" style="font-size: 1.4vw;">
-                            <div class="d-flex justify-content-between align-items-center">
+                    <div class="col-11">
+                      <div class="comment-content p-0">
+                        <div class="row" style="font-size: 1.4vw;">
+                          <div class="d-flex justify-content-between align-items-center">
                             <div class="">
                               <strong class="comment-name">{{ comment.firstname }} {{ comment.lastname+" "+" " }}</strong>
                               {{ " "+formatTimestamp(comment.timestamp) }}
@@ -378,12 +377,12 @@
                                 ลบ
                             </button>
                           </div>
-                          </div>
-                          <div class="row comment-box mt-2 p-2" style="font-size: 1.2vw;">
-                            <div class="comment-text" v-html="formatText(comment.message)"></div>
-                          </div>    
                         </div>
-                      </div>
+                        <div class="row comment-box mt-2 p-2" style="font-size: 1.2vw;">
+                        <div class="comment-text" v-html="formatText(comment.message)"></div>
+                      </div>    
+                    </div>
+                  </div>
                 </div>
             </div>
         </div>
@@ -488,6 +487,12 @@
     }
   },
     methods: {
+    goToProfile(account_id) {
+      const account = this.$cookies.get('account');
+      if (account && (account.permission === 'ติวเตอร์' || account.permission === 'ผู้ดูแลระบบ')) {
+        this.$router.push({ name: 'StudentInfoPage', query: { id: account_id } });
+      }
+    },
     formatScore(score) {
       const validScore = parseFloat(score);
       if (isNaN(validScore)) {
