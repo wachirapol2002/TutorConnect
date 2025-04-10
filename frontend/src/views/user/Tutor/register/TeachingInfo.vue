@@ -331,16 +331,12 @@ export default {
       }
   },
   mounted() {
-    const account = this.$cookies.get('account');
-      if (!account) {
-        window.location.href = '/login';
-      }
     this.initGoogleMap();
     this.teacherInfo();
   },
   methods: {
     initGoogleMap() {
-    const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย API Key จริงของคุณ
+    const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย Google API Key
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places&language=th`;
     script.async = true;

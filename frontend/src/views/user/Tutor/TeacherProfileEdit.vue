@@ -641,7 +641,7 @@
       return validScore % 1 === 0 ? validScore.toFixed(0) : validScore.toFixed(1);
     },
       initGoogleMap() {
-        const apiKey = `AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU`; // แทนที่ด้วย API Key จริงของคุณ
+        const apiKey = "AIzaSyA3COn2lDxjeOm1IsKFTt_78770tHMGnAU"; // แทนที่ด้วย Google API Key
         const script = document.createElement("script");
         script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&libraries=places&language=th`;
         script.async = true;
