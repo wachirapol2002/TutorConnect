@@ -91,7 +91,7 @@ router.post('/student/subject/register', async (req, res, next) => {
     const subject_id = req.body.subject_id
     try {
         const [rows] = await conn.query(
-            `SELECT * FROM studys WHERE account_id = ? AND tutor_id = ? AND subject_id = ?`,
+            `SELECT * FROM studies WHERE account_id = ? AND tutor_id = ? AND subject_id = ?`,
             [account_id, tutor_id, subject_id]
         );
         if (rows.length > 0) {
@@ -100,7 +100,7 @@ router.post('/student/subject/register', async (req, res, next) => {
         } else {
             // หากไม่มีข้อมูลซ้ำ ให้ทำการ INSERT
             await conn.query(
-                `INSERT INTO studys(account_id, tutor_id, subject_id, status) VALUES (?, ?, ?, 'รออนุมัติ')`,
+                `INSERT INTO studies(account_id, tutor_id, subject_id, status) VALUES (?, ?, ?, 'รออนุมัติ')`,
                 [account_id, tutor_id, subject_id]
             );
             await conn.query(
@@ -154,13 +154,13 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
     const subject_id = req.body.subject_id
     try {
         const [rows] = await conn.query(
-            `SELECT * FROM studys WHERE study_id = ?`,
+            `SELECT * FROM studies WHERE study_id = ?`,
             [study_id]
         );
         if (rows.length > 0) {
             // หากมีข้อมูล
             await conn.query(
-                'DELETE FROM studys WHERE study_id = ?;',
+                'DELETE FROM studies WHERE study_id = ?;',
                 [study_id]
             );
             await conn.query(
@@ -213,19 +213,19 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
 
         let sql = `
         SELECT
-          studys.*,
+          studies.*,
           tutors.*,
           subjects.*,
           accounts.portrait_path,
           accounts.phone,
         GROUP_CONCAT(DISTINCT subjects.subject_name ORDER BY subjects.subject_id SEPARATOR ', ') AS subject_list,
         GROUP_CONCAT(DISTINCT subjects.category ORDER BY subjects.subject_id SEPARATOR ', ') AS category_list,
-        MIN(studys.approve_timestamp) AS first_approve_timestamp
-        FROM studys
-        JOIN tutors ON studys.tutor_id = tutors.tutor_id
-        JOIN subjects ON studys.subject_id = subjects.subject_id
+        MIN(studies.approve_timestamp) AS first_approve_timestamp
+        FROM studies
+        JOIN tutors ON studies.tutor_id = tutors.tutor_id
+        JOIN subjects ON studies.subject_id = subjects.subject_id
         JOIN accounts ON tutors.account_id = accounts.account_id
-        WHERE studys.account_id = ? AND studys.status = 'อนุมัติคำขอ'
+        WHERE studies.account_id = ? AND studies.status = 'อนุมัติคำขอ'
         GROUP BY tutors.tutor_id
         ORDER BY first_approve_timestamp DESC;
         `
@@ -257,10 +257,10 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
         const tutor_id = req.body.tutor_id
         const account_id = req.body.account_id
         let sql = `
-                SELECT subjects.*, tutors.displayname, studys.study_id, studys.status, studys.rating_study, studys.register_timestamp, studys.approve_timestamp
+                SELECT subjects.*, tutors.displayname, studies.study_id, studies.status, studies.rating_study, studies.register_timestamp, studies.approve_timestamp
                 FROM subjects
                 JOIN tutors ON subjects.tutor_id = tutors.tutor_id
-                LEFT JOIN studys ON subjects.subject_id = studys.subject_id AND studys.account_id = ?
+                LEFT JOIN studies ON subjects.subject_id = studies.subject_id AND studies.account_id = ?
                 WHERE subjects.tutor_id = ?
                 ORDER BY subjects.timestamp ASC
                 `
@@ -296,7 +296,7 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
         const tutor_id = req.body.tutor_id
         const account_id = req.body.account_id
         let sql = `
-        SELECT * FROM studys WHERE tutor_id = ? AND account_id= ? AND status = 'อนุมัติคำขอ'
+        SELECT * FROM studies WHERE tutor_id = ? AND account_id= ? AND status = 'อนุมัติคำขอ'
         `
         try {
             const [study] = await conn.query(sql, [tutor_id, account_id])
@@ -329,7 +329,7 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
         const study_id = req.body.study_id
         console.log(study_id)
         let sql = `
-        SELECT studys.rating_study FROM studys WHERE study_id = ?;
+        SELECT studies.rating_study FROM studies WHERE study_id = ?;
         `
         try {
             const [rating] = await conn.query(sql, [study_id])
@@ -367,11 +367,11 @@ router.post('/student/subject/cancelRegister', async (req, res, next) => {
             const subject_id = req.body.subject_id
             try {
                 await conn.query(
-                    'UPDATE studys SET rating_study = ? WHERE study_id = ?',
+                    'UPDATE studies SET rating_study = ? WHERE study_id = ?',
                     [rating, study_id]
                 );
                 await conn.query(
-                    'UPDATE subjects s SET s.rating_subject = (SELECT AVG(studys.rating_study) FROM studys WHERE studys.subject_id = ?) WHERE s.subject_id = ?',
+                    'UPDATE subjects s SET s.rating_subject = (SELECT AVG(studies.rating_study) FROM studies WHERE studies.subject_id = ?) WHERE s.subject_id = ?',
                     [subject_id, subject_id]
                 );
                 await conn.query(

@@ -6,6 +6,7 @@ const pool = mysql.createPool({
   password: '',
   database: 'tutorconnect',
   waitForConnections: true,
+  connectionLimit: 10,
   queueLimit: 0,
 });
 

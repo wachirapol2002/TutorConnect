@@ -712,7 +712,7 @@ router.post("/tutor/student/register", async function (req, res, next) {
     const tutor_id = req.body.tutor_id
     let sql = `
     SELECT
-      studys.*,
+      studies.*,
       accounts.portrait_path,
       accounts.username,
       accounts.permission,
@@ -725,11 +725,11 @@ router.post("/tutor/student/register", async function (req, res, next) {
       subjects.degree_level,
       subjects.subject_place,
       subjects.price
-    FROM studys
-    JOIN accounts ON studys.account_id = accounts.account_id
-    JOIN subjects ON studys.subject_id = subjects.subject_id
-    WHERE studys.tutor_id = ? AND studys.status = 'รออนุมัติ'
-    ORDER BY studys.register_timestamp ASC
+    FROM studies
+    JOIN accounts ON studies.account_id = accounts.account_id
+    JOIN subjects ON studies.subject_id = subjects.subject_id
+    WHERE studies.tutor_id = ? AND studies.status = 'รออนุมัติ'
+    ORDER BY studies.register_timestamp ASC
     `
     try {
         const [registerStudents] = await conn.query(sql, [tutor_id])
@@ -762,27 +762,27 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
     console.log(study_id)
     try {
         await conn.query(
-            `UPDATE studys SET status = 'อนุมัติคำขอ', approve_timestamp = NOW() WHERE study_id = ?;`,
+            `UPDATE studies SET status = 'อนุมัติคำขอ', approve_timestamp = NOW() WHERE study_id = ?;`,
             [study_id]
         )
-        const studys = await conn.query(
-            `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
+        const studies = await conn.query(
+            `SELECT subject_id, tutor_id, account_id FROM studies WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
             `UPDATE subjects SET student_count = student_count + 1 WHERE subject_id = ?;`,
-            [studys[0][0].subject_id]
+            [studies[0][0].subject_id]
         )
         await conn.query(
-            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
-            [studys[0][0].tutor_id, studys[0][0].tutor_id]
+            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studies s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
+            [studies[0][0].tutor_id, studies[0][0].tutor_id]
         )
 
         await conn.query(
             `INSERT INTO revisits (tutor_id, account_id, revisit_count)
-            VALUES (?, ?, (SELECT GREATEST(COUNT(*) - 1, 0) FROM studys WHERE tutor_id = ? AND account_id = ? AND status = 'อนุมัติคำขอ'))
+            VALUES (?, ?, (SELECT GREATEST(COUNT(*) - 1, 0) FROM studies WHERE tutor_id = ? AND account_id = ? AND status = 'อนุมัติคำขอ'))
             ON DUPLICATE KEY UPDATE revisit_count = VALUES(revisit_count);`,
-            [studys[0][0].tutor_id, studys[0][0].account_id, studys[0][0].tutor_id, studys[0][0].account_id]
+            [studies[0][0].tutor_id, studies[0][0].account_id, studies[0][0].tutor_id, studies[0][0].account_id]
         );
 
         await conn.query(
@@ -793,19 +793,19 @@ router.post("/tutor/enroll/accept", async function (req, res, next) {
                 WHERE tutor_id = ?
              ) 
              WHERE tutor_id = ?;`,
-            [studys[0][0].tutor_id, studys[0][0].tutor_id]
+            [studies[0][0].tutor_id, studies[0][0].tutor_id]
         );
 
 
-        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[studys[0][0].tutor_id])
-        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[studys[0][0].subject_id])
+        const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[studies[0][0].tutor_id])
+        const [subjectInfo] = await conn.query(`SELECT * FROM subjects WHERE subject_id = ?;`,[studies[0][0].subject_id])
 
         const tutorName = tutor[0].displayname
         const subjectName = subjectInfo[0].subject_name
 
         await conn.query(
             'INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);',
-            [sender_id, studys[0][0].account_id, "ตอบรับการสอน", "ผู้สอน "+tutorName+" ทำการตอบรับการสอนวิชา "+subjectName+" ของคุณ"]
+            [sender_id, studies[0][0].account_id, "ตอบรับการสอน", "ผู้สอน "+tutorName+" ทำการตอบรับการสอนวิชา "+subjectName+" ของคุณ"]
             )
         
         conn.commit()
@@ -836,7 +836,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const sender_id = req.body.sender_id
     try {
         const subject = await conn.query(
-            `SELECT subject_id, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
+            `SELECT subject_id, tutor_id, account_id FROM studies WHERE study_id = ?;`, 
             [study_id]
         )
         await conn.query(
@@ -844,7 +844,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
             [subject[0][0].subject_id]
         )
         await conn.query(
-            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studys s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
+            `UPDATE tutors SET teaching_count =  (SELECT COUNT(*) FROM studies s WHERE s.tutor_id = ? AND s.status = 'อนุมัติคำขอ') WHERE tutor_id = ?;`,
             [subject[0][0].tutor_id, subject[0][0].tutor_id]
         )
 
@@ -860,7 +860,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
             )
 
         await conn.query(
-            `DELETE FROM studys WHERE study_id = ?`,
+            `DELETE FROM studies WHERE study_id = ?`,
             [study_id]
         )
 
@@ -889,7 +889,7 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
     const tutor_id = req.body.tutor_id
     let sql = `
     SELECT
-      studys.*,
+      studies.*,
       accounts.portrait_path,
       accounts.username,
       accounts.permission,
@@ -902,11 +902,11 @@ router.post("/tutor/enroll/unaccept", async function (req, res, next) {
       subjects.degree_level,
       subjects.subject_place,
       subjects.price
-    FROM studys
-    JOIN accounts ON studys.account_id = accounts.account_id
-    JOIN subjects ON studys.subject_id = subjects.subject_id
-    WHERE studys.tutor_id = ? AND studys.status = 'อนุมัติคำขอ'
-    ORDER BY studys.approve_timestamp DESC
+    FROM studies
+    JOIN accounts ON studies.account_id = accounts.account_id
+    JOIN subjects ON studies.subject_id = subjects.subject_id
+    WHERE studies.tutor_id = ? AND studies.status = 'อนุมัติคำขอ'
+    ORDER BY studies.approve_timestamp DESC
     `
     try {
         const [students] = await conn.query(sql, [tutor_id])

@@ -465,7 +465,7 @@ router.post('/report', async (req, res, next) => {
 
         let sqlNotification = `INSERT INTO notifications (sender_id, account_id, type, message) VALUES (?, ?, ?, ?);`
         // const reporter = await conn.query(
-        //     `SELECT username, tutor_id, account_id FROM studys WHERE study_id = ?;`, 
+        //     `SELECT username, tutor_id, account_id FROM studies WHERE study_id = ?;`, 
         //     [study_id]
         // )
         // const [tutor] = await conn.query(`SELECT * FROM tutors WHERE tutor_id = ?`,[subject[0][0].tutor_id])
